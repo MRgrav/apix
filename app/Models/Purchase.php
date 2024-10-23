@@ -25,6 +25,7 @@ class Purchase extends Model
     // Relationship to Course
     public function course()
     {
-        return $this->belongsTo(Course::class);
+        return $this->belongsTo(Course::class, 'course_id');
     }
+
 }

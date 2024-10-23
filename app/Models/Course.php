@@ -61,6 +61,9 @@ public function trials()
 {
     return $this->hasMany(Trial::class);
 }
-
+public function studyMaterials()
+    {
+        return $this->hasMany(StudyMaterial::class);
+    }
 }
 

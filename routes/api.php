@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\StudyMaterialController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use \App\Http\Controllers\AuthController;
@@ -8,6 +9,7 @@ use App\Http\Controllers\WorkshopController;
 use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\CourseController;
 
+use App\Http\Controllers\VideoController;
 use App\Http\Controllers\CourseCategoryController;
 use App\Http\Controllers\SectionController;
 /*
@@ -27,7 +29,7 @@ Route::post('signin', [AuthController::class, 'signIn']);
 Route::post('verify', [AuthController::class, 'verifyPhoneOtp']);
 Route::post('resend-otp', [AuthController::class, 'resendOtp']);
 Route::post('reset-password', [AuthController::class, 'resetPassword']);
-
+Route::get('purchase', [CourseController::class, 'getPurchasedCourses'])->middleware('auth:sanctum');
 
 
 
@@ -58,6 +60,7 @@ Route::prefix('courses')->group(function() {
     Route::delete('/{id}', [CourseController::class, 'destroy']);
     Route::post('/content/{id}', [CourseController::class,'updateCourseContent']);
     Route::middleware('auth:sanctum')->post('/{id}/trial', [CourseController::class, 'startTrial']);
+    Route::middleware('auth:sanctum')->post('/buy', [CourseController::class, 'confirmPayment']);
 
 });
 
@@ -81,3 +84,14 @@ Route::prefix('sections')->group(function() {
 Route::prefix('home')->group(function() {
     Route::get('/', [HomeController::class, 'index']);
 });
+Route::apiResource('materials', StudyMaterialController::class);
+
+
+Route::get('courses/{course_id}/videos', [VideoController::class, 'index']);
+Route::post('videos', [VideoController::class, 'store']);
+Route::get('videos/{id}', [VideoController::class, 'show']);
+Route::put('videos/{id}', [VideoController::class, 'update']);
+Route::delete('videos/{id}', [VideoController::class, 'destroy']);
+
+// Play a video (increments the play count)
+Route::post('videos/{id}/play', [VideoController::class, 'play']);

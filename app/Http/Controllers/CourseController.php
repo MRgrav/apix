@@ -214,33 +214,96 @@ public function createOrder(Request $request, $courseId)
 }
 public function confirmPayment(Request $request)
 {
+    // Log the incoming request data
+    Log::info('Incoming payment request', $request->all());
+
+    // Check and log the authentication status
+    if (auth()->check()) {
+        Log::info('User authenticated', ['user_id' => auth()->id()]);
+    } else {
+        Log::warning('User not authenticated');
+        return response()->json(['message' => 'User not authenticated'], 401);
+    }
+
+    // Validate the input data, including the amount
     $validatedData = $request->validate([
-        'razorpay_payment_id' => 'required|string',
-        'razorpay_order_id' => 'required|string',
-        'razorpay_signature' => 'required|string',
+        'course_id' => 'required|integer',
+        'amount' => 'required|numeric',  // Ensure amount is included and is numeric
+        'status'=>'required'
     ]);
 
-    $razorpay = new \Razorpay\Api\Api(env('RAZORPAY_KEY'), env('RAZORPAY_SECRET'));
-
-    $attributes = [
-        'razorpay_order_id' => $request->razorpay_order_id,
-        'razorpay_payment_id' => $request->razorpay_payment_id,
-        'razorpay_signature' => $request->razorpay_signature
-    ];
+    // For testing, we skip Razorpay verification and use dummy payment details
+    $dummyPaymentId = 'dummy_payment_id_' . uniqid();
 
     try {
-        $razorpay->utility->verifyPaymentSignature($attributes);
+        // Log before attempting to create the purchase
+        Log::info('Attempting to create a purchase for user', [
+            'user_id' => auth()->id(),
+            'course_id' => $request->course_id,
+            'payment_id' => $dummyPaymentId,
+            'amount' => $request->amount,
+            'status' => $request->status
+        ]);
 
         // Store purchase details in 'purchases' table
         Purchase::create([
             'user_id' => auth()->id(),
             'course_id' => $request->course_id,
-            'payment_id' => $request->razorpay_payment_id,
+            'payment_id' => $dummyPaymentId,  // Use dummy payment ID
+            'amount' => $request->amount,     // Save the amount as well
+            'status' => $request->status
         ]);
 
-        return response()->json(['message' => 'Payment successful, course purchased'], 200);
+        // Log the success of the purchase
+        Log::info('Purchase successful', [
+            'user_id' => auth()->id(),
+            'course_id' => $request->course_id,
+            'payment_id' => $dummyPaymentId,
+            'amount' => $request->amount,
+            'status' => $request->status
+        ]);
+
+        return response()->json(['message' => 'Payment successful, course purchased with dummy data'], 200);
     } catch (\Exception $e) {
-        return response()->json(['message' => 'Payment verification failed'], 400);
+        // Log the error message
+        Log::error('Purchase failed with error: ' . $e->getMessage());
+
+        return response()->json(['message' => 'Purchase failed, please try again'], 400);
+    }
+}
+public function getPurchasedCourses()
+{
+    if (auth()->check()) {
+        $userId = auth()->id();
+
+        // Fetch the purchased courses
+        $purchasedCourses = Purchase::where('user_id', $userId)
+            ->with('course')
+            ->get();
+
+        // Ensure course_id is correct and course exists
+        $courses = $purchasedCourses->map(function ($purchase) {
+            if ($purchase->course) {
+                return [
+                    'course_id' => $purchase->course->id,  // Ensure this is an integer
+                    'course_title' => $purchase->course->title,
+                    'course_description' => $purchase->course->description,
+                    'purchase_date' => $purchase->created_at->format('Y-m-d H:i:s'),
+                ];
+            }
+            return null; // Handle cases where the course doesn't exist
+        })->filter(); // Remove null entries
+
+        if ($courses->isEmpty()) {
+            return response()->json(['message' => 'No courses purchased yet'], 404);
+        }
+
+        return response()->json([
+            'message' => 'Purchased courses retrieved successfully',
+            'courses' => $courses,
+        ], 200);
+    } else {
+        return response()->json(['message' => 'User not authenticated'], 401);
     }
 }
 
