@@ -18,7 +18,7 @@ class Course extends Model
         'is_discount', 'discount_type', 'discount_price', 'discount_start_date', 'discount_end_date',
         'instructor_id', 'is_multiple_instructor', 'partner_instructors', 'is_free', 'level_id', 'status_id',
         'visibility_id', 'last_modified', 'rating', 'total_review', 'total_sales', 'course_duration', 'point',
-        'created_by', 'updated_by', 'deleted_by', 'live_class_link', 'pre_recorded_videos' // Fixed
+        'created_by', 'updated_by', 'deleted_by', 'live_class_link', 'pre_recorded_videos' , 'classes_id',// Fixed
     ];
 
     // Cast pre_recorded_videos to array

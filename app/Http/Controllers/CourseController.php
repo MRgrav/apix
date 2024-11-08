@@ -52,6 +52,7 @@ class CourseController extends Controller
         'course_category_id' => 'nullable|exists:course_categories,id',
         'instructor_id' => 'nullable|exists:users,id',
         'thumbnail' => 'required|file|mimes:jpeg,png,jpg,gif|max:2048', // Thumbnail validation
+        'classes_id' =>'required|string',
     ]);
 
     // Handle the thumbnail upload if it exists
