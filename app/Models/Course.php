@@ -65,5 +65,14 @@ public function studyMaterials()
     {
         return $this->hasMany(StudyMaterial::class);
     }
+    public function classes()
+{
+    return $this->belongsTo(classes::class);
+}
+public function groups()
+{
+    return $this->hasMany(Group::class);
+}
+
 }
 

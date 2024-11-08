@@ -26,29 +26,20 @@ class CourseController extends Controller
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-    $course = Course::with('category', 'sections', 'instructor')->findOrFail($id);
+        $course = Course::with('category', 'sections', 'instructor')->findOrFail($id);
 
-    // Check if user has an active trial for this course
-    $trial = $user->trials()->where('course_id', $id)->first();
+        // Check if user has purchased the course
+        $hasPurchased = $user->purchases()->where('course_id', $id)->exists();
 
-    if ($trial && !$trial->isActive()) {
-        return response()->json([
-            'message' => 'Your trial has ended. Please purchase the course to continue access.'
-        ], 403);
+        if (!$hasPurchased) {
+            return response()->json([
+                'message' => 'You need to purchase this course to access the content.'
+            ], 403);
+        }
+
+        // If the course is purchased, show the content
+        return response()->json($course, 200);
     }
-
-    // Check if user has purchased the course
-    $hasPurchased = $user->purchases()->where('course_id', $id)->exists();
-
-    if (!$hasPurchased && !$trial) {
-        return response()->json([
-            'message' => 'You need to start a trial or purchase this course to access the content.'
-        ], 403);
-    }
-
-    // If the trial is active or the course is purchased, show the content
-    return response()->json($course, 200);
-}
 
 
     public function store(Request $request)

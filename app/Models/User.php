@@ -53,6 +53,10 @@ public function purchases()
     {
         return $this->hasMany(Purchase::class);
     }
+    public function groups()
+    {
+        return $this->belongsToMany(Group::class, 'group_user');
+    }
 
 
 }

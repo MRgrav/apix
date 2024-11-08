@@ -51,7 +51,7 @@ class CertificateController extends Controller
 public function downloadCertificate($userId)
 {
     // Get the certificate for the user
-    $certificate = \App\Models\Certificate::where('user_id', $userId)->first();
+    $certificate = Certificate::where('user_id', $userId)->first();
 
     if (!$certificate) {
         return response()->json(['message' => 'Certificate not found'], 404);

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\ClassController;
 use App\Http\Controllers\StudyMaterialController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -8,10 +9,12 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\WorkshopController;
 use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\CourseController;
-
+use App\Http\Controllers\InstructorController;
 use App\Http\Controllers\VideoController;
 use App\Http\Controllers\CourseCategoryController;
 use App\Http\Controllers\SectionController;
+use App\Http\Controllers\GroupController;
+use App\Http\Controllers\TrialController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -28,7 +31,7 @@ Route::post('signup', [AuthController::class, 'signUp']);
 Route::post('signin', [AuthController::class, 'signIn']);
 Route::post('verify', [AuthController::class, 'verifyPhoneOtp']);
 Route::post('resend-otp', [AuthController::class, 'resendOtp']);
-Route::post('reset-password', [AuthController::class, 'resetPassword']);
+Route::post('reset', [AuthController::class, 'resetPassword']);
 Route::get('purchase', [CourseController::class, 'getPurchasedCourses'])->middleware('auth:sanctum');
 
 
@@ -49,7 +52,7 @@ Route::get('/certificates/{userId}', [CertificateController::class, 'getCertific
 
 
 
-
+Route::apiResource('classes', ClassController::class);
 
 
 Route::prefix('courses')->group(function() {
@@ -95,3 +98,25 @@ Route::delete('videos/{id}', [VideoController::class, 'destroy']);
 
 // Play a video (increments the play count)
 Route::post('videos/{id}/play', [VideoController::class, 'play']);
+
+
+
+Route::post('/groups/{courseId}', [GroupController::class, 'addGroup'])->middleware('auth:sanctum');
+Route::post('/groups/{groupId}/assign-user', [GroupController::class, 'assignUserToGroup']);
+
+
+
+
+Route::post('/instructors/assign', [InstructorController::class, 'assignInstructor']);
+Route::delete('/instructors/remove/{id}', [InstructorController::class, 'removeInstructor']);
+Route::get('/courses/{courseId}/instructors', [InstructorController::class, 'getInstructorsByCourse']);
+
+
+
+
+Route::prefix('trials')->group(function () {
+    Route::post('/{courseId}/start', [TrialController::class, 'startTrial']);
+    Route::get('/{courseId}/users', [TrialController::class, 'getTrialUsers']);
+    Route::post('/{courseId}/user/{userId}/set-link', [TrialController::class, 'setTrialLinkAndDescription']);
+    Route::get('/{courseId}/user/{userId}/get-link', [TrialController::class, 'getTrialLinkAndDescription']);
+});
