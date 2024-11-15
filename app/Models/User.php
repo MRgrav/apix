@@ -55,8 +55,11 @@ public function purchases()
     }
     public function groups()
     {
-        return $this->belongsToMany(Group::class, 'group_user');
+        return $this->belongsToMany(Group::class, 'group_user','user_id','group_id');
     }
-
+    public function purchasedCourses()
+    {
+        return $this->belongsToMany(Course::class, 'purchases', 'user_id', 'course_id');
+    }
 
 }

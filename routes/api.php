@@ -86,6 +86,9 @@ Route::prefix('sections')->group(function() {
 
 Route::prefix('home')->group(function() {
     Route::get('/', [HomeController::class, 'index']);
+    Route::get('/users/purchase', [HomeController::class, 'getPurchasedCoursesWithGroupVideos'])->middleware('auth:sanctum');
+
+
 });
 Route::apiResource('materials', StudyMaterialController::class);
 

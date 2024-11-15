@@ -73,6 +73,10 @@ public function groups()
 {
     return $this->hasMany(Group::class);
 }
+public function class()
+{
+    return $this->belongsTo(Classes::class, 'classes_id');
+}
 
 }
 

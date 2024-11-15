@@ -1,34 +1,36 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\Video;
+use App\Models\Group;
 use Illuminate\Http\Request;
 
 class VideoController extends Controller
 {
     /**
-     * Display a listing of videos for a specific course.
+     * Display a listing of videos for a specific course group.
      */
-    public function index($course_id)
+    public function index($group_id)
     {
-        $videos = Video::where('course_id', $course_id)->get();
+        $videos = Video::where('group_id', $group_id)->get();
         return response()->json($videos);
     }
 
     /**
-     * Store a new video.
+     * Store a new video for a course group.
      */
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'course_id' => 'required|exists:courses,id',
+            'group_id' => 'required|exists:groups,id', // Ensure the group exists
             'title' => 'required|string|max:255',
             'video' => 'required|file|mimes:mp4,mov,avi',
             'play_limit' => 'nullable|integer|min:1',
         ]);
 
         $video = new Video();
-        $video->course_id = $validatedData['course_id'];
+        $video->group_id = $validatedData['group_id'];
         $video->title = $validatedData['title'];
 
         if ($request->hasFile('video')) {
