@@ -39,4 +39,42 @@ class GroupController extends Controller
 
         return response()->json(['message' => 'User assigned to group successfully']);
     }
+    public function getAllGroups()
+    {
+        $groups = Group::with('users', 'course')->get();
+
+        return response()->json([
+            'message' => 'Groups retrieved successfully',
+            'groups' => $groups
+        ], 200);
+    }
+
+    // Method to get a group by ID
+    public function getGroup($groupId)
+    {
+        $group = Group::with('users')->find($groupId);
+
+        if (!$group) {
+            return response()->json(['message' => 'Group not found'], 404);
+        }
+
+        return response()->json([
+            'message' => 'Group retrieved successfully',
+            'group' => $group
+        ], 200);
+    }
+
+    // Method to delete a group by ID
+    public function deleteGroup($groupId)
+    {
+        $group = Group::find($groupId);
+
+        if (!$group) {
+            return response()->json(['message' => 'Group not found'], 404);
+        }
+
+        $group->delete();
+
+        return response()->json(['message' => 'Group deleted successfully'], 200);
+    }
 }

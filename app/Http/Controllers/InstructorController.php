@@ -51,4 +51,12 @@ class InstructorController extends Controller
             'instructors' => $instructors
         ]);
     }
+    public function getAllInstructors()
+    {
+        $instructors = Instructor::with(['user', 'course', 'group'])->get();
+
+        return response()->json([
+            'instructors' => $instructors
+        ]);
+    }
 }

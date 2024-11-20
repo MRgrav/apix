@@ -33,6 +33,8 @@ Route::post('verify', [AuthController::class, 'verifyPhoneOtp']);
 Route::post('resend-otp', [AuthController::class, 'resendOtp']);
 Route::post('reset', [AuthController::class, 'resetPassword']);
 Route::get('purchase', [CourseController::class, 'getPurchasedCourses'])->middleware('auth:sanctum');
+Route::get('/users', [AuthController::class, 'getAllUsers']); // Get all users
+Route::delete('/users/{id}', [AuthController::class, 'deleteUser']); // Delete a user by ID
 
 
 
@@ -106,6 +108,9 @@ Route::post('videos/{id}/play', [VideoController::class, 'play']);
 
 Route::post('/groups/{courseId}', [GroupController::class, 'addGroup'])->middleware('auth:sanctum');
 Route::post('/groups/{groupId}/assign-user', [GroupController::class, 'assignUserToGroup']);
+Route::get('/groups/{groupId}', [GroupController::class, 'getGroup']); // Get a group by ID
+Route::delete('/groups/{groupId}', [GroupController::class, 'deleteGroup']); // Delete a group by ID
+Route::get('/groups', [GroupController::class, 'getAllGroups']); // Get all groups
 
 
 
@@ -113,6 +118,7 @@ Route::post('/groups/{groupId}/assign-user', [GroupController::class, 'assignUse
 Route::post('/instructors/assign', [InstructorController::class, 'assignInstructor']);
 Route::delete('/instructors/remove/{id}', [InstructorController::class, 'removeInstructor']);
 Route::get('/courses/{courseId}/instructors', [InstructorController::class, 'getInstructorsByCourse']);
+Route::get('/instructors', [InstructorController::class, 'getAllInstructors']);
 
 
 

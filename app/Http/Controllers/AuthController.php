@@ -229,5 +229,30 @@ public function verifyPhoneOtp(Request $request)
             return $response->status(); // Return HTTP status code in case of failure
         }
     }
+    public function getAllUsers()
+    {
+        $users = User::all(); // Fetch all users
+
+        return response()->json([
+            'message' => 'Users retrieved successfully',
+            'users' => $users
+        ], 200);
+    }
+    public function deleteUser($id)
+    {
+        $user = User::find($id);
+
+        if (!$user) {
+            return response()->json([
+                'message' => 'User not found'
+            ], 404); // 404 Not Found
+        }
+
+        $user->delete();
+
+        return response()->json([
+            'message' => 'User deleted successfully'
+        ], 200); // 200 OK
+    }
 
 }
