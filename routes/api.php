@@ -105,13 +105,13 @@ Route::delete('videos/{id}', [VideoController::class, 'destroy']);
 Route::post('videos/{id}/play', [VideoController::class, 'play']);
 
 
-
-Route::post('/groups/{courseId}', [GroupController::class, 'addGroup'])->middleware('auth:sanctum');
-Route::post('/groups/{groupId}/assign-user', [GroupController::class, 'assignUserToGroup']);
-Route::get('/groups/{groupId}', [GroupController::class, 'getGroup']); // Get a group by ID
-Route::delete('/groups/{groupId}', [GroupController::class, 'deleteGroup']); // Delete a group by ID
-Route::get('/groups', [GroupController::class, 'getAllGroups']); // Get all groups
-
+Route::prefix('groups')->group(function () {
+Route::post('/{courseId}', [GroupController::class, 'addGroup'])->middleware('auth:sanctum');
+Route::post('/{groupId}/assign-user', [GroupController::class, 'assignUserToGroup']);
+Route::get('/{groupId}', [GroupController::class, 'getGroup']); // Get a group by ID
+Route::delete('/{groupId}', [GroupController::class, 'deleteGroup']); // Delete a group by ID
+Route::get('/', [GroupController::class, 'getAllGroups']); // Get all groups
+});
 
 
 
