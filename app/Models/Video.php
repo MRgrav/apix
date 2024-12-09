@@ -9,11 +9,11 @@ class Video extends Model
     use HasFactory;
 
     protected $fillable = [
-        'course_id',
+        'group_id',
         'title',
-        'video_path',
+        'video_link',
         'play_limit',
-        'times_played',
+       // 'times_played',
     ];
 
     public function course()
@@ -40,6 +40,10 @@ class Video extends Model
             return true;
         }
         return false;
+    }
+    public function group()
+    {
+        return $this->belongsTo(Group::class);
     }
 }
 

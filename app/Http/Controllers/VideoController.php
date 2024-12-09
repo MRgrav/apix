@@ -20,28 +20,37 @@ class VideoController extends Controller
     /**
      * Store a new video for a course group.
      */
-    public function store(Request $request)
-    {
+    /**
+ * Store a new video for a course group.
+ */
+public function store(Request $request)
+{
+    try {
         $validatedData = $request->validate([
+            'course_id' => 'required|exists:courses,id',
             'group_id' => 'required|exists:groups,id', // Ensure the group exists
             'title' => 'required|string|max:255',
-            'video' => 'required|file|mimes:mp4,mov,avi',
+            'video_link' => 'required|url', // Ensure the video link is a valid URL
             'play_limit' => 'nullable|integer|min:1',
         ]);
 
         $video = new Video();
         $video->group_id = $validatedData['group_id'];
+        $video->course_id = $validatedData['course_id'];
         $video->title = $validatedData['title'];
-
-        if ($request->hasFile('video')) {
-            $video->video_path = $request->file('video')->store('videos', 'public');
-        }
-
+        $video->video_path = $validatedData['video_link']; // Store the video link
         $video->play_limit = $validatedData['play_limit'] ?? 3; // Default to 3 plays if not provided
         $video->save();
 
-        return response()->json(['message' => 'Video uploaded successfully'], 201);
+        return response()->json(['message' => 'Video link saved successfully'], 201);
+    } catch (\Exception $e) {
+        \Log::error('Error saving video link: ' . $e->getMessage());
+        return response()->json([
+            'error' => 'An error occurred while saving the video link.',
+            'details' => $e->getMessage()
+        ], 500);
     }
+}
 
     /**
      * Display a specific video.

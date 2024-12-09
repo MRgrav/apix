@@ -15,6 +15,7 @@ use App\Http\Controllers\CourseCategoryController;
 use App\Http\Controllers\SectionController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\TrialController;
+use App\Http\Controllers\StudentController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -54,6 +55,9 @@ Route::get('/certificates/{userId}', [CertificateController::class, 'getCertific
 
 
 
+Route::post('/students', [StudentController::class, 'store']);
+
+
 Route::apiResource('classes', ClassController::class);
 
 
@@ -66,7 +70,6 @@ Route::prefix('courses')->group(function() {
     Route::post('/content/{id}', [CourseController::class,'updateCourseContent']);
     Route::middleware('auth:sanctum')->post('/{id}/trial', [CourseController::class, 'startTrial']);
     Route::middleware('auth:sanctum')->post('/buy', [CourseController::class, 'confirmPayment']);
-
 });
 
 Route::prefix('categories')->group(function() {
