@@ -56,6 +56,7 @@ Route::get('/certificates/{userId}', [CertificateController::class, 'getCertific
 
 
 Route::post('/students', [StudentController::class, 'store']);
+Route::get('/students', [StudentController::class, 'getAllStudents']);
 
 
 Route::apiResource('classes', ClassController::class);
