@@ -14,7 +14,8 @@ class CreateVideosTable extends Migration
     {
         Schema::create('videos', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('course_id')->constrained()->onDelete('cascade');
+            $table->unsignedBigInteger('course_id')->nullable();
+            // $table->foreignId('course_id')->constrained()->onDelete('cascade');
             $table->string('title');
             $table->string('video_path');
             $table->integer('play_limit')->default(3); // Default limit of 3 plays

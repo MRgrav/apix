@@ -10,9 +10,12 @@ return new class extends Migration
     {
         Schema::create('instructors', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Link to users table
-            $table->foreignId('course_id')->constrained()->onDelete('cascade');
-            $table->foreignId('group_id')->nullable()->constrained()->onDelete('cascade');
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->unsignedBigInteger('course_id')->nullable();
+            $table->unsignedBigInteger('group_id')->nullable();
+            // $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Link to users table
+            // $table->foreignId('course_id')->constrained()->onDelete('cascade');
+            // $table->foreignId('group_id')->nullable()->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }

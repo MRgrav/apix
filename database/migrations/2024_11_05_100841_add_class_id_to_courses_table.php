@@ -18,7 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('classes_id')->nullable()->after('id');
 
             // Set up the foreign key constraint
-            $table->foreign('classes_id')->references('id')->on('classes')->onDelete('cascade');
+            // $table->foreign('classes_id')->references('id')->on('classes')->onDelete('cascade');
         });
     }
 
@@ -31,7 +31,7 @@ return new class extends Migration
     {
         Schema::table('courses', function (Blueprint $table) {
             // Drop the foreign key constraint and the column
-            $table->dropForeign(['classes_id']);
+            // $table->dropForeign(['classes_id']);
             $table->dropColumn('classes_id');
         });
     }

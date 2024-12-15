@@ -13,14 +13,14 @@ return new class extends Migration
     {
         Schema::create('trials', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');
-            $table->unsignedBigInteger('course_id');
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->unsignedBigInteger('course_id')->nullable();
             $table->timestamp('trial_start')->nullable();
             $table->timestamp('trial_end')->nullable();
             $table->timestamps();
 
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('course_id')->references('id')->on('courses')->onDelete('cascade');
+            // $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            // $table->foreign('course_id')->references('id')->on('courses')->onDelete('cascade');
         });
     }
 

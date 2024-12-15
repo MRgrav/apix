@@ -16,7 +16,7 @@ class AddGroupIdToVideosTable extends Migration
         Schema::table('videos', function (Blueprint $table) {
             // Add the new group_id foreign key column
             $table->unsignedBigInteger('group_id')->nullable()->after('id');
-            $table->foreign('group_id')->references('id')->on('groups')->onDelete('cascade');
+            // $table->foreign('group_id')->references('id')->on('groups')->onDelete('cascade');
         });
     }
 
@@ -29,7 +29,7 @@ class AddGroupIdToVideosTable extends Migration
     {
         Schema::table('videos', function (Blueprint $table) {
             // Remove the group_id foreign key and column
-            $table->dropForeign(['group_id']);
+            // $table->dropForeign(['group_id']);
             $table->dropColumn('group_id');
         });
     }

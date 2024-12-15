@@ -10,10 +10,12 @@ return new class extends Migration
     {
         Schema::create('groups', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('course_id')->constrained('courses')->onDelete('cascade');
+            $table->unsignedBigInteger('course_id')->nullable();
+            // $table->foreignId('course_id')->constrained('courses')->onDelete('cascade');
             $table->string('name', 255); // Group name
             $table->string('description', 255)->nullable(); // Group description
-            $table->foreignId('created_by')->constrained('users')->onDelete('cascade'); // Admin/instructor who created the group
+            $table->unsignedBigInteger('created_by')->nullable();
+            // $table->foreignId('created_by')->constrained('users')->onDelete('cascade'); // Admin/instructor who created the group
             $table->timestamps();
         });
     }

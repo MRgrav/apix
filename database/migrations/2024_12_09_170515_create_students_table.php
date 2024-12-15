@@ -12,11 +12,11 @@ return new class extends Migration {
             $table->string('name');
             $table->integer('age');
             $table->string('class');
-            $table->string('skill_level');
+            $table->string('skill_level')->nullable();
             $table->string('subject');
             $table->string('contact_number');
             $table->string('whatsapp_number')->nullable();
-            $table->string('email')->unique();
+            $table->string('email');
             $table->text('address');
             $table->timestamps();
         });

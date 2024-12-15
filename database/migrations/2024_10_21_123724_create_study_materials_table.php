@@ -14,7 +14,8 @@ class CreateStudyMaterialsTable extends Migration
     {
         Schema::create('study_materials', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('course_id')->constrained()->onDelete('cascade');
+            $table->unsignedBigInteger('course_id')->nullable();
+            // $table->foreignId('course_id')->constrained()->onDelete('cascade');
             $table->string('photo')->nullable();
             $table->string('pdf')->nullable();
             $table->string('audio')->nullable();
