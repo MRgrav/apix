@@ -12,9 +12,9 @@ class StudentController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'age' => 'required|integer|min:1',
+            // 'age' => 'required|integer|min:1',
             'class' => 'required|string|max:50',
-            'skill_level' => 'string|max:50',
+            // 'skill_level' => 'string|max:50',
             'subject' => 'required|string|max:100',
             'contact_number' => 'required|string|max:15',
             'whatsapp_number' => 'nullable|string|max:15',
