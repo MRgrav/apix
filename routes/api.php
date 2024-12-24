@@ -16,6 +16,7 @@ use App\Http\Controllers\SectionController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\TrialController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\StatusController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -41,6 +42,10 @@ Route::delete('/users/{id}', [AuthController::class, 'deleteUser']); // Delete a
 
 //Route::get('/home', [HomeController::class, 'index']);
 
+
+
+Route::get('/statuses', [StatusController::class, 'index']); // Get all statuses
+Route::post('/statuses', [StatusController::class, 'store']); // Create a new status
 
 
 
