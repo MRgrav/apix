@@ -204,65 +204,98 @@ class CourseController extends Controller
 
 //     return response()->json(['order_id' => $order['id'], 'amount' => $course->price, 'currency' => 'INR'], 200);
 // }
-public function createOrder(Request $request, $courseId)
-{
-    try {
-        $course = Course::findOrFail($courseId);
 
-        $razorpay = new \Razorpay\Api\Api(env('RAZORPAY_KEY'), env('RAZORPAY_SECRET'));
+    /**
+     * Create an order for the course
+     *
+     * @param  Request  $request
+     * @param  int  $courseId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function createOrder(Request $request, $courseId)
+    {
+        try {
+            // Fetch the course details
+            $course = Course::findOrFail($courseId);
 
-        $order = $razorpay->order->create([
-            'receipt' => 'rcpt_' . auth()->id(),
-            'amount' => $course->price * 100, // Razorpay expects amount in paise
-            'currency' => 'INR',
-            'payment_capture' => 1 // Auto-capture
+            // Initialize Razorpay API
+            $razorpay = new Api(env('RAZORPAY_KEY'), env('RAZORPAY_SECRET'));
+
+            // Create an order for the course
+            $order = $razorpay->order->create([
+                'receipt' => 'rcpt_' . Auth::id(),
+                'amount' => $course->price * 100, // Razorpay expects amount in paise
+                'currency' => 'INR',
+                'payment_capture' => 1, // Auto-capture
+            ]);
+
+            // Return the order details
+            return response()->json([
+                'order_id' => $order['id'],
+                'amount' => $course->price,
+                'currency' => 'INR',
+            ], 200);
+
+        } catch (\Exception $e) {
+            Log::error('Razorpay Order Creation Failed: ' . $e->getMessage());
+            return response()->json(['message' => 'Failed to create order'], 500);
+        }
+    }
+    /**
+     * Confirm the payment status and save the purchase details
+     *
+     * @param  Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function confirmPayment(Request $request)
+    {
+        Log::info('Incoming payment request', $request->all());
+
+        // Validate the incoming request data
+        $validatedData = $request->validate([
+            'course_id' => 'required|integer',
+            'payment_id' => 'required|string',
+            'payment_signature' => 'required|string',
         ]);
 
-        return response()->json(['order_id' => $order['id'], 'amount' => $course->price, 'currency' => 'INR'], 200);
-    } catch (\Exception $e) {
-        Log::error('Razorpay Order Creation Failed: ' . $e->getMessage());
-        return response()->json(['message' => 'Failed to create order'], 500);
-    }
-}
-public function confirmPayment(Request $request)
-{
-    Log::info('Incoming payment request', $request->all());
+        try {
+            // Fetch the course details
+            $course = Course::findOrFail($validatedData['course_id']);
 
-    if (!auth()->check()) {
-        Log::warning('User not authenticated');
-        return response()->json(['message' => 'User not authenticated'], 401);
-    }
+            // Initialize Razorpay API
+            $razorpay = new Api(env('RAZORPAY_KEY'), env('RAZORPAY_SECRET'));
 
-    $validatedData = $request->validate([
-        'course_id' => 'required|integer',
-        'amount' => 'required|numeric',
-        'payment_id' => 'required|string',
-        'status' => 'required|string',
-    ]);
+            // Verify the payment signature
+            $attributes = [
+                'razorpay_order_id' => $request->razorpay_order_id,
+                'razorpay_payment_id' => $validatedData['payment_id'],
+                'razorpay_signature' => $validatedData['payment_signature'],
+            ];
 
-    try {
-        $payment = $razorpay->payment->fetch($validatedData['payment_id']);
-        if ($payment->status === 'captured') {
+            $isValidSignature = $razorpay->utility->verifyPaymentSignature($attributes);
+            if (!$isValidSignature) {
+                return response()->json(['message' => 'Payment verification failed'], 400);
+            }
+
+            // If the payment is valid, store the purchase details
             Purchase::create([
-                'user_id' => auth()->id(),
+                'user_id' => Auth::id(),
                 'course_id' => $validatedData['course_id'],
                 'payment_id' => $validatedData['payment_id'],
-                'amount' => $validatedData['amount'],
-                'status' => $validatedData['status'],
+                'amount' => $course->price,
+                'status' => 'success',
             ]);
 
             Log::info('Payment confirmed and purchase recorded', $validatedData);
 
             return response()->json(['message' => 'Payment successful'], 200);
-        } else {
-            Log::warning('Payment not captured', $validatedData);
-            return response()->json(['message' => 'Payment not captured'], 400);
+
+        } catch (\Exception $e) {
+            Log::error('Payment confirmation failed: ' . $e->getMessage());
+            return response()->json(['message' => 'Payment confirmation failed'], 500);
         }
-    } catch (\Exception $e) {
-        Log::error('Payment confirmation failed: ' . $e->getMessage());
-        return response()->json(['message' => 'Payment confirmation failed'], 500);
     }
-}
+
 // public function confirmPayment(Request $request)
 // {
 //     // Log the incoming request data
