@@ -189,80 +189,139 @@ class CourseController extends Controller
 
     return response()->json(['message' => 'Trial started successfully', 'trial' => $trial], 200);
 }
+// public function createOrder(Request $request, $courseId)
+// {
+//     $course = Course::findOrFail($courseId);
+
+//     $razorpay = new \Razorpay\Api\Api(env('RAZORPAY_KEY'), env('RAZORPAY_SECRET'));
+
+//     $order = $razorpay->order->create([
+//         'receipt' => 'rcpt_' . auth()->id(),
+//         'amount' => $course->price * 100, // Razorpay expects amount in paise
+//         'currency' => 'INR',
+//         'payment_capture' => 1 // Auto-capture
+//     ]);
+
+//     return response()->json(['order_id' => $order['id'], 'amount' => $course->price, 'currency' => 'INR'], 200);
+// }
 public function createOrder(Request $request, $courseId)
 {
-    $course = Course::findOrFail($courseId);
+    try {
+        $course = Course::findOrFail($courseId);
 
-    $razorpay = new \Razorpay\Api\Api(env('RAZORPAY_KEY'), env('RAZORPAY_SECRET'));
+        $razorpay = new \Razorpay\Api\Api(env('RAZORPAY_KEY'), env('RAZORPAY_SECRET'));
 
-    $order = $razorpay->order->create([
-        'receipt' => 'rcpt_' . auth()->id(),
-        'amount' => $course->price * 100, // Razorpay expects amount in paise
-        'currency' => 'INR',
-        'payment_capture' => 1 // Auto-capture
-    ]);
+        $order = $razorpay->order->create([
+            'receipt' => 'rcpt_' . auth()->id(),
+            'amount' => $course->price * 100, // Razorpay expects amount in paise
+            'currency' => 'INR',
+            'payment_capture' => 1 // Auto-capture
+        ]);
 
-    return response()->json(['order_id' => $order['id'], 'amount' => $course->price, 'currency' => 'INR'], 200);
+        return response()->json(['order_id' => $order['id'], 'amount' => $course->price, 'currency' => 'INR'], 200);
+    } catch (\Exception $e) {
+        Log::error('Razorpay Order Creation Failed: ' . $e->getMessage());
+        return response()->json(['message' => 'Failed to create order'], 500);
+    }
 }
 public function confirmPayment(Request $request)
 {
-    // Log the incoming request data
     Log::info('Incoming payment request', $request->all());
 
-    // Check and log the authentication status
-    if (auth()->check()) {
-        Log::info('User authenticated', ['user_id' => auth()->id()]);
-    } else {
+    if (!auth()->check()) {
         Log::warning('User not authenticated');
         return response()->json(['message' => 'User not authenticated'], 401);
     }
 
-    // Validate the input data, including the amount
     $validatedData = $request->validate([
         'course_id' => 'required|integer',
-        'amount' => 'required|numeric',  // Ensure amount is included and is numeric
-        'status'=>'required'
+        'amount' => 'required|numeric',
+        'payment_id' => 'required|string',
+        'status' => 'required|string',
     ]);
 
-    // For testing, we skip Razorpay verification and use dummy payment details
-    $dummyPaymentId = 'dummy_payment_id_' . uniqid();
-
     try {
-        // Log before attempting to create the purchase
-        Log::info('Attempting to create a purchase for user', [
-            'user_id' => auth()->id(),
-            'course_id' => $request->course_id,
-            'payment_id' => $dummyPaymentId,
-            'amount' => $request->amount,
-            'status' => $request->status
-        ]);
+        $payment = $razorpay->payment->fetch($validatedData['payment_id']);
+        if ($payment->status === 'captured') {
+            Purchase::create([
+                'user_id' => auth()->id(),
+                'course_id' => $validatedData['course_id'],
+                'payment_id' => $validatedData['payment_id'],
+                'amount' => $validatedData['amount'],
+                'status' => $validatedData['status'],
+            ]);
 
-        // Store purchase details in 'purchases' table
-        Purchase::create([
-            'user_id' => auth()->id(),
-            'course_id' => $request->course_id,
-            'payment_id' => $dummyPaymentId,  // Use dummy payment ID
-            'amount' => $request->amount,     // Save the amount as well
-            'status' => $request->status
-        ]);
+            Log::info('Payment confirmed and purchase recorded', $validatedData);
 
-        // Log the success of the purchase
-        Log::info('Purchase successful', [
-            'user_id' => auth()->id(),
-            'course_id' => $request->course_id,
-            'payment_id' => $dummyPaymentId,
-            'amount' => $request->amount,
-            'status' => $request->status
-        ]);
-
-        return response()->json(['message' => 'Payment successful, course purchased with dummy data'], 200);
+            return response()->json(['message' => 'Payment successful'], 200);
+        } else {
+            Log::warning('Payment not captured', $validatedData);
+            return response()->json(['message' => 'Payment not captured'], 400);
+        }
     } catch (\Exception $e) {
-        // Log the error message
-        Log::error('Purchase failed with error: ' . $e->getMessage());
-
-        return response()->json(['message' => 'Purchase failed, please try again'], 400);
+        Log::error('Payment confirmation failed: ' . $e->getMessage());
+        return response()->json(['message' => 'Payment confirmation failed'], 500);
     }
 }
+// public function confirmPayment(Request $request)
+// {
+//     // Log the incoming request data
+//     Log::info('Incoming payment request', $request->all());
+
+//     // Check and log the authentication status
+//     if (auth()->check()) {
+//         Log::info('User authenticated', ['user_id' => auth()->id()]);
+//     } else {
+//         Log::warning('User not authenticated');
+//         return response()->json(['message' => 'User not authenticated'], 401);
+//     }
+
+//     // Validate the input data, including the amount
+//     $validatedData = $request->validate([
+//         'course_id' => 'required|integer',
+//         'amount' => 'required|numeric',  // Ensure amount is included and is numeric
+//         'status'=>'required'
+//     ]);
+
+//     // For testing, we skip Razorpay verification and use dummy payment details
+//     $dummyPaymentId = 'dummy_payment_id_' . uniqid();
+
+//     try {
+//         // Log before attempting to create the purchase
+//         Log::info('Attempting to create a purchase for user', [
+//             'user_id' => auth()->id(),
+//             'course_id' => $request->course_id,
+//             'payment_id' => $dummyPaymentId,
+//             'amount' => $request->amount,
+//             'status' => $request->status
+//         ]);
+
+//         // Store purchase details in 'purchases' table
+//         Purchase::create([
+//             'user_id' => auth()->id(),
+//             'course_id' => $request->course_id,
+//             'payment_id' => $dummyPaymentId,  // Use dummy payment ID
+//             'amount' => $request->amount,     // Save the amount as well
+//             'status' => $request->status
+//         ]);
+
+//         // Log the success of the purchase
+//         Log::info('Purchase successful', [
+//             'user_id' => auth()->id(),
+//             'course_id' => $request->course_id,
+//             'payment_id' => $dummyPaymentId,
+//             'amount' => $request->amount,
+//             'status' => $request->status
+//         ]);
+
+//         return response()->json(['message' => 'Payment successful, course purchased with dummy data'], 200);
+//     } catch (\Exception $e) {
+//         // Log the error message
+//         Log::error('Purchase failed with error: ' . $e->getMessage());
+
+//         return response()->json(['message' => 'Purchase failed, please try again'], 400);
+//     }
+// }
 public function getPurchasedCourses()
 {
     if (auth()->check()) {
