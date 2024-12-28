@@ -24,56 +24,52 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'nullable|email|unique:users',
             'phone' => 'required|digits:10|unique:users',
+            'country_code' => 'required|string|max:5',
+            'is_nri' => 'required|boolean',
             'password' => 'required|string|min:6|confirmed',
         ]);
 
-        // Handle validation failure with 400 Bad Request status
         if ($validator->fails()) {
             Log::warning('Validation Failed:', $validator->errors()->toArray());
             return response()->json([
                 'message' => 'Validation failed. Please check your input.',
                 'errors' => $validator->errors()
-            ], 400);  // 400 Bad Request
+            ], 400);
         }
 
-        // Start a database transaction
         DB::beginTransaction();
         try {
-            // Create a new user
             $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
                 'phone' => $request->phone,
+                'country_code' => $request->country_code,
+                'is_nri' => $request->is_nri,
                 'password' => Hash::make($request->password),
-                'otp' => mt_rand(1000, 9999), // Generate OTP
+                'otp' => mt_rand(1000, 9999),
             ]);
 
-            // Send OTP to the user's phone
-            $this->sendSms($user->phone, $user->otp);
+            // Send OTP using country code and phone
+            $this->sendSms($user->country_code . $user->phone, $user->otp);
 
-            // Commit the transaction
             DB::commit();
 
-            // Log successful user creation
             Log::info('User registered successfully:', ['user_id' => $user->id]);
 
             return response()->json([
                 'message' => 'User registered successfully. Please verify your phone with the OTP sent.',
                 'user_id' => $user->id
-            ], 201);  // 201 Created
+            ], 201);
         } catch (\Exception $e) {
-            // Rollback the transaction in case of an error
             DB::rollBack();
-
-            // Log the exception details for debugging
-            Log::error('User registration failed:', ['error' => $e->getMessage(), 'stack' => $e->getTraceAsString()]);
-
+            Log::error('User registration failed:', ['error' => $e->getMessage()]);
             return response()->json([
                 'message' => 'Registration failed due to a server error. Please try again later.',
                 'error' => $e->getMessage()
-            ], 500);  // 500 Internal Server Error
+            ], 500);
         }
     }
+
     // Login a user
     public function signIn(Request $request)
     {
@@ -213,22 +209,21 @@ public function verifyPhoneOtp(Request $request)
             'authorization' => $apiKey,
             'Content-Type' => 'application/json',
         ])->post('https://www.fast2sms.com/dev/bulkV2', [
-            'route' => 'otp', // Set the route to 'otp'
-            'variables_values' => $otp, // Pass only the OTP (numeric value)
-            'numbers' => $phone, // Pass the recipient's phone number
+            'route' => 'otp',
+            'variables_values' => $otp,
+            'numbers' => $phone, 
         ]);
 
-        // Log the full response for debugging
-        \Log::info('Fast2SMS Response:', ['response' => $response->json()]);
+        Log::info('Fast2SMS Response:', ['response' => $response->json()]);
 
-        // Check if the request was successful
         if ($response->successful()) {
-            return $response->json(); // Return the full JSON response
+            return $response->json();
         } else {
-            \Log::error('Fast2SMS Error:', ['response' => $response->json()]);
-            return $response->status(); // Return HTTP status code in case of failure
+            Log::error('Fast2SMS Error:', ['response' => $response->json()]);
+            return $response->status();
         }
     }
+
     public function getAllUsers()
     {
         $users = User::all(); // Fetch all users

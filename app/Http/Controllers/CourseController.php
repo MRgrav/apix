@@ -192,18 +192,37 @@ class CourseController extends Controller
 public function createOrder(Request $request, $courseId)
 {
     $course = Course::findOrFail($courseId);
+    $user = auth()->user(); // Get the authenticated user
+
+
+    if ($user->is_nri) {
+        $currency = 'USD';
+        $price = $course->price_in_usd;
+    } else {
+        $currency = 'INR';
+        $price = $course->price;
+    }
+
+
+    $amount = $price * 100;
+
 
     $razorpay = new \Razorpay\Api\Api(env('RAZORPAY_KEY'), env('RAZORPAY_SECRET'));
 
     $order = $razorpay->order->create([
         'receipt' => 'rcpt_' . auth()->id(),
-        'amount' => $course->price * 100, // Razorpay expects amount in paise
-        'currency' => 'INR',
+        'amount' => $amount, // Amount in smallest unit
+        'currency' => $currency,
         'payment_capture' => 1 // Auto-capture
     ]);
 
-    return response()->json(['order_id' => $order['id'], 'amount' => $course->price, 'currency' => 'INR'], 200);
+    return response()->json([
+        'order_id' => $order['id'],
+        'amount' => $price,
+        'currency' => $currency
+    ], 200);
 }
+
 public function confirmPayment(Request $request)
 {
     // Log the incoming request data
