@@ -295,41 +295,41 @@ class CourseController extends Controller
     }
 
 
-public function getPurchasedCourses()
-{
-    if (auth()->check()) {
-        $userId = auth()->id();
+    public function getPurchasedCourses()
+    {
+        if (auth()->check()) {
+            $userId = auth()->id();
 
-        // Fetch the purchased courses
-        $purchasedCourses = Purchase::where('user_id', $userId)
-            ->with('course')
-            ->get();
+            // Fetch the purchased courses
+            $purchasedCourses = Purchase::where('user_id', $userId)
+                ->with('course')
+                ->get();
 
-        // Ensure course_id is correct and course exists
-        $courses = $purchasedCourses->map(function ($purchase) {
-            if ($purchase->course) {
-                return [
-                    'course_id' => $purchase->course->id,  // Ensure this is an integer
-                    'course_title' => $purchase->course->title,
-                    'course_description' => $purchase->course->description,
-                    'purchase_date' => $purchase->created_at->format('Y-m-d H:i:s'),
-                ];
+            // Ensure course_id is correct and course exists
+            $courses = $purchasedCourses->map(function ($purchase) {
+                if ($purchase->course) {
+                    return [
+                        'course_id' => $purchase->course->id,  // Ensure this is an integer
+                        'course_title' => $purchase->course->title,
+                        'course_description' => $purchase->course->description,
+                        'purchase_date' => $purchase->created_at->format('Y-m-d H:i:s'),
+                    ];
+                }
+                return null; // Handle cases where the course doesn't exist
+            })->filter(); // Remove null entries
+
+            if ($courses->isEmpty()) {
+                return response()->json(['message' => 'No courses purchased yet'], 404);
             }
-            return null; // Handle cases where the course doesn't exist
-        })->filter(); // Remove null entries
 
-        if ($courses->isEmpty()) {
-            return response()->json(['message' => 'No courses purchased yet'], 404);
+            return response()->json([
+                'message' => 'Purchased courses retrieved successfully',
+                'courses' => $courses,
+            ], 200);
+        } else {
+            return response()->json(['message' => 'User not authenticated'], 401);
         }
-
-        return response()->json([
-            'message' => 'Purchased courses retrieved successfully',
-            'courses' => $courses,
-        ], 200);
-    } else {
-        return response()->json(['message' => 'User not authenticated'], 401);
     }
-}
 
 
 }

@@ -1,0 +1,92 @@
+// public function createOrder(Request $request, $courseId)
+// {
+//     $course = Course::findOrFail($courseId);
+=======
+public function createOrder(Request $request, $courseId)
+{
+    $course = Course::findOrFail($courseId);
+    $user = auth()->user(); // Get the authenticated user
+
+
+    if ($user->is_nri) {
+        $currency = 'USD';
+        $price = $course->price_in_usd;
+    } else {
+        $currency = 'INR';
+        $price = $course->price;
+    }
+
+
+    $amount = $price * 100;
+
+>>>>>>> upstream/main
+
+//     $razorpay = new \Razorpay\Api\Api(env('RAZORPAY_KEY'), env('RAZORPAY_SECRET'));
+
+<<<<<<< HEAD
+//     $order = $razorpay->order->create([
+//         'receipt' => 'rcpt_' . auth()->id(),
+//         'amount' => $course->price * 100, // Razorpay expects amount in paise
+//         'currency' => 'INR',
+//         'payment_capture' => 1 // Auto-capture
+//     ]);
+
+//     return response()->json(['order_id' => $order['id'], 'amount' => $course->price, 'currency' => 'INR'], 200);
+// }
+=======
+    $order = $razorpay->order->create([
+        'receipt' => 'rcpt_' . auth()->id(),
+        'amount' => $amount, // Amount in smallest unit
+        'currency' => $currency,
+        'payment_capture' => 1 // Auto-capture
+    ]);
+
+    return response()->json([
+        'order_id' => $order['id'],
+        'amount' => $price,
+        'currency' => $currency
+    ], 200);
+}
+
+public function confirmPayment(Request $request)
+{
+    // Log the incoming request data
+    Log::info('Incoming payment request', $request->all());
+>>>>>>> upstream/main
+
+    /**
+     * Create an order for the course
+     *
+     * @param  Request  $request
+     * @param  int  $courseId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function createOrder(Request $request, $courseId)
+    {
+        try {
+            // Fetch the course details
+            $course = Course::findOrFail($courseId);
+
+            // Initialize Razorpay API
+            $razorpay = new Api(env('RAZORPAY_KEY'), env('RAZORPAY_SECRET'));
+
+            // Create an order for the course
+            $order = $razorpay->order->create([
+                'receipt' => 'rcpt_' . Auth::id(),
+                'amount' => $course->price * 100, // Razorpay expects amount in paise
+                'currency' => 'INR',
+                'payment_capture' => 1, // Auto-capture
+            ]);
+
+            // Return the order details
+            return response()->json([
+                'order_id' => $order['id'],
+                'amount' => $course->price,
+                'currency' => 'INR',
+            ], 200);
+
+        } catch (\Exception $e) {
+            Log::error('Razorpay Order Creation Failed: ' . $e->getMessage());
+            return response()->json(['message' => 'Failed to create order'], 500);
+        }
+    }
