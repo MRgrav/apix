@@ -99,7 +99,7 @@ class AuthController extends Controller
                     'phone' => $user->phone,
                     'email' => $user->email,
                 ]
-            ], 200);
+            ], 200)->cookie('auth_token', $token, 60 * 24);
         }
 
         return response()->json(['error' => 'Invalid credentials'], 401);
