@@ -201,45 +201,38 @@ class CourseController extends Controller
      */
     public function createOrder(Request $request, $courseId)
     {
-        try {
-            // Fetch the course details
-            $course = Course::findOrFail($courseId);
+        $course = Course::findOrFail($courseId);
+        $user = auth()->user(); // Get the authenticated user
 
-            // Initialize Razorpay API
-            $razorpay = new Api(env('RAZORPAY_KEY'), env('RAZORPAY_SECRET'));
-
-            // Currency
-            if ($user->is_nri) {
-                $currency = 'USD';
-                $price = $course->price_in_usd;
-            } else {
-                $currency = 'INR';
-                $price = $course->price;
-            }
-
-            // price
-            $amount = $price * 100;
-
-            // Create an order for the course
-            $order = $razorpay->order->create([
-                'receipt' => 'rcpt_' . Auth::id(),
-                'amount' => $amount, // Amount in smallest unit
-                'currency' => $currency,
-                'payment_capture' => 1, // Auto-capture
-            ]);
-
-            // Return the order details
-            return response()->json([
-                'order_id' => $order['id'],
-                'amount' => $price,
-                'currency' => $currency
-            ], 200);
-
-        } catch (\Exception $e) {
-            Log::error('Razorpay Order Creation Failed: ' . $e->getMessage());
-            return response()->json(['message' => 'Failed to create order'], 500);
+        // Determine currency and price based on user's NRI status
+        if ($user->is_nri) {
+            $currency = 'USD';
+            $price = $course->price_in_usd; // Assuming you have a `price_in_usd` field in your Course model
+        } else {
+            $currency = 'INR';
+            $price = $course->price; // Assuming this is the price in INR
         }
+
+        // Convert price to the smallest unit (paise for INR, cents for USD)
+        $amount = $price * 100;
+
+        // Create order in Razorpay
+        $razorpay = new \Razorpay\Api\Api(env('RAZORPAY_KEY'), env('RAZORPAY_SECRET'));
+
+        $order = $razorpay->order->create([
+            'receipt' => 'rcpt_' . auth()->id(),
+            'amount' => $amount, // Amount in smallest unit
+            'currency' => $currency,
+            'payment_capture' => 1 // Auto-capture
+        ]);
+
+        return response()->json([
+            'order_id' => $order['id'],
+            'amount' => $price,
+            'currency' => $currency
+        ], 200);
     }
+
     /**
      * Confirm the payment status and save the purchase details
      *
