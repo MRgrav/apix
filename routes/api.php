@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\ClassController;
+use App\Http\Controllers\CoursePlanController;
 use App\Http\Controllers\StudyMaterialController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -132,10 +133,14 @@ Route::get('/instructors', [InstructorController::class, 'getAllInstructors']);
 
 
 
-
+//trails
 Route::prefix('trials')->group(function () {
     Route::post('/{courseId}/start', [TrialController::class, 'startTrial']);
     Route::get('/{courseId}/users', [TrialController::class, 'getTrialUsers']);
     Route::post('/{courseId}/user/{userId}/set-link', [TrialController::class, 'setTrialLinkAndDescription']);
     Route::get('/{courseId}/user/{userId}/get-link', [TrialController::class, 'getTrialLinkAndDescription']);
+//plans
+    Route::apiResource('course-plans', CoursePlanController::class);
+    Route::get('course-plans/nri-status', [CoursePlanController::class, 'getPlansByNriStatus']);
+
 });

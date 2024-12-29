@@ -7,6 +7,7 @@ use App\Models\Purchase;
 use App\Models\Trial;
 use App\Models\Uploads;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class CourseController extends Controller
@@ -252,6 +253,7 @@ class CourseController extends Controller
         // Validate the incoming request data
         $validatedData = $request->validate([
             'course_id' => 'required|integer',
+            'plan_id'=> 'required|integer',
             'payment_id' => 'required|string',
             'payment_signature' => 'required|string',
         ]);
@@ -280,6 +282,7 @@ class CourseController extends Controller
                 'user_id' => Auth::id(),
                 'course_id' => $validatedData['course_id'],
                 'payment_id' => $validatedData['payment_id'],
+                'plan_id'=> $validatedData['required|integer'],
                 'amount' => $course->price,
                 'status' => 'success',
             ]);
