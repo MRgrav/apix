@@ -234,7 +234,7 @@ class CourseController extends Controller
 
         return response()->json([
             'order_id' => $order['id'],
-            'amount' => $price,
+            'amount' => $amount,
             'currency' => $currency
         ], 200);
     }
