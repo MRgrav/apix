@@ -213,7 +213,7 @@ class CourseController extends Controller
 
         // Determine currency and price
         // Safely cast is_nri to boolean
-        $isNri = filter_var($user->is_nri, FILTER_VALIDATE_BOOLEAN);
+        // $isNri = filter_var($user->is_nri, FILTER_VALIDATE_BOOLEAN);
         
         // Set currency and price
         // $currency = $isNri ? 'USD' : 'INR';
