@@ -212,7 +212,7 @@ class CourseController extends Controller
         }
 
         // Determine currency and price based on user's NRI status
-        if ($user->is_nri) {
+        if ($user->is_nri===true) {
             $currency = 'USD';
             $price = $course->price; // Assuming you have a `price_in_usd` field in your Course model
         } else {
