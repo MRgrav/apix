@@ -202,12 +202,19 @@ class CourseController extends Controller
     public function createOrder(Request $request, $courseId)
     {
         $course = Course::findOrFail($courseId);
+        if (!$course) {
+            return response()->json(['error' => 'Course not found'], 404);
+        }
         $user = auth()->user(); // Get the authenticated user
+        // Ensure the user has the 'is_nri' property
+        if (!isset($user->is_nri)) {
+            return response()->json(['error' => 'User NRI status is not set'], 400);
+        }
 
         // Determine currency and price based on user's NRI status
         if ($user->is_nri) {
             $currency = 'USD';
-            $price = $course->price_in_usd; // Assuming you have a `price_in_usd` field in your Course model
+            $price = $course->price; // Assuming you have a `price_in_usd` field in your Course model
         } else {
             $currency = 'INR';
             $price = $course->price; // Assuming this is the price in INR
