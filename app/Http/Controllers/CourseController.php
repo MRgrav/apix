@@ -216,7 +216,8 @@ class CourseController extends Controller
         $isNri = filter_var($user->is_nri, FILTER_VALIDATE_BOOLEAN);
         
         // Set currency and price
-        $currency = $isNri ? 'USD' : 'INR';
+        // $currency = $isNri ? 'USD' : 'INR';
+        $currency = 'INR';
 
         // Convert price to the smallest unit (paise for INR, cents for USD)
         $amount = $price * 100;
