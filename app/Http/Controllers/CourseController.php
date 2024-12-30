@@ -206,19 +206,13 @@ class CourseController extends Controller
             return response()->json(['error' => 'Course not found'], 404);
         }
         $user = auth()->user(); // Get the authenticated user
-        // Ensure the user has the 'is_nri' property
-        if (!($user->is_nri===true || $user->is_nri===false)) {
-            return response()->json(['error' => 'User NRI status is not set','user'=>$user], 400);
-        }
 
-        // Determine currency and price based on user's NRI status
-        if ($user->is_nri===true) {
-            $currency = 'USD';
-            $price = $course->price; // Assuming you have a `price_in_usd` field in your Course model
-        } else {
-            $currency = 'INR';
-            $price = $course->price; // Assuming this is the price in INR
-        }
+        // Convert is_nri to boolean explicitly and add debugging
+        $isNri = (bool) $user->is_nri;
+        \Log::info('User NRI status:', ['user_id' => $user->id, 'is_nri' => $isNri, 'raw_is_nri' => $user->is_nri]);
+
+        // Determine currency and price
+        $currency = $isNri ? 'USD' : 'INR';
 
         // Convert price to the smallest unit (paise for INR, cents for USD)
         $amount = $price * 100;
