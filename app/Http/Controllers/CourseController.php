@@ -208,11 +208,11 @@ class CourseController extends Controller
         $user = auth()->user(); // Get the authenticated user
 
         // Convert is_nri to boolean explicitly and add debugging
-        $isNri = (bool) $user->is_nri;
-        \Log::info('User NRI status:', ['user_id' => $user->id, 'is_nri' => $isNri, 'raw_is_nri' => $user->is_nri]);
+        // $isNri = (bool) $user->is_nri;
+        // \Log::info('User NRI status:', ['user_id' => $user->id, 'is_nri' => $isNri, 'raw_is_nri' => $user->is_nri]);
 
         // Determine currency and price
-        $currency = $isNri ? 'USD' : 'INR';
+        $currency = $user->is_nri===true ? 'USD' : 'INR';
 
         // Convert price to the smallest unit (paise for INR, cents for USD)
         $amount = $price * 100;
