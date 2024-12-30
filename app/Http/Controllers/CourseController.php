@@ -220,7 +220,7 @@ class CourseController extends Controller
         $currency = 'INR';
 
         // Convert price to the smallest unit (paise for INR, cents for USD)
-        $amount = $price * 100;
+        $amount = 1 * 100;
 
         // Create order in Razorpay
         $razorpay = new \Razorpay\Api\Api(env('RAZORPAY_KEY'), env('RAZORPAY_SECRET'));
