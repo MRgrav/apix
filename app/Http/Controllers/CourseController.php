@@ -207,8 +207,8 @@ class CourseController extends Controller
         }
         $user = auth()->user(); // Get the authenticated user
         // Ensure the user has the 'is_nri' property
-        if (!isset($user->is_nri)) {
-            return response()->json(['error' => 'User NRI status is not set'], 400);
+        if (!($user->is_nri===true || $user->is_nri===false)) {
+            return response()->json(['error' => 'User NRI status is not set','user'=>$user], 400);
         }
 
         // Determine currency and price based on user's NRI status
