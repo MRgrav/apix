@@ -53,6 +53,18 @@ class CoursePlanController extends Controller
         return response()->json($coursePlan);
     }
 
+    public function coursePlans($id){
+        try {
+            //code...
+            $plans = CoursePlan::where('category',$id)->get();
+            return response()->json($plans, 200);
+        } catch (\Throwable $e) {
+            //throw $e;
+            Log::error("Plan error: ". $e->getMessage());
+            return response()->json(['message'=>'Something is wrong'], 200);
+        }
+    }
+
     /**
      * Update the specified resource in storage.
      *

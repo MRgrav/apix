@@ -44,7 +44,7 @@ class CourseController extends Controller
 
     public function getCourseDetailsById($id)
     {
-        $course = Course::with('category', 'sections', 'instructor')->findOrFail($id);
+        $course = Course::with('category', 'sections', 'instructor')->findOrFail($id)->first();
 
         if (!$course) {
             return response()->json([
