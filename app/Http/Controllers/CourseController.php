@@ -42,6 +42,20 @@ class CourseController extends Controller
         return response()->json($course, 200);
     }
 
+    public function getCourseDetailsById($id)
+    {
+        $course = Course::with('category', 'sections', 'instructor')->findOrFail($id);
+
+        if (!$course) {
+            return response()->json([
+                'message' => 'Course not found.'
+            ], 404);
+        }
+
+        // If the course is purchased, show the content
+        return response()->json($course, 200);
+    }
+
 
     public function store(Request $request)
 {

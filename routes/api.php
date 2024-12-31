@@ -70,6 +70,7 @@ Route::apiResource('classes', ClassController::class);
 
 Route::prefix('courses')->group(function() {
     Route::get('/', [CourseController::class, 'index']);
+    Route::get('/details/{id}', [CourseController::class, 'getCourseDetailsById']);
     Route::middleware('auth:sanctum')->get('/{id}', [CourseController::class, 'show']);
     Route::post('/', [CourseController::class, 'store']);
     Route::put('/{id}', [CourseController::class, 'update']);
