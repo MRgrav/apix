@@ -106,14 +106,15 @@ class CoursePlanController extends Controller
         // Fetch the logged-in user
         $user = Auth::user();
 
-        // Check if the user's is_nri field is true
-        if ($user->is_nri) {
-            // Fetch plans where is_NRI is true
-            $plans = CoursePlan::where('is_NRI', true)->get();
-        } else {
-            // Fetch plans where is_NRI is false
-            $plans = CoursePlan::where('is_NRI', false)->get();
+        // Ensure the user is authenticated
+        if (!$user) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'User not authenticated',
+            ], 401);
         }
+        
+        $plans = CoursePlan::where('is_NRI', $user->is_nri)->get();
 
         // Return the plans as a JSON response
         return response()->json([
