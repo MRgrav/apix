@@ -141,13 +141,13 @@ Route::prefix('trials')->group(function () {
     Route::post('/{courseId}/user/{userId}/set-link', [TrialController::class, 'setTrialLinkAndDescription']);
     Route::get('/{courseId}/user/{userId}/get-link', [TrialController::class, 'getTrialLinkAndDescription']);
 //plans
-    Route::apiResource('course-plans', CoursePlanController::class);
+    // Route::apiResource('course-plans', CoursePlanController::class);
     
     
 
 });
 
 // filtered plans only (is_nri: true/false)
-Route::get('courses/available-plans', [CoursePlanController::class, 'getPlansByNriStatus']);
+// Route::get('/courses/available-plans', [CoursePlanController::class, 'getPlansByNriStatus']);
 // accessible to everyone
 Route::get('/courses/plans/{id}',[CoursePlanController::class, 'coursePlans']);

@@ -56,7 +56,17 @@ class CoursePlanController extends Controller
     public function coursePlans($id){
         try {
             //code...
-            $plans = CoursePlan::where('category',$id)->get();
+
+            // Fetch the logged-in user
+            $user = Auth::user();
+
+            // Ensure the user is authenticated
+            if (!$user) {
+                $plans = CoursePlan::where('category',$id)->get();
+            } else {
+                $plans = coursePlan::where('is_nri', $user->is_nri)->get();
+            }
+
             return response()->json($plans, 200);
         } catch (\Throwable $e) {
             //throw $e;
@@ -103,23 +113,30 @@ class CoursePlanController extends Controller
     }
     public function getPlansByNriStatus()
     {
-        // Fetch the logged-in user
-        $user = Auth::user();
+        try {
+            //code...
+            // Fetch the logged-in user
+            $user = Auth::user();
 
-        // Ensure the user is authenticated
-        if (!$user) {
+            // Ensure the user is authenticated
+            if (!$user) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'User not authenticated',
+                ], 401);
+            }
+            
+            $plans = coursePlan::where('is_nri', $user->is_NRI)->get();
+
+            // Return the plans as a JSON response
             return response()->json([
-                'status' => 'error',
-                'message' => 'User not authenticated',
-            ], 401);
+                'status' => 'success',
+                'plans' => $plans,
+            ], 200);
+        } catch (\Throwable $e) {
+            //throw $e;
+            Log::error("Plan error: ". $e->getMessage());
+            return response()->json(['message'=>'Something is wrong'], 200);
         }
-        
-        $plans = CoursePlan::where('is_NRI', $user->is_NRI)->get();
-
-        // Return the plans as a JSON response
-        return response()->json([
-            'status' => 'success',
-            'plans' => $plans,
-        ], 200);
     }
 }
