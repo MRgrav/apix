@@ -14,6 +14,7 @@ class Purchase extends Model
         'payment_id',
         'amount',
         'status',
+        'plan_id'
     ];
 
     // Relationship to User

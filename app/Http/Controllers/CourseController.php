@@ -215,42 +215,58 @@ class CourseController extends Controller
      */
     public function createOrder(Request $request, $courseId)
     {
+        // Validate the request data
+        $validatedData = $request->validate([
+            'duration' => 'required|integer',
+            'plan_id' => 'required|integer|exist:course_plans'
+        ]);
+
         $course = Course::findOrFail($courseId);
         if (!$course) {
             return response()->json(['error' => 'Course not found'], 404);
         }
         $user = auth()->user(); // Get the authenticated user
 
-        // Convert is_nri to boolean explicitly and add debugging
-        // $isNri = (bool) $user->is_nri;
-        // \Log::info('User NRI status:', ['user_id' => $user->id, 'is_nri' => $isNri, 'raw_is_nri' => $user->is_nri]);
+        $plan = CoursePlans::findOrFail($validatedData['plan_id']);
+        if (!$plan) {
+            return response()->json(['error' => 'Plan not found'], 404);
+        }
 
-        // Determine currency and price
-        // Safely cast is_nri to boolean
-        // $isNri = filter_var($user->is_nri, FILTER_VALIDATE_BOOLEAN);
-        
-        // Set currency and price
-        // $currency = $isNri ? 'USD' : 'INR';
-        $currency = 'INR';
+        if ( $plan->GST == 0 ) {
+            $currency =  'USD';
+        } else {
+            $currency =  'INR';
+        }
 
         // Convert price to the smallest unit (paise for INR, cents for USD)
-        $amount = 1 * 100;
+        $amount = 100 * $validatedData['duration'] * $plan->current_rate;
+
+        if (!in_array($currency, ['INR', 'USD'])) {
+            return response()->json(['error' => 'Invalid currency'], 400);
+        }        
 
         // Create order in Razorpay
         $razorpay = new \Razorpay\Api\Api(env('RAZORPAY_KEY'), env('RAZORPAY_SECRET'));
 
-        $order = $razorpay->order->create([
-            'receipt' => 'rcpt_' . auth()->id(),
-            'amount' => $amount, // Amount in smallest unit
-            'currency' => $currency,
-            'payment_capture' => 1 // Auto-capture
-        ]);
+        try {
+            $order = $razorpay->order->create([
+                'receipt' => 'rcpt_' . auth()->id(),
+                'amount' => $amount,
+                'currency' => $currency,
+                'payment_capture' => 1
+            ]);
 
-        return response()->json([
-            'order_id' => $order['id'],
-            'amount' => $amount,
-            'currency' => $currency
-        ], 200);
+            // Return response with order details
+            return response()->json([
+                'order_id' => $order['id'],
+                'amount' => $amount,
+                'currency' => $currency
+            ], 200);
+        } catch (\Razorpay\Api\Errors\SignatureVerificationError $e) {
+            return response()->json(['error' => 'Razorpay error: ' . $e->getMessage()], 500);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Internal server error: ' . $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -262,54 +278,72 @@ class CourseController extends Controller
     public function confirmPayment(Request $request)
     {
         Log::info('Incoming payment request', $request->all());
-
+    
         // Validate the incoming request data
         $validatedData = $request->validate([
             'course_id' => 'required|integer',
-            'plan_id'=> 'required|integer',
+            'plan_id' => 'required|integer',
             'payment_id' => 'required|string',
             'payment_signature' => 'required|string',
+            'duration' => 'required|integer|min:1',  // Ensure duration is positive
+            'razorpay_order_id' => 'required|string',  // Ensure order_id is passed
         ]);
-
+    
         try {
             // Fetch the course details
             $course = Course::findOrFail($validatedData['course_id']);
-
+    
             // Initialize Razorpay API
             $razorpay = new Api(env('RAZORPAY_KEY'), env('RAZORPAY_SECRET'));
-
+    
             // Verify the payment signature
             $attributes = [
-                'razorpay_order_id' => $request->razorpay_order_id,
+                'razorpay_order_id' => $validatedData['razorpay_order_id'], // Use validated order_id
                 'razorpay_payment_id' => $validatedData['payment_id'],
                 'razorpay_signature' => $validatedData['payment_signature'],
             ];
-
+    
             $isValidSignature = $razorpay->utility->verifyPaymentSignature($attributes);
             if (!$isValidSignature) {
                 return response()->json(['message' => 'Payment verification failed'], 400);
             }
-
+    
+            // Fetch the payment details using Razorpay API
+            $payment = $razorpay->payment->fetch($validatedData['payment_id']);
+            
+            // Ensure the payment was captured successfully
+            if ($payment->status !== 'captured') {
+                return response()->json(['message' => 'Payment not captured'], 400);
+            }
+    
+            // You can now access payment details like amount, status, and more
+            $amount = $payment->amount; // Amount paid in the smallest unit (e.g., paise for INR, cents for USD)
+            $paymentStatus = $payment->status; // Payment status (e.g., 'captured', 'failed', etc.)
+            
+            // Calculate the expiry date based on the plan's duration
+            $expiryDate = now()->addMonths($validatedData['duration']);  // Assuming duration is in months
+    
             // If the payment is valid, store the purchase details
             Purchase::create([
                 'user_id' => Auth::id(),
                 'course_id' => $validatedData['course_id'],
                 'payment_id' => $validatedData['payment_id'],
-                'plan_id'=> $validatedData['required|integer'],
-                'amount' => $course->price,
-                'status' => 'success',
+                'plan_id' => $validatedData['plan_id'],
+                'amount' => $amount / 100,  // Convert from smallest unit to main unit
+                'status' => $paymentStatus,  // Store the payment status
+                'expiry_date' => $expiryDate,  // Store the calculated expiry date
             ]);
-
+    
             Log::info('Payment confirmed and purchase recorded', $validatedData);
-
+    
             return response()->json(['message' => 'Payment successful'], 200);
-
+    
         } catch (\Exception $e) {
             Log::error('Payment confirmation failed: ' . $e->getMessage());
-            return response()->json(['message' => 'Payment confirmation failed'], 500);
+            return response()->json(['message' => 'Payment confirmation failed', 'error' => $e->getMessage()], 500);
         }
     }
-
+    
 
     public function getPurchasedCourses()
     {
