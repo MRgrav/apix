@@ -60,6 +60,9 @@ class CoursePlanController extends Controller
             // Fetch the logged-in user
             $user = Auth::user();
 
+             // Log user information for debugging
+            Log::debug("User: ", ['user' => $user]); 
+
             // Ensure the user is authenticated
             if (!$user) {
                 $plans = CoursePlan::where('category',$id)->get();
