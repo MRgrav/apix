@@ -142,10 +142,12 @@ Route::prefix('trials')->group(function () {
     Route::get('/{courseId}/user/{userId}/get-link', [TrialController::class, 'getTrialLinkAndDescription']);
 //plans
     Route::apiResource('course-plans', CoursePlanController::class);
-    Route::get('course-plans/nri-status', [CoursePlanController::class, 'getPlansByNriStatus']);
+    
     
 
 });
 
+// filtered plans only (is_nri: true/false)
+Route::get('courses/available-plans', [CoursePlanController::class, 'getPlansByNriStatus']);
 // accessible to everyone
 Route::get('/courses/plans/{id}',[CoursePlanController::class, 'coursePlans']);

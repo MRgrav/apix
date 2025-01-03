@@ -114,7 +114,7 @@ class CoursePlanController extends Controller
             ], 401);
         }
         
-        $plans = CoursePlan::where('is_NRI', $user->is_nri)->get();
+        $plans = CoursePlan::where('is_NRI', $user->is_NRI)->get();
 
         // Return the plans as a JSON response
         return response()->json([
