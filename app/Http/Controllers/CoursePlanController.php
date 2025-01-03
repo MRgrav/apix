@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\CoursePlan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class CoursePlanController extends Controller
 {
@@ -61,7 +62,7 @@ class CoursePlanController extends Controller
             $user = Auth::user();
 
              // Log user information for debugging
-            Log::debug("User: ", ['user' => $user]); 
+            Log::debug("User: ", ['user' => $user]);
 
             // Ensure the user is authenticated
             if (!$user) {
