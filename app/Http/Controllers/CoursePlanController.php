@@ -67,7 +67,7 @@ class CoursePlanController extends Controller
                 $plans = coursePlan::where('is_nri', $user->is_nri)->get();
             }
 
-            return response()->json($plans, 200);
+            return response()->json(['plan' =>$plans, 'user' => $user], 200);
         } catch (\Throwable $e) {
             //throw $e;
             Log::error("Plan error: ". $e->getMessage());
