@@ -14,7 +14,8 @@ class Purchase extends Model
         'payment_id',
         'amount',
         'status',
-        'plan_id'
+        'plan_id',
+        'expiry_date'
     ];
 
     // Relationship to User
@@ -27,6 +28,11 @@ class Purchase extends Model
     public function course()
     {
         return $this->belongsTo(Course::class, 'course_id');
+    }
+
+    // Relation to Plan
+    public function plan(){
+        return $this->belongsTo(CoursePlan::class, 'plan_id');
     }
 
 }

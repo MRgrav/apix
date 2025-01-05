@@ -11,6 +11,7 @@ class CoursePlan extends Model
 
     protected $fillable = [
         'plan_name',
+        'plan_details',
         'old_rate',
         'current_rate',
         'category',
