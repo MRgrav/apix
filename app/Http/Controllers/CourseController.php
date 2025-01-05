@@ -217,10 +217,10 @@ class CourseController extends Controller
     public function createOrder(Request $request, $courseId)
     {
         // Validate the request data
-        // $validatedData = $request->validate([
-        //     'duration' => 'required',
-        //     'plan_id' => 'required'
-        // ]);
+        $validatedData = $request->validate([
+            'duration' => 'required',
+            'plan_id' => 'required'
+        ]);
 
         $course = Course::findOrFail($courseId);
         if (!$course) {
