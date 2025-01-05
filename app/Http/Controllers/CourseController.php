@@ -217,8 +217,8 @@ class CourseController extends Controller
     {
         // Validate the request data
         $validatedData = $request->validate([
-            'duration' => 'required|integer',
-            'plan_id' => 'required|integer|exist:course_plans'
+            'duration' => 'required|integer|min:1',
+            'plan_id' => 'required|exist:course_plans,id'
         ]);
 
         $course = Course::findOrFail($courseId);
