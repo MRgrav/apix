@@ -291,7 +291,7 @@ class CourseController extends Controller
             $course = Course::findOrFail($validatedData['course_id']);
     
             // Initialize Razorpay API
-            $razorpay = new Api(env('RAZORPAY_KEY'), env('RAZORPAY_SECRET'));
+            $razorpay = new \Razorpay\Api\Api(env('RAZORPAY_KEY'), env('RAZORPAY_SECRET'));
     
             // Verify the payment signature
             $attributes = [
