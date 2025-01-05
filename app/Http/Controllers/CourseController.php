@@ -240,7 +240,7 @@ class CourseController extends Controller
         }
 
         // Convert price to the smallest unit (paise for INR, cents for USD)
-        $amount = 100 * $validatedData['duration'] * $plan->current_rate;    
+        $amount = 100 * $validatedData['duration'] * $plan->current_rate + ($plan->current_rate * $plan->GST);    
 
         // Create order in Razorpay
         $razorpay = new \Razorpay\Api\Api(env('RAZORPAY_KEY'), env('RAZORPAY_SECRET'));
@@ -262,7 +262,7 @@ class CourseController extends Controller
         } catch (\Razorpay\Api\Errors\SignatureVerificationError $e) {
             return response()->json(['error' => 'Razorpay error: ' . $e->getMessage()], 500);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Internal server error: ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'Internal server error: '. $amount . $e->getMessage()], 500);
         }
     }
 
