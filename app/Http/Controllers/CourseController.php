@@ -6,6 +6,7 @@ use App\Models\Course;
 use App\Models\Purchase;
 use App\Models\Trial;
 use App\Models\Uploads;
+use App\Models\CoursePlan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -227,7 +228,7 @@ class CourseController extends Controller
         }
         $user = auth()->user(); // Get the authenticated user
 
-        $plan = CoursePlans::findOrFail($validatedData['plan_id']);
+        $plan = CoursePlan::findOrFail($validatedData['plan_id']);
         if (!$plan) {
             return response()->json(['error' => 'Plan not found'], 404);
         }
