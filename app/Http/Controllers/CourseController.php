@@ -216,10 +216,10 @@ class CourseController extends Controller
     public function createOrder(Request $request, $courseId)
     {
         // Validate the request data
-        $validatedData = $request->validate([
-            'duration' => 'required|integer|min:1',
-            'plan_id' => 'required|exist:course_plans,id'
-        ]);
+        // $validatedData = $request->validate([
+        //     'duration' => 'required',
+        //     'plan_id' => 'required'
+        // ]);
 
         $course = Course::findOrFail($courseId);
         if (!$course) {
@@ -239,11 +239,7 @@ class CourseController extends Controller
         }
 
         // Convert price to the smallest unit (paise for INR, cents for USD)
-        $amount = 100 * $validatedData['duration'] * $plan->current_rate;
-
-        if (!in_array($currency, ['INR', 'USD'])) {
-            return response()->json(['error' => 'Invalid currency'], 400);
-        }        
+        $amount = 100 * $validatedData['duration'] * $plan->current_rate;    
 
         // Create order in Razorpay
         $razorpay = new \Razorpay\Api\Api(env('RAZORPAY_KEY'), env('RAZORPAY_SECRET'));
