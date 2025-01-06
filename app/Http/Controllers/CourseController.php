@@ -356,12 +356,14 @@ class CourseController extends Controller
             $courses = $purchasedCourses->map(function ($purchase) {
                 if ($purchase->course) {
                     return [
-                        'course_id' => (int)$purchase->course->id,  // Ensure this is an integer
+                        'course_id' => $purchase->course->id,  // Ensure this is an integer
                         'course_title' => $purchase->course->title,
                         'plan_name' => $purchase->plan->plan_name,
                         'plan_details' => $purchase->plan->plan_details,
-                        'purchase_date' => $purchase->created_at->format('d-m-Y'),
-                        'expiry_date' => $purchase->expiry_date->format('d-m-Y'),
+                        // 'purchase_date' => $purchase->created_at->format('d-m-Y'),
+                        // 'expiry_date' => $purchase->expiry_date->format('d-m-Y'),
+                        'purchase_date' => $purchase->created_at instanceof \Carbon\Carbon ? $purchase->created_at->format('d-m-Y') : $purchase->created_at,
+                        'expiry_date' => $purchase->expiry_date instanceof \Carbon\Carbon ? $purchase->expiry_date->format('d-m-Y') : $purchase->expiry_date,
                     ];
                 }
                 return null; // Handle cases where the course doesn't exist

@@ -18,10 +18,16 @@ class Purchase extends Model
         'expiry_date'
     ];
 
+    protected $casts = [
+        'expiry_date' => 'datetime', // Automatically cast expiry_date to a Carbon instance
+        'created_at' => 'datetime',   // Automatically cast created_at to a Carbon instance
+    ];
+    
+
     // Relationship to User
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     // Relationship to Course
