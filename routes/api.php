@@ -107,7 +107,8 @@ Route::prefix('home')->group(function() {
 Route::apiResource('materials', StudyMaterialController::class);
 
 
-Route::get('courses/{course_id}/videos', [VideoController::class, 'index']);
+// Route::get('courses/{course_id}/videos', [VideoController::class, 'index']);
+Route::get('courses/{group_id}/videos', [VideoController::class, 'index']);
 Route::post('videos', [VideoController::class, 'store']);
 Route::get('videos/{id}', [VideoController::class, 'show']);
 Route::put('videos/{id}', [VideoController::class, 'update']);
