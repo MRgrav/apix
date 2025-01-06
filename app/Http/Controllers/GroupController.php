@@ -77,4 +77,33 @@ class GroupController extends Controller
 
         return response()->json(['message' => 'Group deleted successfully'], 200);
     }
+
+    // Method to create/update live class link
+    public function updateLiveClass(Request $request, $groupId) {
+        // Validate the incoming request data
+        $validatedData = $request->validate([
+            'live_class_link' => 'required|url', 
+        ]);
+
+        // Find the group by ID
+        $group = Group::find($groupId);
+
+        // Check if the group exists
+        if (!$group) {
+            return response()->json(['message' => 'Group not found'], 404);
+        }
+
+        // Update the live_class_link attribute
+        $group->live_class_link = $validatedData['live_class_link'];
+
+        // Save the changes to the database
+        $group->save();
+
+        // Return a success response
+        return response()->json([
+            'message' => 'Live class link updated successfully',
+            'group' => $group // Optionally return the updated group data
+        ], 200);
+    }
+
 }
