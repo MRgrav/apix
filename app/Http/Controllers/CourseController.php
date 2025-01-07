@@ -372,13 +372,13 @@ class CourseController extends Controller
             $key = $userId . 'purchase';
 
             // Try to fetch the purchased courses from Redis cache
-            // if (Redis::exists($key)) {
-            //     $courses = json_decode(Redis::get($key), true);
-            //     return response()->json([
-            //         'message' => 'Purchased courses retrieved from cache successfully',
-            //         'courses' => $courses,
-            //     ], 200);
-            // }              
+            if (Cache::has($key)) {
+                $courses = Cache::get($key);
+                return response()->json([
+                    'message' => 'Purchased courses retrieved from cache successfully',
+                    'courses' => $courses,
+                ], 200);
+            }            
 
             // Fetch the purchased courses
             $purchasedCourses = Purchase::where('user_id', $userId)
