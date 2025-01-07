@@ -374,6 +374,13 @@ class CourseController extends Controller
                     'message' => 'Purchased courses retrieved from cache successfully',
                     'courses' => $courses,
                 ], 200);
+            } 
+            if (Cache::has($key)) {
+                $courses = json_decode(Cache::get($key), true); // Decode the JSON data
+                return response()->json([
+                    'message' => 'Purchased courses retrieved from cache successfully',
+                    'courses' => $courses,
+                ], 200);
             }          
 
             // Fetch the purchased courses
