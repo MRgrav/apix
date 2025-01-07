@@ -125,6 +125,7 @@ Route::prefix('groups')->group(function () {
     Route::delete('/{groupId}', [GroupController::class, 'deleteGroup']); // Delete a group by ID
     Route::get('/', [GroupController::class, 'getAllGroups']); // Get all groups
     Route::post('/{groupId}/live-class', [GroupController::class, 'updateLiveClass']);
+    Route::get('/{groupId}/live-class', [GroupController::class, 'getLiveClass']);
 });
 
 

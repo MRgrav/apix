@@ -10,6 +10,7 @@ use App\Models\CoursePlan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 
 class CourseController extends Controller
 {
@@ -45,16 +46,31 @@ class CourseController extends Controller
 
     public function getCourseDetailsById($id)
     {
-        $course = Course::with('category', 'sections', 'instructor')->findOrFail($id)->first();
+        // Define cache key for the course details
+        $cacheKey = 'course_' . $id;
 
-        if (!$course) {
+        // Check if course data is cached
+        if (Cache::has($cacheKey)) {
+            // If data exists in cache, retrieve it
+            $course = Cache::get($cacheKey);
+            return response()->json($course, 200);
+        }
+        try {
+            //code...
+            $course = Course::with('category', 'sections', 'instructor')->findOrFail($id)->first();
+
+            // Cache the course data for future requests (e.g., cache for 1 hour)
+            Cache::put($cacheKey, $course, now()->addHour());
+
+            // If the course is purchased, show the content
+            return response()->json($course, 200);
+        } catch (\Throwable $e) {
+            //throw $th;
+            Log::error("Course fetch failed: ", $e->getMessage());
             return response()->json([
                 'message' => 'Course not found.'
             ], 404);
         }
-
-        // If the course is purchased, show the content
-        return response()->json($course, 200);
     }
 
 
@@ -347,9 +363,21 @@ class CourseController extends Controller
         if (auth()->check()) {
             $userId = auth()->id();
 
+            // Define cache key
+            $key = $userId . 'purchase';
+
+            // Try to fetch the purchased courses from Redis cache
+            if (Cache::has($key)) {
+                $courses = Cache::get($key);
+                return response()->json([
+                    'message' => 'Purchased courses retrieved from cache successfully',
+                    'courses' => $courses,
+                ], 200);
+            }            
+
             // Fetch the purchased courses
             $purchasedCourses = Purchase::where('user_id', $userId)
-                ->with('course')
+                ->with(['course','plan'])
                 ->get();
 
             // Ensure course_id is correct and course exists
@@ -372,6 +400,9 @@ class CourseController extends Controller
             if ($courses->isEmpty()) {
                 return response()->json(['message' => 'No courses purchased yet'], 404);
             }
+
+            // Cache the purchased courses in Redis for future requests (cache for 1 hour)
+            Cache::put($key, $courses, now()->addHour());
 
             return response()->json([
                 'message' => 'Purchased courses retrieved successfully',

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Course;
 use App\Models\Group;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class GroupController extends Controller
 {
@@ -39,6 +40,7 @@ class GroupController extends Controller
 
         return response()->json(['message' => 'User assigned to group successfully']);
     }
+    
     public function getAllGroups()
     {
         $groups = Group::with('users', 'course')->get();
@@ -80,11 +82,46 @@ class GroupController extends Controller
 
     // Method to create/update live class link
     public function updateLiveClass(Request $request, $groupId) {
-        // Validate the incoming request data
-        $validatedData = $request->validate([
-            'live_class_link' => 'required|url', 
-        ]);
+        try {
+            //code...
+            // Validate the incoming request data
+            $validatedData = $request->validate([
+                'live_class_link' => 'required|url', 
+            ]);
 
+            $group = findGroup($groupId);
+
+            // Update the live_class_link attribute
+            $group->live_class_link = $validatedData['live_class_link'];
+
+            // Save the changes to the database
+            $group->save();
+
+            // Return a success response
+            return response()->json([
+                'message' => 'Live class link updated successfully',
+                'group' => $group // Optionally return the updated group data
+            ], 200);
+        } catch (\Throwable $th) {
+            //throw $th;
+            Log::error('Live class link update failed: ' . $e->getMessage());
+            return response()->json(['message' => 'Internal server error'], 500);
+        }
+    }
+
+    public function getLiveClass ($groupId) {
+        try {
+            //code...
+            $group = findGroup($groupId);
+            return response()->json(['live_class_link' => $group->live_class_link], 200);
+        } catch (\Throwable $th) {
+            //throw $th;
+            Log::error('Get live class link failed: ' . $e->getMessage());
+            return response()->json(['message' => 'Internal server error'], 500);
+        }
+    }
+
+    private function findGroup($groupId) {
         // Find the group by ID
         $group = Group::find($groupId);
 
@@ -93,17 +130,7 @@ class GroupController extends Controller
             return response()->json(['message' => 'Group not found'], 404);
         }
 
-        // Update the live_class_link attribute
-        $group->live_class_link = $validatedData['live_class_link'];
-
-        // Save the changes to the database
-        $group->save();
-
-        // Return a success response
-        return response()->json([
-            'message' => 'Live class link updated successfully',
-            'group' => $group // Optionally return the updated group data
-        ], 200);
+        return $group;
     }
 
 }
