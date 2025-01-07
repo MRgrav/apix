@@ -364,21 +364,18 @@ class CourseController extends Controller
         if (auth()->check()) {
             $userId = auth()->id();
 
-            // $keys = Redis::keys('*');
-            // Log::info('Redis keys: ', $keys);
+            // Define cache key with proper prefix
+            $key = env('REDIS_PREFIX', 'app_') . ':' . $userId . 'purchase';
 
-
-            // Define cache key
-            $key = $userId . 'purchase';
 
             // Try to fetch the purchased courses from Redis cache
             if (Cache::has($key)) {
-                $courses = Cache::get($key);
+                $courses = json_decode(Cache::get($key), true); // Decode the JSON data
                 return response()->json([
                     'message' => 'Purchased courses retrieved from cache successfully',
                     'courses' => $courses,
                 ], 200);
-            }            
+            }          
 
             // Fetch the purchased courses
             $purchasedCourses = Purchase::where('user_id', $userId)
@@ -407,9 +404,7 @@ class CourseController extends Controller
             }
 
             // Cache the purchased courses in Redis for future requests (cache for 1 hour)
-            Cache::put($key, $courses, now()->addHour());
-            // Cache the purchased courses in Redis for future requests (cache for 1 hour)
-            // Redis::set($key, json_encode($courses), 'EX', 3600); // Set expiration to 3600 seconds (1 hour)
+            Cache::put($key, $courses->toJson(), now()->addHour()); // Store the courses as JSON string
 
             return response()->json([
                 'message' => 'Purchased courses retrieved successfully',
