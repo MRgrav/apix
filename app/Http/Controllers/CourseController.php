@@ -368,12 +368,8 @@ class CourseController extends Controller
             $key = $userId . 'purchase';
 
             // Try to fetch the purchased courses from Redis cache
-            if (Cache::has(env('CACHE_PREFIX', 'app_') . ':' . $key)) {
-                Log::info('CACHE : '. env('CACHE_PREFIX', 'app_') . ':' . $key);
-                Log::info('Cache Prefix: ' . env('CACHE_PREFIX', 'app_'));
-                Log::info('Redis Prefix: ' . env('REDIS_PREFIX', 'app_'));
-
-                $courses = json_decode(Cache::get(env('CACHE_PREFIX', 'app_') . ':' . $key), true); // Decode the JSON data
+            if (Cache::has('classwix_:' . $key)) {
+                $courses = json_decode(Cache::get('classwix_:' . $key), true); // Decode the JSON data
                 return response()->json([
                     'message' => 'Purchased courses retrieved from cache successfully',
                     'courses' => $courses,

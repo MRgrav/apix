@@ -125,7 +125,7 @@ return [
 
         'options' => [
             'cluster' => env('REDIS_CLUSTER', 'redis'),
-            'prefix' => env('REDIS_PREFIX', 'app_'),
+            'prefix' => env('REDIS_PREFIX', 'classwix_'),
         ],
 
         'default' => [
