@@ -365,12 +365,12 @@ class CourseController extends Controller
             $userId = auth()->id();
 
             // Define cache key with proper prefix
-            $key = env('REDIS_PREFIX', 'app_') . ':' . $userId . 'purchase';
+            $key = $userId . 'purchase';
 
 
             // Try to fetch the purchased courses from Redis cache
-            if (Cache::has($key)) {
-                $courses = json_decode(Cache::get($key), true); // Decode the JSON data
+            if (Cache::has(env('REDIS_PREFIX', 'app_') . ':' . $key)) {
+                $courses = json_decode(Cache::get(env('REDIS_PREFIX', 'app_') . ':' . $key), true); // Decode the JSON data
                 return response()->json([
                     'message' => 'Purchased courses retrieved from cache successfully',
                     'courses' => $courses,
