@@ -363,6 +363,10 @@ class CourseController extends Controller
         if (auth()->check()) {
             $userId = auth()->id();
 
+            $keys = Cache::keys('*');
+            Log::info('Redis keys: ', $keys);
+
+
             // Define cache key
             $key = $userId . 'purchase';
 
