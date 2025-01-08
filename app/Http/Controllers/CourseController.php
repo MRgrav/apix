@@ -7,6 +7,7 @@ use App\Models\Purchase;
 use App\Models\Trial;
 use App\Models\Uploads;
 use App\Models\CoursePlan;
+use App\Models\GroupUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -347,6 +348,26 @@ class CourseController extends Controller
                 'status' => $paymentStatus,  // Store the payment status
                 'expiry_date' => $expiryDate,  // Store the calculated expiry date
             ]);
+
+            $existGroup = GroupUser::where('user_id',Auth::id())
+                                    ->where('course_id',$validatedData['course_id'])
+                                    ->whereNotNull('group_id')
+                                    ->exists();
+
+            if (!$existGroup) {
+                // initializing groups for users
+                GroupUser::create([
+                    'user_id' => Auth::id(),
+                    'course_id' => $validatedData['course_id'],
+                    'expiry_date' => $expiryDate,
+                ]);
+            } else {
+                // Find the GroupUser record by user_id and course_id
+                GroupUser::where('user_id', Auth::id())
+                    ->where('course_id', $validatedData['course_id'])
+                    ->update(['expiry_date' => $expiryDate]);
+            }
+
     
             Log::info('Payment confirmed and purchase recorded', $validatedData);
     

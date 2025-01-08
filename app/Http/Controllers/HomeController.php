@@ -79,9 +79,9 @@ class HomeController extends Controller
                 ], 200);
             }      
 
-            $content = Group::with(['video'])->find($groupId);
+            $content = Group::with(['videos'])->find($groupId);
 
-            Log::debug("testing group : ". Group::with(['video'])->find($groupId));
+            Log::debug("testing group : ". Group::with(['videos'])->find($groupId));
 
             if (!$content) {
                 return response()->json(['message' => 'Course not yet approved by classwix'], 404);

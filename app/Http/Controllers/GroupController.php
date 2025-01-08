@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Course;
 use App\Models\Group;
+use App\Models\GroupUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -131,6 +132,30 @@ class GroupController extends Controller
         }
 
         return $group;
+    }
+
+    public function myGroups() {
+        try {
+            //code...
+            $userId = Auth::id();
+
+            $myCourses = GroupUser::with(['course','group','user'])
+                                    ->where('user_id', $userId)
+                                    ->get();
+
+            if (!$myCourses) {
+                return response()->json(['message' => 'You have not enrolled any course yet'], 404);
+            }
+
+            return response()->json([
+                'message' => 'Fetched enrolled courses',
+                '$courses' => $myCourses
+            ], 200);
+
+        } catch (\Throwable $e) {
+            //throw $th;
+            Log::error("Purchase courses/groups error : " . $e->getMessage());
+        }
     }
 
 }

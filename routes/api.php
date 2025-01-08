@@ -127,6 +127,7 @@ Route::prefix('groups')->group(function () {
     Route::post('/{groupId}/live-class', [GroupController::class, 'updateLiveClass']);
     Route::get('/{groupId}/live-class', [GroupController::class, 'getLiveClass']);
     Route::get('/content/{groupId}', [HomeController::class, 'getPurchasedCourseDetails']);
+    Route::get('/my-groups', [GroupController::class, 'myGroups']);
 });
 
 
