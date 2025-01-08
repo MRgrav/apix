@@ -6,6 +6,7 @@ use App\Models\CourseCategory;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
+use App\Models\Group;
 
 class HomeController extends Controller
 {
