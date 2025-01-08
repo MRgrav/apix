@@ -127,10 +127,9 @@ Route::prefix('groups')->group(function () {
     Route::post('/{groupId}/live-class', [GroupController::class, 'updateLiveClass']);
     Route::get('/{groupId}/live-class', [GroupController::class, 'getLiveClass']);
     Route::get('/content/{groupId}', [HomeController::class, 'getPurchasedCourseDetails']);
-    Route::get('/my-groups', [GroupController::class, 'myGroups']);
 });
 
-
+Route::get('/my-groups', [GroupController::class, 'myGroups']);
 
 Route::post('/instructors/assign', [InstructorController::class, 'assignInstructor']);
 Route::delete('/instructors/remove/{id}', [InstructorController::class, 'removeInstructor']);

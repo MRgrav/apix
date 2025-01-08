@@ -139,6 +139,27 @@ class GroupController extends Controller
             //code...
             $userId = Auth::id();
 
+            if (!$userId) {
+                return response()->json(['message' => 'You are not authorized'], 401);
+            }
+
+            $key = 'mygroups' . $userId;
+
+            if (Cache::has('classwix_' . $key)) {
+                $myCourses = json_decode(Cache::get('classwix_' . $key), true); // Decode the JSON data
+                return response()->json([
+                    'message' => 'Fetched enrolled courses',
+                    '$courses' => $myCourses
+                ], 200);
+            } 
+            if (Cache::has($key)) {
+                $myCourses = json_decode(Cache::get($key), true); // Decode the JSON data
+                return response()->json([
+                    'message' => 'Fetched enrolled courses',
+                    '$courses' => $myCourses
+                ], 200);
+            }  
+
             $myCourses = GroupUser::with(['course','group','user'])
                                     ->where('user_id', $userId)
                                     ->get();
@@ -146,6 +167,8 @@ class GroupController extends Controller
             if (!$myCourses) {
                 return response()->json(['message' => 'You have not enrolled any course yet'], 404);
             }
+
+            Cache::put($key, $myCourses->toJson(), now()->addHour());
 
             return response()->json([
                 'message' => 'Fetched enrolled courses',
