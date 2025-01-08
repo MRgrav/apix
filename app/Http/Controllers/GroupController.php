@@ -147,7 +147,7 @@ class GroupController extends Controller
     //     return $group;
     // }
 
-    public function myGroups() {
+    public function myGroups(Request $request) {
         try {
             //code...
             $user = auth()->user();
