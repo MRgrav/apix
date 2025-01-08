@@ -17,6 +17,7 @@ class GroupUser extends Model
         'course_id',
         'group_id',
         'user_id',
+        'plan_id',
     ];
 
     /**
