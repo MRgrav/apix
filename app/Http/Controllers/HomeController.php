@@ -64,13 +64,6 @@ class HomeController extends Controller
 
             $key = $id . 'group' . $userId;
 
-            if (Cache::has('classwix_' . $key)) {
-                $content = json_decode(Cache::get('classwix_' . $key), true); // Decode the JSON data
-                return response()->json([
-                    'message' => 'Data fetched successfully',
-                    'content' => $content
-                ], 200);
-            } 
             if (Cache::has($key)) {
                 $content = json_decode(Cache::get($key), true); // Decode the JSON data
                 return response()->json([

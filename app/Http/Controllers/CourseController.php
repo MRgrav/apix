@@ -389,13 +389,6 @@ class CourseController extends Controller
             $key = $userId . 'purchase';
 
             // Try to fetch the purchased courses from Redis cache
-            if (Cache::has('classwix_' . $key)) {
-                $courses = json_decode(Cache::get('classwix_' . $key), true); // Decode the JSON data
-                return response()->json([
-                    'message' => 'Purchased courses retrieved from cache successfully',
-                    'courses' => $courses,
-                ], 200);
-            } 
             if (Cache::has($key)) {
                 $courses = json_decode(Cache::get($key), true); // Decode the JSON data
                 return response()->json([
