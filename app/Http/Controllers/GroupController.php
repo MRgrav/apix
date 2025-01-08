@@ -169,7 +169,7 @@ class GroupController extends Controller
                 ], 200);
             }  
 
-            $myCourses = GroupUser::with(['course','group','user'])
+            $myCourses = GroupUser::with(['course','group','user','plan'])
                                     ->where('user_id', $userId)
                                     ->get();
 
