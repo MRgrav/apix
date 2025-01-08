@@ -8,7 +8,13 @@ class Group extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'description', 'course_id', 'created_by'];
+    protected $fillable = [
+        'name', 
+        'description', 
+        'course_id', 
+        'created_by',
+        'live_class_link'
+    ];
 
     public function course()
     {

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\CourseCategory;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 
 class HomeController extends Controller
 {
@@ -48,5 +50,46 @@ class HomeController extends Controller
 
     return response()->json(['courses' => $courses]);
 }
+
+    public function getPurchasedCourseDetails($id) {
+        try {
+            //code...
+            $user = auth()->user();
+
+            $key = $id . 'group' . $user->id;
+
+            if (Cache::has('classwix_' . $key)) {
+                $content = json_decode(Cache::get('classwix_' . $key), true); // Decode the JSON data
+                return response()->json([
+                    'message' => 'Data fetched successfully',
+                    'content' => $content
+                ], 200);
+            } 
+            if (Cache::has($key)) {
+                $content = json_decode(Cache::get($key), true); // Decode the JSON data
+                return response()->json([
+                    'message' => 'Data fetched successfully',
+                    'content' => $content
+                ], 200);
+            }      
+
+            $content = Group::findOrFail($id)->with(['video']);
+
+            if (!$content) {
+                return response()->json(['message' => 'Course not yet approved by classwix'], 404);
+            }
+
+            Cache::put($key, $courses->toJson(), now()->addHour());
+
+            return response()->json([
+                'message' => 'Data fetched successfully',
+                'content' => $content
+            ], 200);
+        } catch (\Throwable $e) {
+            //throw $th;
+            Log::error("Error fetching student's course data: ". $e->getMessage());
+            return response()->json(['message' => 'Internal server error'], 500);
+        }
+    }
 
 }
