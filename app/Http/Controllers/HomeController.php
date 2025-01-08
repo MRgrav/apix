@@ -73,13 +73,13 @@ class HomeController extends Controller
                 ], 200);
             }      
 
-            $content = Group::findOrFail($id)->with(['video']);
+            $content = Group::with(['video'])->find($id);
 
             if (!$content) {
                 return response()->json(['message' => 'Course not yet approved by classwix'], 404);
             }
 
-            Cache::put($key, $courses->toJson(), now()->addHour());
+            Cache::put($key, $content->toJson(), now()->addHour());
 
             return response()->json([
                 'message' => 'Data fetched successfully',
