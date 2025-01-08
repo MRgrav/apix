@@ -140,7 +140,7 @@ class GroupController extends Controller
     public function myGroups() {
         try {
             //code...
-            $userId = Auth::id();
+            $userId = auth()->id();
 
             if (!$userId) {
                 return response()->json(['message' => 'You are not authorized'], 401);
