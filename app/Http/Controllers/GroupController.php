@@ -106,7 +106,7 @@ class GroupController extends Controller
                 'message' => 'Live class link updated successfully',
                 'group' => $group // Optionally return the updated group data
             ], 200);
-        } catch (\Throwable $th) {
+        } catch (\Throwable $e) {
             //throw $th;
             Log::error('Live class link update failed: ' . $e->getMessage());
             return response()->json(['message' => 'Internal server error'], 500);
