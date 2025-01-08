@@ -9,6 +9,9 @@ class GroupUser extends Model
 {
     use HasFactory;
 
+    // Specify the table name explicitly
+    protected $table = 'group_user'; // Add this line to specify the correct table
+
     protected $fillable = [
         'course_id',
         'group_id',
