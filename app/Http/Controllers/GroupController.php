@@ -93,7 +93,12 @@ class GroupController extends Controller
                 'live_class_link' => 'required|url', 
             ]);
 
-            $group = findGroup($groupId);
+            $group = Group::find($groupId);
+
+            // Check if the group exists
+            if (!$group) {
+                return response()->json(['message' => 'Group not found'], 404);
+            }
 
             // Update the live_class_link attribute
             $group->live_class_link = $validatedData['live_class_link'];
@@ -116,7 +121,12 @@ class GroupController extends Controller
     public function getLiveClass ($groupId) {
         try {
             //code...
-            $group = findGroup($groupId);
+            $group = Group::find($groupId);
+
+            // Check if the group exists
+            if (!$group) {
+                return response()->json(['message' => 'Group not found'], 404);
+            }
             return response()->json(['live_class_link' => $group->live_class_link], 200);
         } catch (\Throwable $th) {
             //throw $th;
@@ -125,17 +135,17 @@ class GroupController extends Controller
         }
     }
 
-    private function findGroup($groupId) {
-        // Find the group by ID
-        $group = Group::find($groupId);
+    // private function findGroup($groupId) {
+    //     // Find the group by ID
+    //     $group = Group::find($groupId);
 
-        // Check if the group exists
-        if (!$group) {
-            return response()->json(['message' => 'Group not found'], 404);
-        }
+    //     // Check if the group exists
+    //     if (!$group) {
+    //         return response()->json(['message' => 'Group not found'], 404);
+    //     }
 
-        return $group;
-    }
+    //     return $group;
+    // }
 
     public function myGroups() {
         try {
