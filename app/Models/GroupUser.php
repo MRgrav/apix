@@ -48,4 +48,14 @@ class GroupUser extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+
+    /**
+     * Get the plan that owns the GroupUser
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function plan(): BelongsTo
+    {
+        return $this->belongsTo(CoursePlan::class, 'plan_id');
+    }
 }

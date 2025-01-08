@@ -360,12 +360,13 @@ class CourseController extends Controller
                     'user_id' => Auth::id(),
                     'course_id' => $validatedData['course_id'],
                     'expiry_date' => $expiryDate,
+                    'plan_id' => $validatedData['plan_id'],
                 ]);
             } else {
                 // Find the GroupUser record by user_id and course_id
                 GroupUser::where('user_id', Auth::id())
                     ->where('course_id', $validatedData['course_id'])
-                    ->update(['expiry_date' => $expiryDate]);
+                    ->update(['expiry_date' => $expiryDate, 'plan_id' => $validatedData['plan_id']]);
             }
 
     
