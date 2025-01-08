@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::table('group_user', function (Blueprint $table) {
             //
             $table->unsignedBigInteger('course_id')->nullable();
-            $table->timestamp('expiry_date')->nullable()->default(time());
+            $table->timestamp('expiry_date')->nullable();
         });
     }
 
