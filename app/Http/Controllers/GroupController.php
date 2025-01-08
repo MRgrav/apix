@@ -164,15 +164,15 @@ class GroupController extends Controller
             if (Cache::has('classwix_' . $key)) {
                 $myCourses = json_decode(Cache::get('classwix_' . $key), true); // Decode the JSON data
                 return response()->json([
-                    'message' => 'Fetched enrolled courses',
-                    '$courses' => $myCourses
+                    'message' => 'Fetched enrolled courses.',
+                    'courses' => $myCourses
                 ], 200);
             } 
             if (Cache::has($key)) {
                 $myCourses = json_decode(Cache::get($key), true); // Decode the JSON data
                 return response()->json([
-                    'message' => 'Fetched enrolled courses',
-                    '$courses' => $myCourses
+                    'message' => 'Fetched enrolled courses,',
+                    'courses' => $myCourses
                 ], 200);
             }  
 
@@ -188,7 +188,7 @@ class GroupController extends Controller
 
             return response()->json([
                 'message' => 'Fetched enrolled courses',
-                '$courses' => $myCourses
+                'courses' => $myCourses
             ], 200);
 
         } catch (\Throwable $e) {
