@@ -52,12 +52,17 @@ class HomeController extends Controller
     return response()->json(['courses' => $courses]);
 }
 
-    public function getPurchasedCourseDetails($id) {
+    public function getPurchasedCourseDetails($groupId) {
         try {
             //code...
-            $user = auth()->user();
+            $userId = auth()->id();
 
-            $key = $id . 'group' . $user->id;
+            // If no user is authenticated, return an Unauthorized response
+            if (!$userId) {
+                return response()->json(['message' => 'User not authenticated'], 401); // Unauthorized
+            }
+
+            $key = $id . 'group' . $userId;
 
             if (Cache::has('classwix_' . $key)) {
                 $content = json_decode(Cache::get('classwix_' . $key), true); // Decode the JSON data
@@ -74,7 +79,9 @@ class HomeController extends Controller
                 ], 200);
             }      
 
-            $content = Group::with(['video'])->find($id);
+            $content = Group::with(['video'])->find($groupId);
+
+            Log::debug("testing group : ". Group::with(['video'])->find($groupId));
 
             if (!$content) {
                 return response()->json(['message' => 'Course not yet approved by classwix'], 404);
