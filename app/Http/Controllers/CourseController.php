@@ -317,9 +317,12 @@ class CourseController extends Controller
                 'razorpay_payment_id' => $validatedData['payment_id'],
                 'razorpay_signature' => $validatedData['payment_signature'],
             ];
-    
+
+            Log::info('Verifying payment signature', $attributes);
+            
             $isValidSignature = $razorpay->utility->verifyPaymentSignature($attributes);
             if (!$isValidSignature) {
+                Log::error('Payment verification failed', $attributes);
                 return response()->json(['message' => 'Payment verification failed'], 400);
             }
     

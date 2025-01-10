@@ -38,6 +38,7 @@ Route::post('reset', [AuthController::class, 'resetPassword']);
 Route::get('purchase', [CourseController::class, 'getPurchasedCourses'])->middleware('auth:sanctum');
 Route::get('/users', [AuthController::class, 'getAllUsers']); // Get all users
 Route::delete('/users/{id}', [AuthController::class, 'deleteUser']); // Delete a user by ID
+Route::get('/my-profile', [AuthController::class, 'myProfile'])->middleware('auth:sanctum');
 
 
 

@@ -172,34 +172,34 @@ public function verifyPhoneOtp(Request $request)
 
     // Reset password
     public function resetPassword(Request $request)
-{
-    // Validate the input
-    $validator = Validator::make($request->all(), [
-        'phone' => 'required|digits:10',
-        'otp' => 'required|digits:4',
-        'new_password' => 'required|string|min:6|confirmed',
-    ]);
+    {
+        // Validate the input
+        $validator = Validator::make($request->all(), [
+            'phone' => 'required|digits:10',
+            'otp' => 'required|digits:4',
+            'new_password' => 'required|string|min:6|confirmed',
+        ]);
 
-    // Check for validation errors
-    if ($validator->fails()) {
-        return response()->json(['error' => $validator->errors()], 400);
+        // Check for validation errors
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 400);
+        }
+
+        // Retrieve the user based on the provided phone number
+        $user = User::where('phone', $request->phone)->first();
+
+        // Check if user exists and OTP matches
+        if (!$user || $user->otp !== $request->otp) {
+            return response()->json(['error' => 'Invalid phone number or OTP'], 400);
+        }
+
+        // If OTP is correct, proceed with resetting the password
+        $user->password = Hash::make($request->new_password);
+        $user->otp = null; // Clear the OTP after successful password reset
+        $user->save();
+
+        return response()->json(['message' => 'Password reset successfully.'], 200);
     }
-
-    // Retrieve the user based on the provided phone number
-    $user = User::where('phone', $request->phone)->first();
-
-    // Check if user exists and OTP matches
-    if (!$user || $user->otp !== $request->otp) {
-        return response()->json(['error' => 'Invalid phone number or OTP'], 400);
-    }
-
-    // If OTP is correct, proceed with resetting the password
-    $user->password = Hash::make($request->new_password);
-    $user->otp = null; // Clear the OTP after successful password reset
-    $user->save();
-
-    return response()->json(['message' => 'Password reset successfully.'], 200);
-}
 
 
     // Function to send SMS via Fast2SMS
@@ -249,6 +249,27 @@ public function verifyPhoneOtp(Request $request)
         return response()->json([
             'message' => 'User deleted successfully'
         ], 200); // 200 OK
+    }
+
+    public function myProfile() {
+        try {
+            //code...
+            $user = auth()->user();
+
+            if (!$user) {
+                return response()->json(['message' => 'You are not authorized.'], 401);
+            }
+
+            return response()->json([
+                'message' => 'Your data.',
+                'profile' => $user
+            ], 200);
+
+        } catch (\Throwable $e) {
+            //throw $th;
+            Log::error("Profile fetching error: ", $e->getMessage());
+            return response()->json(['message' => 'You are not authorized'], 500);
+        }
     }
 
 }
