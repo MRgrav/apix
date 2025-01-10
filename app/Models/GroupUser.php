@@ -18,6 +18,8 @@ class GroupUser extends Model
         'group_id',
         'user_id',
         'plan_id',
+        'class_counted',
+        'total_classes',
     ];
 
     /**

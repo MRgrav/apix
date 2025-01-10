@@ -9,6 +9,7 @@ use App\Models\Uploads;
 use App\Models\CoursePlan;
 use App\Models\GroupUser;
 use App\Models\PaymentOrder;
+use App\Models\ClassFrequency;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -238,8 +239,11 @@ class CourseController extends Controller
         // Validate the request data
         $validatedData = $request->validate([
             'duration' => 'required',
-            'plan_id' => 'required'
+            'plan_id' => 'required',
+            'class_frequency_id' => 'required',
         ]);
+
+        $classFrequecny = ClassFrequency::findOrFail($validatedData['class_frequency_id']);
 
         $course = Course::findOrFail($courseId);
         if (!$course) {
@@ -285,6 +289,8 @@ class CourseController extends Controller
                 'currency' => $currency,
                 'user_id' => auth()->id(),
                 'course_id' => $courseId,
+                'class_frequency_id' => $classFrequecny->id,
+                'number_of_classes' => $classFrequecny->classes_per_month,
             ]);
 
             // Return response with order details
@@ -318,9 +324,12 @@ class CourseController extends Controller
             'payment_signature' => 'required|string',
             'duration' => 'required|integer|min:1',  // Ensure duration is positive
             'razorpay_order_id' => 'required|string',  // Ensure order_id is passed
+            'class_frequency_id' => 'required|string',
         ]);
     
         try {
+            $classFrequecny = ClassFrequency::findOrFail($validatedData['class_frequency_id']);
+
             // Fetch the course details
             $course = Course::findOrFail($validatedData['course_id']);
     
@@ -370,6 +379,8 @@ class CourseController extends Controller
                 'amount' => $amount / 100,  // Convert from smallest unit to main unit
                 'status' => $paymentStatus,  // Store the payment status
                 'expiry_date' => $expiryDate,  // Store the calculated expiry date
+                'class_frequency_id' => $classFrequecny->id,
+                'number_of_classes' => $classFrequecny->classes_per_month,
             ]);
 
             $existGroup = GroupUser::where('user_id', auth()->id())

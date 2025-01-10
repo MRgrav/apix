@@ -156,3 +156,6 @@ Route::prefix('trials')->group(function () {
 // Route::get('/courses/available-plans', [CoursePlanController::class, 'getPlansByNriStatus']);
 // accessible to everyone
 Route::get('/courses/plans/{id}',[CoursePlanController::class, 'coursePlans']);
+
+// class start by instructor : required = group_id
+Route::post('/class/start', [TeacherClassController::class, 'store'])->middleware('auth:sanctum');
