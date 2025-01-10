@@ -76,10 +76,10 @@ Route::prefix('courses')->group(function() {
     Route::post('/', [CourseController::class, 'store']);
     Route::put('/{id}', [CourseController::class, 'update']);
     Route::delete('/{id}', [CourseController::class, 'destroy']);
-    Route::post('/enroll/{courseId}', [CourseController::class, 'createOrder']);
+    Route::post('/enroll/{courseId}', [CourseController::class, 'createOrder'])->middleware('auth:sanctum');
     Route::post('/content/{id}', [CourseController::class,'updateCourseContent']);
     Route::middleware('auth:sanctum')->post('/{id}/trial', [CourseController::class, 'startTrial']);
-    Route::middleware('auth:sanctum')->post('/buy', [CourseController::class, 'confirmPayment']);
+    Route::middleware('auth:sanctum')->post('/buy', [CourseController::class, 'confirmPayment'])->middleware('auth:sanctum');
 });
 
 Route::prefix('categories')->group(function() {

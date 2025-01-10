@@ -283,7 +283,7 @@ class CourseController extends Controller
                 'order_id' => $order['id'],
                 'amount' => $amount / 100, // Store amount in original currency unit
                 'currency' => $currency,
-                'user_id' => $user->id,
+                'user_id' => auth()->id(),
                 'course_id' => $courseId,
             ]);
 
@@ -363,7 +363,7 @@ class CourseController extends Controller
     
             // If the payment is valid, store the purchase details
             Purchase::create([
-                'user_id' => Auth::id(),
+                'user_id' => auth()->id(),
                 'course_id' => $validatedData['course_id'],
                 'payment_id' => $validatedData['payment_id'],
                 'plan_id' => $validatedData['plan_id'],
@@ -372,7 +372,7 @@ class CourseController extends Controller
                 'expiry_date' => $expiryDate,  // Store the calculated expiry date
             ]);
 
-            $existGroup = GroupUser::where('user_id',Auth::id())
+            $existGroup = GroupUser::where('user_id', auth()->id())
                                     ->where('course_id',$validatedData['course_id'])
                                     ->whereNotNull('group_id')
                                     ->exists();
@@ -380,14 +380,14 @@ class CourseController extends Controller
             if (!$existGroup) {
                 // initializing groups for users
                 GroupUser::create([
-                    'user_id' => Auth::id(),
+                    'user_id' => auth()->id(),
                     'course_id' => $validatedData['course_id'],
                     'expiry_date' => $expiryDate,
                     'plan_id' => $validatedData['plan_id'],
                 ]);
             } else {
                 // Find the GroupUser record by user_id and course_id
-                GroupUser::where('user_id', Auth::id())
+                GroupUser::where('user_id', auth()->id())
                     ->where('course_id', $validatedData['course_id'])
                     ->update(['expiry_date' => $expiryDate, 'plan_id' => $validatedData['plan_id']]);
             }
