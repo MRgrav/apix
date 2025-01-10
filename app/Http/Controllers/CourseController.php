@@ -8,6 +8,7 @@ use App\Models\Trial;
 use App\Models\Uploads;
 use App\Models\CoursePlan;
 use App\Models\GroupUser;
+use App\Models\PaymentOrder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -258,7 +259,14 @@ class CourseController extends Controller
         }
 
         // Convert price to the smallest unit (paise for INR, cents for USD)
-        $amount = 100 * $validatedData['duration'] * $plan->current_rate + ($plan->current_rate * $plan->GST);    
+        // $amount = 100 * $validatedData['duration'] * $plan->current_rate + ($plan->current_rate * $plan->GST);    
+        // Calculate the base price
+        $basePrice = $validatedData['duration'] * $plan->current_rate;
+        // Calculate GST
+        $gstAmount = $basePrice * ($plan->GST / 100);
+        // Total amount in smallest unit
+        $amount = ($basePrice + $gstAmount) * 100; // Convert to paise
+
 
         // Create order in Razorpay
         $razorpay = new \Razorpay\Api\Api(env('RAZORPAY_KEY'), env('RAZORPAY_SECRET'));
@@ -269,6 +277,14 @@ class CourseController extends Controller
                 'amount' => $amount,
                 'currency' => $currency,
                 'payment_capture' => 1
+            ]);
+
+            PaymentOrder::create([
+                'order_id' => $order['id'],
+                'amount' => $amount / 100, // Store amount in original currency unit
+                'currency' => $currency,
+                'user_id' => $user->id,
+                'course_id' => $courseId,
             ]);
 
             // Return response with order details
@@ -319,6 +335,10 @@ class CourseController extends Controller
             ];
 
             Log::info('Verifying payment signature', $attributes);
+
+             // Log the expected signature for debugging
+            $expectedSignature = hash_hmac('sha256', $validatedData['razorpay_order_id'] . '|' . $validatedData['payment_id'], env('RAZORPAY_SECRET'));
+            Log::info('Expected Signature: ' . $expectedSignature);
             
             $isValidSignature = $razorpay->utility->verifyPaymentSignature($attributes);
             if (!$isValidSignature) {
