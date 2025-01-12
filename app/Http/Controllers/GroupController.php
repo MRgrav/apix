@@ -45,9 +45,21 @@ class GroupController extends Controller
         return response()->json(['message' => 'User assigned to group successfully']);
     }
     
+    // redis : done
     public function getAllGroups()
     {
+        $key = 'allgroup';
+
+        if (Cache::has($key)) {
+            $groups = json_decode(Cache::get($key), true); // Decode the JSON data
+            return response()->json([
+                'message' => 'Groups retrieved successfully',
+                'groups' => $groups
+            ], 200);
+        }  
+
         $groups = Group::with('users', 'course')->get();
+        Cache::put($key, $groups->toJson(), now()->addHour());
 
         return response()->json([
             'message' => 'Groups retrieved successfully',
@@ -147,6 +159,8 @@ class GroupController extends Controller
     //     return $group;
     // }
 
+
+    // redis : done
     public function myGroups(Request $request) {
         try {
             //code...
