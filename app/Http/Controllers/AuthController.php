@@ -99,6 +99,8 @@ class AuthController extends Controller
                     'phone' => $user->phone,
                     'email' => $user->email,
                     'is_nri' => $user->is_nri,
+                    'role' => $user->role->name,
+                    'permissions' => $user->role->permissions,
                 ]
             ], 200)->cookie('auth_token', $token, 60 * 24);
         }

@@ -132,6 +132,7 @@ Route::prefix('groups')->group(function () {
 
 Route::get('/my-groups', [GroupController::class, 'myGroups'])->middleware('auth:sanctum');
 
+Route::get('/instructors/home', [InstructorController::class, 'home'])->middleware('auth:sanctum');
 Route::post('/instructors/assign', [InstructorController::class, 'assignInstructor']);
 Route::delete('/instructors/remove/{id}', [InstructorController::class, 'removeInstructor']);
 Route::get('/courses/{courseId}/instructors', [InstructorController::class, 'getInstructorsByCourse']);

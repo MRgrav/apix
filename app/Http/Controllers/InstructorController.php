@@ -59,4 +59,23 @@ class InstructorController extends Controller
             'instructors' => $instructors
         ]);
     }
+
+    public function home() {
+        $user = auth()->user();
+        try {
+            //code...
+            $course = Instructor::with(['course','group'])
+                                    ->where('user_id', $user->id)
+                                    ->first();
+
+            if (!$course) {
+                return response()->json('Have not enrolled to a course', 404);
+            }
+
+            return response()->json(['course' => $course], 200);
+        } catch (\Throwable $e) {
+            //throw $th;
+            return response()->json(['message' => 'Internal server error'], 500);
+        }
+    }
 }

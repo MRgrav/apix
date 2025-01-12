@@ -23,6 +23,8 @@ class User extends Authenticatable
         'phone',
         'password',
         'otp', // Include OTP in mass-assignable fields
+        'role_id',
+        'is_nri'
     ];
 
     /**
@@ -60,6 +62,16 @@ public function purchases()
     public function purchasedCourses()
     {
         return $this->belongsToMany(Course::class, 'purchases', 'user_id', 'course_id');
+    }
+
+    /**
+     * Get the role that owns the User
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function role(): BelongsTo
+    {
+        return $this->belongsTo(Role::class, 'role_id');
     }
 
 }
