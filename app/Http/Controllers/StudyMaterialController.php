@@ -21,6 +21,7 @@ class StudyMaterialController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
+            'group_id' => 'required',
             'course_id' => 'required|exists:courses,id',
             'photo' => 'nullable|file|mimes:jpeg,png,jpg',
             'pdf' => 'nullable|file|mimes:pdf',
@@ -28,6 +29,7 @@ class StudyMaterialController extends Controller
         ]);
 
         $studyMaterial = new StudyMaterial();
+        $studyMaterial->group_id = $validatedData['group_id'];
         $studyMaterial->course_id = $validatedData['course_id'];
 
         if ($request->hasFile('photo')) {

@@ -6,17 +6,34 @@ use App\Models\TeacherClass;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 
 class TeacherClassController extends Controller
 {
     /**
      * Display a listing of the resource.
+     * Redis : done
      */
     public function index()
     {
         // List all TeacherClass records, or use pagination if needed
+        $key = 'allTeacherClasses';
+
+        if (Cache::has($key)) {
+            $teacherClasses = json_decode(Cache::get($key), true); // Decode the JSON data
+            return response()->json([
+                'message' => 'Fetched teacher classes,',
+                'courses' => $teacherClasses
+            ], 200);
+        }  
+
+        Cache::put($key, $teacherClasses->toJson(), now()->addHour());
+
         $teacherClasses = TeacherClass::all();
-        return response()->json($teacherClasses);
+        return response()->json([
+            'message' => 'Fetched teacher classes,',
+            'courses' => $teacherClasses
+        ], 200);
     }
 
     /**

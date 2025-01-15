@@ -130,6 +130,7 @@ Route::prefix('groups')->group(function () {
     Route::get('/content/{groupId}', [HomeController::class, 'getPurchasedCourseDetails']);
 });
 
+// for student
 Route::get('/my-groups', [GroupController::class, 'myGroups'])->middleware('auth:sanctum');
 
 Route::get('/instructors/home', [InstructorController::class, 'home'])->middleware('auth:sanctum');

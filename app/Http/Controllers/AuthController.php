@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Cache;
 
 class AuthController extends Controller
 {
@@ -227,15 +228,29 @@ public function verifyPhoneOtp(Request $request)
         }
     }
 
+    // redis : done
     public function getAllUsers()
     {
+        $key = 'allUsers';
+
+        if (Cache::has($key)) {
+            $users = json_decode(Cache::get($key), true); // Decode the JSON data
+            return response()->json([
+                'message' => 'Users retrieved successfully',
+                'users' => $users
+            ], 200);
+        }  
+
         $users = User::all(); // Fetch all users
+
+        Cache::put($key, $users->toJson(), now()->addMinutes(10));
 
         return response()->json([
             'message' => 'Users retrieved successfully',
             'users' => $users
         ], 200);
     }
+
     public function deleteUser($id)
     {
         $user = User::find($id);
