@@ -18,6 +18,7 @@ use App\Http\Controllers\GroupController;
 use App\Http\Controllers\TrialController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\StatusController;
+use App\Http\Controllers\MicroController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -161,3 +162,9 @@ Route::get('/courses/plans/{id}',[CoursePlanController::class, 'coursePlans']);
 
 // class start by instructor : required = group_id
 Route::post('/class/start', [TeacherClassController::class, 'store'])->middleware('auth:sanctum');
+
+
+// micro apis
+Route::get('/micro/courses', [MicroController::class, 'courses']);
+Route::get('/micro/instructors/{courseId}', [MicroController::class, 'instructors']);
+Route::get('/micro/students', [MicroController::class, 'students']);
