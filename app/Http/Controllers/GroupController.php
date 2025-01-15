@@ -19,6 +19,7 @@ class GroupController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string|max:255',
+            'course_id' => 'required',
         ]);
 
         $course = Course::findOrFail($courseId);
@@ -26,6 +27,7 @@ class GroupController extends Controller
         $group = $course->groups()->create([
             'name' => $request->name,
             'description' => $request->description,
+            'course_id' => $request->course_id,
             'created_by' => auth()->id(),
         ]);
 
@@ -35,15 +37,36 @@ class GroupController extends Controller
     // Method to assign a user to an existing group
     public function assignUserToGroup(Request $request, $groupId)
     {
+        // Validate the request
         $request->validate([
-            'user_id' => 'required|exists:users,id',
+            'user_id' => 'required|exists:users,id', // Validate that the user_id exists in the users table
         ]);
 
+        // Find the group or fail with 404 if not found
         $group = Group::findOrFail($groupId);
-        $group->users()->attach($request->user_id);
 
-        return response()->json(['message' => 'User assigned to group successfully']);
+         // Find the existing GroupUser entry for the user and their associated course
+        $groupUser = GroupUser::where('user_id', $request->user_id)
+                                ->where('course_id', $group->course_id) // Match by course_id
+                                ->first();
+
+         // Check if the GroupUser record exists
+        if (!$groupUser) {
+            return response()->json(['message' => 'User is not enrolled in the course'], 400);
+        }
+
+        // Update the group_id field in the existing GroupUser record
+        $groupUser->update([
+            'group_id' => $groupId, // Update only the group_id
+            // 'plan_id' => $request->plan_id ?? $groupUser->plan_id, // Optionally update the plan_id if provided
+        ]);
+
+        return response()->json([
+            'message' => 'User assigned to group successfully',
+            'group_user' => $groupUser // Optionally return the updated GroupUser record
+        ], 201);
     }
+
     
     // redis : done
     public function getAllGroups()
