@@ -24,7 +24,7 @@ class MicroController extends Controller
             ], 200);
         }  
 
-        $micro = Course::select('id', 'name')->get();
+        $micro = Course::select('title')->get();
 
         if (!$micro) {
             return response()->json(['message' => 'You have not enrolled any course yet'], 404);
