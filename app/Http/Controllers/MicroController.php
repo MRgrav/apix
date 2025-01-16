@@ -69,7 +69,7 @@ class MicroController extends Controller
 
     // redis : done
     // fetch instructors for other groups or assign new instructor
-    public function getInstructors ($courseId) {
+    public function getInstructors () {
         $key = 'micro_instructors_name';
 
         if (Cache::has($key)) {
@@ -80,7 +80,7 @@ class MicroController extends Controller
             ], 200);
         }
 
-        $micro = Instructor::where('course_id', $courseId)->get();
+        $micro = Instructor::all();
 
         if (!$micro) {
             $micro = User::where('role',1)->whereNotNull('phone_verified_at')->get();
