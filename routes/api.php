@@ -165,6 +165,6 @@ Route::post('/class/start', [TeacherClassController::class, 'store'])->middlewar
 
 
 // micro apis
-Route::get('/micro/courses', [MicroController::class, 'courses']);
-Route::get('/micro/instructors/{courseId}', [MicroController::class, 'instructors']);
-Route::get('/micro/students', [MicroController::class, 'students']);
+Route::get('/micro/courses', [MicroController::class, 'getCoursesName']);
+Route::get('/micro/instructors/{courseId}', [MicroController::class, 'getInstructors']);
+Route::get('/micro/students', [MicroController::class, 'getStudents']);
