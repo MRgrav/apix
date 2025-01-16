@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Cache;
 
 use App\Models\Course;
 use App\Models\Instructor;
+use App\Modals\User;
 
 class MicroController extends Controller
 {
@@ -94,6 +95,33 @@ class MicroController extends Controller
 
         return response()->json([
             'message' => 'Fetched instructors names,',
+            'courses' => $micro
+        ], 200);
+    }
+
+    // redis : done
+    // fetch basic users
+    public function getUsers () {
+        $key = 'micro_users';
+
+        if (Cache::has($key)) {
+            $micro = json_decode(Cache::get($key), true); // Decode the JSON data
+            return response()->json([
+                'message' => 'Fetched users,',
+                'courses' => $micro
+            ], 200);
+        }
+
+        $micro = User::where('role',1)->whereNotNull('phone_verified_at')->get();
+
+        if (!$micro) {
+            return response()->json(['message' => 'You have no users'], 404);
+        }
+
+        Cache::put($key, $micro->toJson(), now()->addMinutes(30));
+
+        return response()->json([
+            'message' => 'Fetched users,',
             'courses' => $micro
         ], 200);
     }

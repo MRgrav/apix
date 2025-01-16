@@ -93,7 +93,7 @@ class GroupController extends Controller
     // Method to get a group by ID
     public function getGroup($groupId)
     {
-        $group = Group::with('users')->find($groupId);
+        $group = Group::with(['users','course','videos'])->find($groupId);
 
         if (!$group) {
             return response()->json(['message' => 'Group not found'], 404);
