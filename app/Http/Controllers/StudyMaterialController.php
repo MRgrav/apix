@@ -92,7 +92,7 @@ class StudyMaterialController extends Controller
                 $materials = json_decode(Cache::get($key), true); // Decode the JSON data
                 return response()->json([
                     'message' => 'Fetched study materials,',
-                    'courses' => $materials
+                    'materials' => $materials
                 ], 200);
             }
 
@@ -108,7 +108,7 @@ class StudyMaterialController extends Controller
             
             return response()->json([
                 'message' => 'Fetched study materials',
-                'courses' => $studyMaterials
+                'materials' => $studyMaterials
             ], 200);
         } catch (\Throwable $e) {
             //throw $th;
