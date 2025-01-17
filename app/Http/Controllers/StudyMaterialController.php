@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\StudyMaterial;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 
 class StudyMaterialController extends Controller
 {
@@ -109,6 +110,9 @@ class StudyMaterialController extends Controller
             ], 200);
         } catch (\Throwable $e) {
             //throw $th;
+            Log::error('An error occurred while fetching study material', [
+                'error' => $e->getMessage(),
+            ]);
             return response()->json([
                 'message' => 'Internal server error',
             ], 500);
