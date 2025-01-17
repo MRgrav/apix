@@ -79,12 +79,40 @@ class StudyMaterialController extends Controller
 
 
     /**
-     * Display a specific study material.
+     * Display a specific group's study materials.
      */
     public function show($id)
     {
-        $studyMaterial = StudyMaterial::findOrFail($id);
-        return response()->json($studyMaterial);
+        try {
+            //code...
+            $key = 'group_materials' . $id;
+
+            if (Cache::has($key)) {
+                $materials = json_decode(Cache::get($key), true); // Decode the JSON data
+                return response()->json([
+                    'message' => 'Fetched study materials,',
+                    'courses' => $materials
+                ], 200);
+            }
+
+            $studyMaterials = StudyMaterial::where('group_id', $id)->get();
+
+            if ($studyMaterials) {
+                return response()->json([
+                    'message' => 'No materials available'
+                ], 404);
+            }
+            
+            return response()->json([
+                'message' => 'Fetched study materials',
+                'courses' => $studyMaterials
+            ], 200);
+        } catch (\Throwable $e) {
+            //throw $th;
+            return response()->json([
+                'message' => 'Internal server error',
+            ], 500);
+        }
     }
 
     /**
