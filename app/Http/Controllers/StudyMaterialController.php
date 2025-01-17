@@ -25,7 +25,7 @@ class StudyMaterialController extends Controller
             $validatedData = $request->validate([
                 'group_id' => 'required',
                 'course_id' => 'required|exists:courses,id',
-                'photo' => 'nullable|file|mimes:jpeg,png,jpg',
+                'photo' => 'nullable|file|mimes:jpeg,png,jpg|max:2048',
                 'pdf' => 'nullable|file|mimes:pdf',
                 'audio' => 'nullable|file|mimes:mp3,wav',
             ]);
@@ -35,16 +35,22 @@ class StudyMaterialController extends Controller
             $studyMaterial->course_id = $validatedData['course_id'];
 
             if ($request->hasFile('photo')) {
-                $studyMaterial->photo = $request->file('photo')->store('photos', 'public');
+                $file = $request->file('photo');
+                $filename = time() . '_' . $file->getClientOriginalName();
+                $studyMaterial->photo = $file->storeAs('photos', $filename, 'public');
             }
-
+            
             if ($request->hasFile('pdf')) {
-                $studyMaterial->pdf = $request->file('pdf')->store('pdfs', 'public');
+                $file = $request->file('pdf');
+                $filename = time() . '_' . $file->getClientOriginalName();
+                $studyMaterial->pdf = $file->storeAs('pdfs', $filename, 'public');
             }
-
+            
             if ($request->hasFile('audio')) {
-                $studyMaterial->audio = $request->file('audio')->store('audios', 'public');
-            }
+                $file = $request->file('audio');
+                $filename = time() . '_' . $file->getClientOriginalName();
+                $studyMaterial->audio = $file->storeAs('audios', $filename, 'public');
+            }            
 
             $studyMaterial->save();
 
@@ -95,16 +101,42 @@ class StudyMaterialController extends Controller
         ]);
 
         if ($request->hasFile('photo')) {
-            $studyMaterial->photo = $request->file('photo')->store('photos', 'public');
+            // Delete old photo if exists
+            if ($studyMaterial->photo) {
+                Storage::disk('public')->delete($studyMaterial->photo);
+            }
+            $file = $request->file('photo');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $studyMaterial->photo = $file->storeAs('photos', $filename, 'public');
         }
 
         if ($request->hasFile('pdf')) {
-            $studyMaterial->pdf = $request->file('pdf')->store('pdfs', 'public');
+            // Delete old photo if exists
+            if ($studyMaterial->pdf) {
+                Storage::disk('public')->delete($studyMaterial->pdf);
+            }
+            $file = $request->file('pdf');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $studyMaterial->pdf = $file->storeAs('pdfs', $filename, 'public');
         }
 
         if ($request->hasFile('audio')) {
-            $studyMaterial->audio = $request->file('audio')->store('audios', 'public');
+            // Delete old photo if exists
+            if ($studyMaterial->audio) {
+                Storage::disk('public')->delete($studyMaterial->audio);
+            }
+            $file = $request->file('audio');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $studyMaterial->audio = $file->storeAs('audios', $filename, 'public');
         }
+
+        // if ($request->hasFile('pdf')) {
+        //     $studyMaterial->pdf = $request->file('pdf')->store('pdfs', 'public');
+        // }
+
+        // if ($request->hasFile('audio')) {
+        //     $studyMaterial->audio = $request->file('audio')->store('audios', 'public');
+        // }
 
         $studyMaterial->save();
 
