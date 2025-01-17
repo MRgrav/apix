@@ -31,7 +31,7 @@ class MicroController extends Controller
             return response()->json(['message' => 'You have not enrolled any course yet'], 404);
         }
 
-        Cache::put($key, $micro->toJson(), now()->addHour());
+        Cache::put($key, $micro->toJson(), now()->addMinutes(15));
 
         return response()->json([
             'message' => 'Fetched courses names,',

@@ -98,11 +98,13 @@ class StudyMaterialController extends Controller
 
             $studyMaterials = StudyMaterial::where('group_id', $id)->get();
 
-            if ($studyMaterials) {
+            if ($studyMaterials->isEmpty()) {
                 return response()->json([
                     'message' => 'No materials available'
                 ], 404);
             }
+
+            Cache::put($key, $studyMaterials->toJson(), now()->addMinutes(27));
             
             return response()->json([
                 'message' => 'Fetched study materials',

@@ -80,7 +80,7 @@ class HomeController extends Controller
                 return response()->json(['message' => 'Course not yet approved by classwix'], 404);
             }
 
-            Cache::put($key, $content->toJson(), now()->addHour());
+            Cache::put($key, $content->toJson(), now()->addMinutes(39));
 
             return response()->json([
                 'message' => 'Data fetched successfully',

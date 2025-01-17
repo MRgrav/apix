@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Course;
 use App\Models\Group;
 use App\Models\GroupUser;
+use App\Models\TeacherClass;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -82,7 +83,7 @@ class GroupController extends Controller
         }  
 
         $groups = Group::with('users', 'course')->get();
-        Cache::put($key, $groups->toJson(), now()->addHour());
+        Cache::put($key, $groups->toJson(), now()->addMinutes(23));
 
         return response()->json([
             'message' => 'Groups retrieved successfully',
@@ -93,17 +94,56 @@ class GroupController extends Controller
     // Method to get a group by ID
     public function getGroup($groupId)
     {
-        $group = Group::with(['users','course','videos'])->find($groupId);
+        $key = 'group_details_' . $groupId; // Use $groupId instead of $id
+
+        // Check if the group details are cached
+        if (Cache::has($key)) {
+            $groupData = json_decode(Cache::get($key), true); // Decode the JSON data
+            return response()->json([
+                'message' => 'Group retrieved successfully from cache',
+                'group' => $groupData['group'],
+                'class_status' => $groupData['class_status']
+            ], 200);
+        }
+
+        // Fetch the group with related data
+        $group = Group::with(['users', 'course', 'videos'])->find($groupId);
 
         if (!$group) {
             return response()->json(['message' => 'Group not found'], 404);
         }
 
+        // Get the current date
+        $currentDate = now(); // Use Laravel's now() helper for the current date
+
+        // Create the class code
+        $codeString = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+        // Generate the class code using the group ID and formatted date
+        $new_class_code = $groupId . '&' .
+            $codeString[$currentDate->year % 26] . // Year (mod 26 for index)
+            $codeString[$currentDate->month - 1] . // Month (0-indexed)
+            $codeString[$currentDate->day - 1]; // Day (0-indexed)
+
+        // Check if the class code exists for the group
+        $code = TeacherClass::where('group_id', $groupId)->value('class_code');
+
+        // Determine class status
+        $class_status = $new_class_code == $code ? true : false;
+
+        // Cache the group data
+        Cache::put($key, json_encode([
+            'group' => $group,
+            'class_status' => $class_status
+        ]), now()->addMinutes(16));
+
         return response()->json([
             'message' => 'Group retrieved successfully',
-            'group' => $group
+            'group' => $group,
+            'class_status' => $class_status
         ], 200);
     }
+
 
     // Method to delete a group by ID
     public function deleteGroup($groupId)
@@ -214,7 +254,7 @@ class GroupController extends Controller
                 return response()->json(['message' => 'You have not enrolled any course yet'], 404);
             }
 
-            Cache::put($key, $myCourses->toJson(), now()->addHour());
+            Cache::put($key, $myCourses->toJson(), now()->addMinutes(21));
 
             return response()->json([
                 'message' => 'Fetched enrolled courses',
