@@ -19,6 +19,7 @@ use App\Http\Controllers\TrialController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\StatusController;
 use App\Http\Controllers\MicroController;
+use App\Http\Controllers\TeacherClassController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
