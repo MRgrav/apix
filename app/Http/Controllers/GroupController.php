@@ -150,7 +150,8 @@ class GroupController extends Controller
         return response()->json([
             'message' => 'Group retrieved successfully',
             'group' => $group,
-            'class_status' => $class_status
+            'class_status' => $class_status,
+            'class_code' => $code
         ], 200);
     }
 
