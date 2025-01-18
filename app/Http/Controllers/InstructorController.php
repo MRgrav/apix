@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Course;
 use App\Models\Group;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class InstructorController extends Controller
 {
@@ -16,14 +17,22 @@ class InstructorController extends Controller
         $request->validate([
             'user_id' => 'required|exists:users,id',
             'course_id' => 'required|exists:courses,id',
-            'group_id' => 'nullable|exists:groups,id',
+            // 'group_id' => 'nullable|exists:groups,id',
         ]);
 
         $instructor = Instructor::create([
             'user_id' => $request->user_id,
             'course_id' => $request->course_id,
-            'group_id' => $request->group_id,
+            // 'group_id' => $request->group_id,
         ]);
+
+        // Update the user's role to 2 (Instructor)
+        $user = User::find($request->user_id);
+        $user->update(['role_id' => 2]);
+
+        Cache::forget('micro_users');
+        Cache::forget('allUsers');
+        Cache::forget('micro_instructors_name');
 
         return response()->json([
             'message' => 'Instructor assigned successfully',

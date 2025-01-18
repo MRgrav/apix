@@ -25,9 +25,9 @@ class MicroController extends Controller
             ], 200);
         }  
 
-        $micro = Course::select('id','title')->get();
+        $micro = Course::select('id','title')->with('category')->get();
 
-        if (!$micro) {
+        if ($micro->isEmpty()) {
             return response()->json(['message' => 'You have not enrolled any course yet'], 404);
         }
 
@@ -77,17 +77,17 @@ class MicroController extends Controller
             $micro = json_decode(Cache::get($key), true); // Decode the JSON data
             return response()->json([
                 'message' => 'Fetched instructors names,',
-                'courses' => $micro
+                'users' => $micro
             ], 200);
         }
 
-        $micro = Instructor::all();
+        $micro = Instructor::with(['user','course'])->all();
 
-        if (!$micro) {
-            $micro = User::where('role',1)->whereNotNull('phone_verified_at')->get();
+        if ($micro->isEmpty()) {
+            $micro = User::where('role_id',1)->whereNotNull('phone_verified_at')->get();
         }
 
-        if (!$micro) {
+        if ($micro->isEmpty()) {
             return response()->json(['message' => 'You have no users'], 404);
         }
 
@@ -95,7 +95,7 @@ class MicroController extends Controller
 
         return response()->json([
             'message' => 'Fetched instructors names,',
-            'courses' => $micro
+            'users' => $micro
         ], 200);
     }
 
@@ -124,5 +124,16 @@ class MicroController extends Controller
             'message' => 'Fetched users,',
             'users' => $micro
         ], 200);
+    }
+
+    // redis : done
+    // fetch basic dashboard
+    public function getDashboard () {
+        $keyCourses = 'dash_courses';
+        $keyUsers = 'dash_users';
+        $keyGroups = 'dash_groups';
+        $keyAcademics = 'dash_academics';
+        $keyMusics = 'dash_musics';
+        
     }
 }
