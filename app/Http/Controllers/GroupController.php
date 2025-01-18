@@ -144,7 +144,8 @@ class GroupController extends Controller
         // Cache the group data
         Cache::put($key, json_encode([
             'group' => $group,
-            'class_status' => $class_status
+            'class_status' => $class_status,
+            'class_code' => $code
         ]), now()->addMinutes(16));
 
         return response()->json([
