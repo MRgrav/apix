@@ -5,6 +5,8 @@ use App\Models\StudyMaterial;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Validation\ValidationException;
+
 
 class StudyMaterialController extends Controller
 {
@@ -61,7 +63,7 @@ class StudyMaterialController extends Controller
             ]);
 
             return response()->json(['message' => 'Study material created successfully'], 201);
-        } catch (\Illuminate\Validation\ValidationException $e) {
+        } catch (ValidationException $e) {
             // Handle validation exceptions
             Log::error('Validation error while creating study material', [
                 'errors' => $e->validator->errors(),

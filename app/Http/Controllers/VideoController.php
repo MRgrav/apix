@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Video;
 use App\Models\Group;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 
 class VideoController extends Controller
 {
@@ -13,7 +15,17 @@ class VideoController extends Controller
      */
     public function index($group_id)
     {
+        $key = 'videos' . $group_id;
+
+        if (Cache::has($key)) {
+            $videos = json_decode(Cache::get($key), true); // Decode the JSON data
+            return response()->json($videos);
+        }  
+
         $videos = Video::where('group_id', $group_id)->get();
+
+        Cache::put($key, $videos->toJson(), now()->addMinutes(48));
+
         return response()->json($videos);
     }
 

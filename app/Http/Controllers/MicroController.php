@@ -108,7 +108,7 @@ class MicroController extends Controller
             $micro = json_decode(Cache::get($key), true); // Decode the JSON data
             return response()->json([
                 'message' => 'Fetched users,',
-                'courses' => $micro
+                'users' => $micro
             ], 200);
         }
 
@@ -122,7 +122,7 @@ class MicroController extends Controller
 
         return response()->json([
             'message' => 'Fetched users,',
-            'courses' => $micro
+            'users' => $micro
         ], 200);
     }
 }
