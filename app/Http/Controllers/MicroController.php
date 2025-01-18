@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Cache;
 
 use App\Models\Course;
 use App\Models\Instructor;
-use App\Modals\User;
+use App\Models\User;
 
 class MicroController extends Controller
 {
@@ -114,7 +114,7 @@ class MicroController extends Controller
 
         $micro = User::where('role_id',1)->whereNotNull('phone_verified_at')->get();
 
-        if (!$micro) {
+        if ($micro->isEmpty()) {
             return response()->json(['message' => 'You have no users'], 404);
         }
 
