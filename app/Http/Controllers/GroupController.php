@@ -34,6 +34,8 @@ class GroupController extends Controller
                 'instructor_id' => $request->instructor_id,
                 'created_by' => auth()->id(),
             ]);
+
+            Cache::forget('allgroup');
     
             return response()->json(['message' => 'Group created successfully', 'group' => $group], 201);
         } catch (\Throwable $e) {
@@ -115,7 +117,7 @@ class GroupController extends Controller
         }
 
         // Fetch the group with related data
-        $group = Group::with(['users', 'course', 'videos'])->find($groupId);
+        $group = Group::with(['users', 'course', 'videos', 'instructor'])->find($groupId);
 
         if (!$group) {
             return response()->json(['message' => 'Group not found'], 404);
