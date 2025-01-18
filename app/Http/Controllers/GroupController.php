@@ -17,22 +17,30 @@ class GroupController extends Controller
     // Method to create a new group within a course
     public function addGroup(Request $request, $courseId)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string|max:255',
-            'course_id' => 'required',
-        ]);
-
-        $course = Course::findOrFail($courseId);
-
-        $group = $course->groups()->create([
-            'name' => $request->name,
-            'description' => $request->description,
-            'course_id' => $request->course_id,
-            'created_by' => auth()->id(),
-        ]);
-
-        return response()->json(['message' => 'Group created successfully', 'group' => $group], 201);
+        try {
+            //code...
+            $request->validate([
+                'name' => 'required|string|max:255',
+                'description' => 'nullable|string|max:255',
+                'instructor_id' => 'required',
+            ]);
+    
+            $course = Course::findOrFail($courseId);
+    
+            $group = $course->groups()->create([
+                'name' => $request->name,
+                'description' => $request->description,
+                'course_id' => $courseId,   // This is not required
+                'instructor_id' => $request->instructor_id,
+                'created_by' => auth()->id(),
+            ]);
+    
+            return response()->json(['message' => 'Group created successfully', 'group' => $group], 201);
+        } catch (\Throwable $e) {
+            //throw $th;
+            Log::error('Error creating new group under : '.$courseId. '\n' . $e->getMessage());
+            return response()->json(['message' => 'Internal server error'], 500);
+        }
     }
 
     // Method to assign a user to an existing group

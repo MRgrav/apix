@@ -12,6 +12,7 @@ class Group extends Model
         'name', 
         'description', 
         'course_id', 
+        'instructor_id',
         'created_by',
         'live_class_link'
     ];
@@ -26,9 +27,12 @@ class Group extends Model
         return $this->belongsToMany(User::class, 'group_user','group_id','user_id');
     }
     public function videos()
-{
-    return $this->hasMany(Video::class);
-}
+    {
+        return $this->hasMany(Video::class);
+    }
+    public function instructor() {
+        return $this->belongsTo(User::class, 'instructor_id');
+    }
 
 }
 

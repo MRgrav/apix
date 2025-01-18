@@ -81,7 +81,7 @@ class MicroController extends Controller
             ], 200);
         }
 
-        $micro = Instructor::with(['user','course'])->all();
+        $micro = Instructor::with(['user','course'])->get();
 
         if ($micro->isEmpty()) {
             $micro = User::where('role_id',1)->whereNotNull('phone_verified_at')->get();
@@ -134,6 +134,6 @@ class MicroController extends Controller
         $keyGroups = 'dash_groups';
         $keyAcademics = 'dash_academics';
         $keyMusics = 'dash_musics';
-        
+
     }
 }
