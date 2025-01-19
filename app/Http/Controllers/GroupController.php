@@ -6,6 +6,7 @@ use App\Models\Course;
 use App\Models\Group;
 use App\Models\GroupUser;
 use App\Models\TeacherClass;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -125,7 +126,7 @@ class GroupController extends Controller
         }
 
         // Get the current date
-        $currentDate = now(); // Use Laravel's now() helper for the current date
+        $currentDate = Carbon::now(); // Use Laravel's now() helper for the current date
 
         // Create the class code
         $codeString = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -140,7 +141,7 @@ class GroupController extends Controller
         $code = TeacherClass::where('group_id', $groupId)->value('class_code');
 
         // Determine class status
-        $class_status = $new_class_code == $code ? true : false;
+        $class_status = $new_class_code === $code;
 
         // Cache the group data
         Cache::put($key, json_encode([
