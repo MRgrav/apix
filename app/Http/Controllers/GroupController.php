@@ -112,7 +112,8 @@ class GroupController extends Controller
             return response()->json([
                 'message' => 'Group retrieved successfully from cache',
                 'group' => $groupData['group'],
-                'class_status' => $groupData['class_status']
+                'class_status' => $groupData['class_status'],
+                'class_code' => $groupData['class_code'],
             ], 200);
         }
 

@@ -76,6 +76,9 @@ class TeacherClassController extends Controller
                 'group_id' => $validated['group_id'],
                 'class_code' => $class_code,
             ]);
+
+            $key = 'group_details_' . $validated['group_id'];
+            Cache::forget($key);
     
             // Return a success response
             return response()->json(['message' => 'Teacher attendance created successfully.'], 201);
