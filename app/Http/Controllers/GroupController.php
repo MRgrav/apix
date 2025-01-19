@@ -138,7 +138,9 @@ class GroupController extends Controller
             $codeString[$currentDate->day - 1]; // Day (0-indexed)
 
         // Check if the class code exists for the group
-        $code = TeacherClass::where('group_id', $groupId)->value('class_code');
+        $code = TeacherClass::where('group_id', $groupId)
+                            ->orderBy('created_at', 'desc')
+                            ->value('class_code');
 
         // Determine class status
         $class_status = $new_class_code === $code;
