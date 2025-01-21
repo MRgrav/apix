@@ -13,6 +13,7 @@ class TeacherClass extends Model
         'user_id',
         'group_id',
         'class_code',
+        'class_time',
     ];
 
     /**

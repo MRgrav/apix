@@ -131,8 +131,11 @@ class GroupController extends Controller
         // Create the class code
         $codeString = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
+        // Format the group_id as a four-digit string with leading zeros
+        $formattedGroupId = str_pad($groupId, 4, '0', STR_PAD_LEFT);
+
         // Generate the class code using the group ID and formatted date
-        $new_class_code = $groupId . '&' .
+        $new_class_code = $formattedGroupId . '&' .
             $codeString[$currentDate->year % 26] . // Year (mod 26 for index)
             $codeString[$currentDate->month - 1] . // Month (0-indexed)
             $codeString[$currentDate->day - 1]; // Day (0-indexed)

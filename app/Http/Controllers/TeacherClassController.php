@@ -64,8 +64,11 @@ class TeacherClassController extends Controller
             // Get the current date using Carbon
             $currentDate = Carbon::now();
     
-            // Generate the class code using the group ID and formatted date
-            $class_code = $validated['group_id'] . '&' .
+            // Format the group_id as a four-digit string with leading zeros
+            $formattedGroupId = str_pad($validated['group_id'], 4, '0', STR_PAD_LEFT);
+
+            // Generate the class code using the formatted group ID and formatted date
+            $class_code = $formattedGroupId . '&' .
                           $codeString[$currentDate->year % 50] . // Year (mod 26 for index)
                           $codeString[$currentDate->month - 1] . // Month (0-indexed)
                           $codeString[$currentDate->day - 1]; // Day (0-indexed)

@@ -90,3 +90,79 @@ public function confirmPayment(Request $request)
             return response()->json(['message' => 'Failed to create order'], 500);
         }
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public function store(Request $request)
+    {
+        try {
+            $validatedData = $request->validate([
+                'group_id' => 'required',
+                'course_id' => 'required|exists:courses,id',
+                'photo' => 'nullable|file|mimes:jpeg,png,jpg|max:2048',
+                'pdf' => 'nullable|file|mimes:pdf',
+                'audio' => 'nullable|file|mimes:mp3,wav',
+            ]);
+
+            $studyMaterial = new StudyMaterial();
+            $studyMaterial->group_id = $validatedData['group_id'];
+            $studyMaterial->course_id = $validatedData['course_id'];
+
+            if ($request->hasFile('photo')) {
+                $file = $request->file('photo');
+                $filename = time() . '_' . $file->getClientOriginalName();
+                // $studyMaterial->photo = $file->storeAs('photos', $filename, 'public');
+                $studyMaterial->photo = Storage::disk('minio')->put('photos/'.$filename ,$request->file('photo'));
+            }
+            
+            if ($request->hasFile('pdf')) {
+                $file = $request->file('pdf');
+                $filename = time() . '_' . $file->getClientOriginalName();
+                $studyMaterial->pdf = $file->storeAs('pdfs', $filename, 'public');
+            }
+            
+            if ($request->hasFile('audio')) {
+                $file = $request->file('audio');
+                $filename = time() . '_' . $file->getClientOriginalName();
+                $studyMaterial->audio = $file->storeAs('audios', $filename, 'public');
+            }            
+
+            $studyMaterial->save();
+
+            Log::info('Study material created successfully', [
+                'group_id' => $studyMaterial->group_id,
+                'course_id' => $studyMaterial->course_id,
+            ]);
+
+            $key = 'group_materials' . $validatedData['group_id'];
+
+            Cache::forget($key);
+
+            return response()->json(['message' => 'Study material created successfully'], 201);
+        } catch (ValidationException $e) {
+            // Handle validation exceptions
+            Log::error('Validation error while creating study material', [
+                'errors' => $e->validator->errors(),
+                'request_data' => $request->all(),
+            ]);
+            return response()->json(['errors' => $e->validator->errors()], 422);
+        } catch (\Exception $e) {
+            // Handle other exceptions
+            Log::error('An error occurred while creating study material', [
+                'error' => $e->getMessage(),
+                'request_data' => $request->all(),
+            ]);
+            return response()->json(['message' => 'An error occurred while creating study material', 'error' => $e->getMessage()], 500);
+        }
+    }

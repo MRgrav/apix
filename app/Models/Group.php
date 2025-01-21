@@ -14,7 +14,8 @@ class Group extends Model
         'course_id', 
         'instructor_id',
         'created_by',
-        'live_class_link'
+        'live_class_link',
+        'class_time',
     ];
 
     public function course()

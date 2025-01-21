@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Storage;
 
 
 class StudyMaterialController extends Controller
@@ -22,8 +23,7 @@ class StudyMaterialController extends Controller
     /**
      * Store a new study material.
      */
-    public function store(Request $request)
-    {
+    public function store(Request $request){
         try {
             $validatedData = $request->validate([
                 'group_id' => 'required',
@@ -37,23 +37,29 @@ class StudyMaterialController extends Controller
             $studyMaterial->group_id = $validatedData['group_id'];
             $studyMaterial->course_id = $validatedData['course_id'];
 
+            // Store the photo file in Minio
             if ($request->hasFile('photo')) {
                 $file = $request->file('photo');
                 $filename = time() . '_' . $file->getClientOriginalName();
-                $studyMaterial->photo = $file->storeAs('photos', $filename, 'public');
+                $path = Storage::disk('minio')->put('photos/'.$filename, $file);  // Store in Minio
+                $studyMaterial->photo = Storage::disk('minio')->url($path);  // Get the URL of the stored file
             }
-            
+        
+            // Store the PDF file in Minio
             if ($request->hasFile('pdf')) {
                 $file = $request->file('pdf');
                 $filename = time() . '_' . $file->getClientOriginalName();
-                $studyMaterial->pdf = $file->storeAs('pdfs', $filename, 'public');
+                $path = Storage::disk('minio')->put('pdfs/'.$filename, $file);  // Store in Minio
+                $studyMaterial->pdf = Storage::disk('minio')->url($path);  // Get the URL of the stored file
             }
-            
+
+            // Store the audio file in Minio
             if ($request->hasFile('audio')) {
                 $file = $request->file('audio');
                 $filename = time() . '_' . $file->getClientOriginalName();
-                $studyMaterial->audio = $file->storeAs('audios', $filename, 'public');
-            }            
+                $path = Storage::disk('minio')->put('audios/'.$filename, $file);  // Store in Minio
+                $studyMaterial->audio = Storage::disk('minio')->url($path);  // Get the URL of the stored file
+            }                   
 
             $studyMaterial->save();
 
@@ -62,23 +68,29 @@ class StudyMaterialController extends Controller
                 'course_id' => $studyMaterial->course_id,
             ]);
 
+            // Cache invalidation logic
+            $key = 'group_materials' . $validatedData['group_id'];
+            Cache::forget($key);
+
             return response()->json(['message' => 'Study material created successfully'], 201);
         } catch (ValidationException $e) {
-            // Handle validation exceptions
             Log::error('Validation error while creating study material', [
                 'errors' => $e->validator->errors(),
                 'request_data' => $request->all(),
             ]);
             return response()->json(['errors' => $e->validator->errors()], 422);
         } catch (\Exception $e) {
-            // Handle other exceptions
             Log::error('An error occurred while creating study material', [
                 'error' => $e->getMessage(),
+                'stack_trace' => $e->getTraceAsString(),
                 'request_data' => $request->all(),
             ]);
             return response()->json(['message' => 'An error occurred while creating study material', 'error' => $e->getMessage()], 500);
         }
     }
+
+    
+    
 
 
     /**
