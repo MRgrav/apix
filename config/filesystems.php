@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'default' => env('FILESYSTEM_DISK', 'local'),
+    'default' => env('FILESYSTEM_DISK', 's3'),
 
     /*
     |--------------------------------------------------------------------------
@@ -59,11 +59,11 @@ return [
         'minio' => [
             'driver' => 's3',
             'endpoint' => env('MINIO_ENDPOINT'),
-            'use_ssl' => env('MINIO_USE_SSL', false),
-            'version' => env('MINIO_VERSION', 'latest'),
-            'access_key' => env('MINIO_ACCESS_KEY'),
-            'secret_key' => env('MINIO_SECRET_KEY'),
+            'region' => env('MINIO_REGION'),
+            'key' => env('MINIO_ACCESS_KEY'),
+            'secret' => env('MINIO_SECRET_KEY'),
             'bucket' => env('MINIO_BUCKET'),
+            'use_path_style_endpoint' => true, 
         ],
 
     ],
