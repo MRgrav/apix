@@ -118,11 +118,12 @@ class HomeController extends Controller
     
                 // Loop through each group ID and get upcoming classes for today
                 foreach ($groupIds as $groupId) {
-                    $upcoming = TeacherClass::where('group_id', $groupId)
-                        ->whereDate('class_time', '>=', $today->format('Y-m-d H:i:s')) // Filter for classes scheduled today
+                    $upcoming = TeacherClass::with('group.course')
+                        ->where('group_id', $groupId)
+                        ->whereDate('class_time', '>=', $today->format('Y-m-d')) // Filter for classes scheduled today
                         ->orderBy('class_time', 'desc') // Optional: order by created_at for the latest class first
                         ->get(); // Fetch all classes for the given group
-    
+                        
                     // If there are any upcoming classes, add them to the array
                     if ($upcoming->isNotEmpty()) {
                         // $upcomingClasses->push($upcoming); // Use push() to add to array
