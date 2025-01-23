@@ -121,12 +121,11 @@ class HomeController extends Controller
                     $upcoming = TeacherClass::where('group_id', $groupId)
                         ->whereDate('class_time', '>=', $today->format('Y-m-d H:i:s')) // Filter for classes scheduled today
                         ->orderBy('class_time', 'desc') // Optional: order by created_at for the latest class first
-                        ->orderBy('created_at', 'desc')
                         ->get(); // Fetch all classes for the given group
     
-                    // If there are any upcoming classes, add them to the collection
+                    // If there are any upcoming classes, add them to the array
                     if ($upcoming->isNotEmpty()) {
-                        $upcomingClasses->put($groupId, $upcoming); // Using collection's put method
+                        $upcomingClasses->push($upcoming); // Use push() to add to array
                     }
                 }
     
@@ -157,6 +156,7 @@ class HomeController extends Controller
             return response()->json(['message' => 'Internal server error'], 500);
         }
     }
+    
     
     
 
