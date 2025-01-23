@@ -104,6 +104,9 @@ class HomeController extends Controller
     
             $key = 'upcoming_class_' . $userId;
     
+            // Initialize an empty collection to hold upcoming classes
+            $upcomingClasses = collect(); // Make sure to initialize before checking cache
+    
             if (Cache::has($key)) {
                 $myCourses = json_decode(Cache::get($key), true); // Decode the JSON data
             } else {
@@ -112,9 +115,6 @@ class HomeController extends Controller
     
                 // Get all groups the user belongs to
                 $groupIds = GroupUser::where('user_id', $userId)->pluck('group_id'); // Use pluck to get just the group IDs
-    
-                // Initialize an empty collection to hold upcoming classes
-                $upcomingClasses = collect(); // Use a collection instead of an array
     
                 // Loop through each group ID and get upcoming classes for today
                 foreach ($groupIds as $groupId) {
@@ -157,6 +157,7 @@ class HomeController extends Controller
             return response()->json(['message' => 'Internal server error'], 500);
         }
     }
+    
     
 
 }
