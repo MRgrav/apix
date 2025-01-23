@@ -97,74 +97,66 @@ class HomeController extends Controller
     }
 
 
-    public function getHomePage () {
+    public function getHomePage() {
         try {
             // Get the authenticated user's ID
             $userId = auth()->id(); // Corrected method call
-
+    
             $key = 'upcoming_class_' . $userId;
-
+    
             if (Cache::has($key)) {
                 $myCourses = json_decode(Cache::get($key), true); // Decode the JSON data
             } else {
                 // Get today's date
                 $today = Carbon::now(); //->toDateString(); // Format as 'YYYY-MM-DD' for today's date
-                    
+    
                 // Get all groups the user belongs to
                 $groupIds = GroupUser::where('user_id', $userId)->pluck('group_id'); // Use pluck to get just the group IDs
-
-                // Array to hold upcoming classes
-                $upcomingClasses = [];
-
+    
+                // Initialize an empty collection to hold upcoming classes
+                $upcomingClasses = collect(); // Use a collection instead of an array
+    
                 // Loop through each group ID and get upcoming classes for today
                 foreach ($groupIds as $groupId) {
                     $upcoming = TeacherClass::where('group_id', $groupId)
-                        // ->where('expiry_date', '>=', $today)  // Only upcoming classes
-                        // ->where('class_counted', '<', DB::raw('total_classes'))  // Ensure class_counted < total_classes
                         ->whereDate('class_time', '>=', $today->format('Y-m-d H:i:s')) // Filter for classes scheduled today
                         ->orderBy('class_time', 'desc') // Optional: order by created_at for the latest class first
                         ->orderBy('created_at', 'desc')
                         ->get(); // Fetch all classes for the given group
-
-                    // If there are any upcoming classes, add them to the array
+    
+                    // If there are any upcoming classes, add them to the collection
                     if ($upcoming->isNotEmpty()) {
-                        $upcomingClasses[$groupId] = $upcoming;
+                        $upcomingClasses->put($groupId, $upcoming); // Using collection's put method
                     }
                 }
-
+    
                 Cache::put($key, $upcomingClasses->toJson(), now()->addMinutes(3));
             }
     
-            
-
             // my enrolled classes
-
             $key = 'mygroups' . $userId;
-
+    
             if (Cache::has($key)) {
                 $myCourses = json_decode(Cache::get($key), true); // Decode the JSON data
-                
             } else {
-                $myCourses = GroupUser::with(['course','group','user','plan'])
+                $myCourses = GroupUser::with(['course', 'group', 'user', 'plan'])
                                         ->where('user_id', $userId)
                                         ->get();
-
+    
                 Cache::put($key, $myCourses->toJson(), now()->addMinutes(21));
             }
-
+    
             return response()->json([
                 'message' => 'Fetched home,',
                 'upcomings' => $upcomingClasses,
                 'courses' => $myCourses
             ], 200);
-
-            // plan expiry
-
+    
         } catch (\Throwable $e) {
-            //throw $th;
             Log::error("Web Home error : ". $e->getMessage());
-            return response()->json(['message'=>'Internal server error'], 500);
+            return response()->json(['message' => 'Internal server error'], 500);
         }
     }
+    
 
 }
