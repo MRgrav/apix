@@ -125,7 +125,8 @@ class HomeController extends Controller
     
                     // If there are any upcoming classes, add them to the array
                     if ($upcoming->isNotEmpty()) {
-                        $upcomingClasses->push($upcoming); // Use push() to add to array
+                        // $upcomingClasses->push($upcoming); // Use push() to add to array
+                        $upcomingClasses = $upcomingClasses->merge($upcoming);  // not to use sub-array
                     }
                 }
     
