@@ -102,13 +102,13 @@ class HomeController extends Controller
             // Get the authenticated user's ID
             $userId = auth()->id(); // Corrected method call
     
-            $key = 'upcoming_class_' . $userId;
+            $key1 = 'upcoming_class_' . $userId;
     
             // Initialize an empty collection to hold upcoming classes
             $upcomingClasses = collect(); // Make sure to initialize before checking cache
     
-            if (Cache::has($key)) {
-                $myCourses = json_decode(Cache::get($key), true); // Decode the JSON data
+            if (Cache::has($key1)) {
+                $upcomingClasses = collect(json_decode(Cache::get($upcomingKey), true)); // Decode the JSON data
             } else {
                 // Get today's date
                 $today = Carbon::now(); //->toDateString(); // Format as 'YYYY-MM-DD' for today's date
@@ -129,7 +129,7 @@ class HomeController extends Controller
                     }
                 }
     
-                Cache::put($key, $upcomingClasses->toJson(), now()->addMinutes(3));
+                Cache::put($key1, $upcomingClasses->toJson(), now()->addMinutes(3));
             }
     
             // my enrolled classes
