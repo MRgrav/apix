@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
 use App\Models\Group;
+use App\Models\GroupUser;
 use App\Models\TeacherClass;
 use Carbon\Carbon;
 
