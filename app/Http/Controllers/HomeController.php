@@ -129,7 +129,7 @@ class HomeController extends Controller
                     }
                 }
     
-                Cache::put($key1, $upcomingClasses->toJson(), now()->addMinutes(3));
+                Cache::put($upcomingKey, $upcomingClasses->toJson(), now()->addMinutes(3));
             }
     
             // my enrolled classes
