@@ -161,7 +161,7 @@ class HomeController extends Controller
 
         } catch (\Throwable $e) {
             //throw $th;
-            Log::error("Web Home error : ", $e->message());
+            Log::error("Web Home error : ". $e->getMessage());
             return response()->json(['message'=>'Internal server error'], 500);
         }
     }
