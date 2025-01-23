@@ -96,7 +96,7 @@ class HomeController extends Controller
     }
 
 
-    public function getHomePage ($groupId) {
+    public function getHomePage () {
         try {
             // Get the authenticated user's ID
             $userId = auth()->id(); // Corrected method call
@@ -161,6 +161,8 @@ class HomeController extends Controller
 
         } catch (\Throwable $e) {
             //throw $th;
+            Log::error("Web Home error : ", $e->message());
+            return response()->json(['message'=>'Internal server error'], 500);
         }
     }
 

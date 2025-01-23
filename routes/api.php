@@ -104,7 +104,7 @@ Route::prefix('sections')->group(function() {
 Route::prefix('home')->group(function() {
     Route::get('/', [HomeController::class, 'index']);
     Route::get('/users/purchase', [HomeController::class, 'getPurchasedCoursesWithGroupVideos'])->middleware('auth:sanctum');
-    Route::get('/{groupId}', [HomeController::class, 'getHomePage'])->middleware('auth:sanctum');
+    Route::get('/v2', [HomeController::class, 'getHomePage'])->middleware('auth:sanctum');
 
 });
 Route::apiResource('materials', StudyMaterialController::class);
