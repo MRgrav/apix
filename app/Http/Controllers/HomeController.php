@@ -102,12 +102,12 @@ class HomeController extends Controller
             // Get the authenticated user's ID
             $userId = auth()->id(); // Corrected method call
     
-            $key1 = 'upcoming_class_' . $userId;
+            $upcomingKey = 'upcoming_class_' . $userId;
     
             // Initialize an empty collection to hold upcoming classes
             $upcomingClasses = collect(); // Make sure to initialize before checking cache
     
-            if (Cache::has($key1)) {
+            if (Cache::has($upcomingKey)) {
                 $upcomingClasses = collect(json_decode(Cache::get($upcomingKey), true)); // Decode the JSON data
             } else {
                 // Get today's date
