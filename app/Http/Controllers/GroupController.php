@@ -142,11 +142,11 @@ class GroupController extends Controller
 
         // Check if the class code exists for the group
         $code = TeacherClass::where('group_id', $groupId)
-                            ->orderBy('created_at', 'desc')
-                            ->value('class_code');
+            ->where('class_code', $new_class_code)
+            ->value('class_code');
 
         // Determine class status
-        $class_status = $new_class_code === $code;
+        $class_status = $code !== null;
 
         // Cache the group data
         Cache::put($key, json_encode([
