@@ -82,7 +82,7 @@ public function store(Request $request)
 
         $validatedData = $request->validate([
             'title' => 'nullable|string|max:255',
-            'video' => 'nullable|file|mimes:mp4,mov,avi',
+            'video' => 'nullable|url',
             'play_limit' => 'nullable|integer|min:1',
         ]);
 
