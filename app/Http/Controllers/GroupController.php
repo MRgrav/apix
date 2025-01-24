@@ -127,6 +127,7 @@ class GroupController extends Controller
 
         // Get the current date
         $currentDate = Carbon::now(); // Use Laravel's now() helper for the current date
+        $nextDate = $currentDate->copy()->addDay();
 
         // Create the class code
         $codeString = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -140,13 +141,24 @@ class GroupController extends Controller
             $codeString[$currentDate->month - 1] . // Month (0-indexed)
             $codeString[$currentDate->day - 1]; // Day (0-indexed)
 
+        $new_next_class_code = $formattedGroupId . '&' .
+            $codeString[$nextDate->year % 26] . // Year (mod 26 for index)
+            $codeString[$nextDate->month - 1] . // Month (0-indexed)
+            $codeString[$nextDate->day - 1]; // Day (0-indexed)
+
         // Check if the class code exists for the group
         $code = TeacherClass::where('group_id', $groupId)
-            ->where('class_code', $new_class_code)
+            ->whereIn('class_code', [$new_class_code, $new_next_class_code])
+            ->orderBy('created_at', 'desc')
             ->value('class_code');
 
         // Determine class status
-        $class_status = $code !== null;
+        $class_status = false;
+        if ($code === $new_class_code) {
+            $class_status = true;
+        } elseif ($code === $new_next_class_code) {
+            $class_status = true;
+        }
 
         // Cache the group data
         Cache::put($key, json_encode([
