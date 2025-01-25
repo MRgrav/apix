@@ -54,6 +54,8 @@ public function store(Request $request)
         $video->play_limit = $validatedData['play_limit'] ?? 3; // Default to 3 plays if not provided
         $video->save();
 
+        Cache::forget('videos'.$validatedData['group_id']);
+
         return response()->json(['message' => 'Video link saved successfully'], 201);
     } catch (\Exception $e) {
         \Log::error('Error saving video link: ' . $e->getMessage());
@@ -93,6 +95,8 @@ public function store(Request $request)
         $video->title = $validatedData['title'] ?? $video->title;
         $video->play_limit = $validatedData['play_limit'] ?? $video->play_limit;
         $video->save();
+
+        Cache::forget('videos'.$id);
 
         return response()->json(['message' => 'Video updated successfully']);
     }
