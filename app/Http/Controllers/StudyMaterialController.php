@@ -118,7 +118,8 @@ class StudyMaterialController extends Controller
                 ], 404);
             }
 
-            Cache::put($key, $studyMaterials->toJson(), now()->addMinutes(27));
+            // Cache::put($key, $studyMaterials->toJson(), now()->addMinutes(27));
+            Cache::put($key, $studyMaterials->toJson(), now()->addSeconds(5));
             
             return response()->json([
                 'message' => 'Fetched study materials',
