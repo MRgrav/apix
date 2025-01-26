@@ -134,7 +134,7 @@ class HomeController extends Controller
                 ->where('group_id', $groupId)
                 ->whereDate('class_time', '>=', Carbon::now()->format('Y-m-d'))
                 ->orderBy('class_time', 'desc')
-                ->get();
+                ->first();
 
             if ($upcoming) {
                 $upcomingClasses = $upcomingClasses->merge([$upcoming]);

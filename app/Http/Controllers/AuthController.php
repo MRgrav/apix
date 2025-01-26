@@ -86,6 +86,10 @@ class AuthController extends Controller
         if (Auth::attempt(['phone' => $request->phone, 'password' => $request->password])) {
             $user = Auth::user();
             if (is_null($user->phone_verified_at)) {
+                $user->otp = mt_rand(1000, 9999); // Generate new OTP
+                $user->save();
+                $this->sendSms($user->country_code . $user->phone, $user->otp);
+
                 return response()->json(['error' => 'Please verify your phone first.'], 403);
             }
 
