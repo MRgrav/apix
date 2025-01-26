@@ -161,9 +161,9 @@ class HomeController extends Controller
     
             return response()->json([
                 'message' => 'Fetched home,',
-                'upcomings' => $upcomingClasses,
+                'upcomings' => $upcomingClasses->toArray(),
                 'courses' => $myCourses,
-                'materials' => $studyMaterials
+                'materials' => $studyMaterials->toArray()
             ], 200);
     
         } catch (\Throwable $e) {
