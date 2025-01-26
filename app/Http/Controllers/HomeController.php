@@ -155,7 +155,7 @@ class HomeController extends Controller
                                         ->first();
                 if ($material) {
                     // $upcomingClasses->push($upcoming); // Use push() to add to array
-                    $studyMaterials = $studyMaterials->merge($material);  // not to use sub-array
+                    $studyMaterials = $studyMaterials->merge([$material]);  // not to use sub-array
                 }
             }
     
