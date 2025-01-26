@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Cache;
 use App\Models\Group;
 use App\Models\GroupUser;
 use App\Models\TeacherClass;
+use App\Models\StudyMaterial;
 use Carbon\Carbon;
 
 class HomeController extends Controller
@@ -146,11 +147,23 @@ class HomeController extends Controller
     
                 Cache::put($key, $myCourses->toJson(), now()->addMinutes(21));
             }
+
+            $studyMaterials = collect();
+            foreach ($groupIds as $groupId) {
+                $material = StudyMaterial::where('group_id', $groupId)
+                                        ->orderBy('created_at', 'desc')
+                                        ->first();
+                if ($material->isNotEmpty()) {
+                    // $upcomingClasses->push($upcoming); // Use push() to add to array
+                    $studyMaterials = $studyMaterials->merge($material);  // not to use sub-array
+                }
+            }
     
             return response()->json([
                 'message' => 'Fetched home,',
                 'upcomings' => $upcomingClasses,
-                'courses' => $myCourses
+                'courses' => $myCourses,
+                'materials' => $studyMaterials
             ], 200);
     
         } catch (\Throwable $e) {
