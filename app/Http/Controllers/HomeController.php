@@ -102,6 +102,9 @@ class HomeController extends Controller
         try {
             // Get the authenticated user's ID
             $userId = auth()->id(); // Corrected method call
+
+            // Get all groups the user belongs to
+            $groupIds = GroupUser::where('user_id', $userId)->pluck('group_id'); // Use pluck to get just the group IDs
     
             $upcomingKey = 'upcoming_class_' . $userId;
     
@@ -113,9 +116,6 @@ class HomeController extends Controller
             } else {
                 // Get today's date
                 $today = Carbon::now(); //->toDateString(); // Format as 'YYYY-MM-DD' for today's date
-    
-                // Get all groups the user belongs to
-                $groupIds = GroupUser::where('user_id', $userId)->pluck('group_id'); // Use pluck to get just the group IDs
     
                 // Loop through each group ID and get upcoming classes for today
                 foreach ($groupIds as $groupId) {
