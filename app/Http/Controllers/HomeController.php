@@ -150,7 +150,8 @@ class HomeController extends Controller
 
             $studyMaterials = collect();
             foreach ($groupIds as $groupId) {
-                $material = StudyMaterial::where('group_id', $groupId)
+                $material = StudyMaterial::with(['course','group'])
+                                        ->where('group_id', $groupId)
                                         ->orderBy('created_at', 'desc')
                                         ->first();
                 if ($material) {
