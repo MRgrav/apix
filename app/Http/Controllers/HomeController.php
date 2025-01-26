@@ -98,87 +98,98 @@ class HomeController extends Controller
     }
 
 
-    public function getHomePage() {
+    public function getHomePage()
+    {
         try {
-            // Get the authenticated user's ID
-            $userId = auth()->id(); // Corrected method call
+            $userId = auth()->id();
 
-            // Get all groups the user belongs to
-            $groupIds = GroupUser::where('user_id', $userId)->pluck('group_id'); // Use pluck to get just the group IDs
-    
-            $upcomingKey = 'upcoming_class_' . $userId;
-    
-            // Initialize an empty collection to hold upcoming classes
-            $upcomingClasses = collect(); // Make sure to initialize before checking cache
-    
-            if (Cache::has($upcomingKey)) {
-                $upcomingClasses = collect(json_decode(Cache::get($upcomingKey), true)); // Decode the JSON data
-            } else {
-                // Get today's date
-                $today = Carbon::now(); //->toDateString(); // Format as 'YYYY-MM-DD' for today's date
-    
-                // Loop through each group ID and get upcoming classes for today
-                foreach ($groupIds as $groupId) {
-                    $upcoming = TeacherClass::with(['group','group.course'])
-                        ->where('group_id', $groupId)
-                        ->whereDate('class_time', '>=', $today->format('Y-m-d')) // Filter for classes scheduled today
-                        ->orderBy('class_time', 'desc') // Optional: order by created_at for the latest class first
-                        ->get(); // Fetch all classes for the given group
-                        
-                    // If there are any upcoming classes, add them to the array
-                    if ($upcoming) {
-                        // $upcomingClasses->push($upcoming); // Use push() to add to array
-                        $upcomingClasses = $upcomingClasses->merge($upcoming);  // not to use sub-array
-                    }
-                }
-    
-                Cache::put($upcomingKey, $upcomingClasses->toJson(), now()->addMinutes(3));
-            }
-    
-            // my enrolled classes
-            $key = 'mygroups' . $userId;
-    
-            if (Cache::has($key)) {
-                $myCourses = json_decode(Cache::get($key), true); // Decode the JSON data
-            } else {
-                $myCourses = GroupUser::with(['course', 'group', 'user', 'plan'])
-                                        ->where('user_id', $userId)
-                                        ->get();
-    
-                Cache::put($key, $myCourses->toJson(), now()->addMinutes(21));
-            }
+            $groupIds = GroupUser::where('user_id', $userId)->pluck('group_id');
 
-            $key = 'material_home' . $userId;
-            $studyMaterials = collect();
-    
-            if (Cache::has($key)) {
-                $studyMaterials = json_decode(Cache::get($key), true); // Decode the JSON data
-            } else {
-                foreach ($groupIds as $groupId) {
-                    $material = StudyMaterial::with(['course','group'])
-                                            ->where('group_id', $groupId)
-                                            ->orderBy('created_at', 'desc')
-                                            ->first();
-                    if ($material) {
-                        // $upcomingClasses->push($upcoming); // Use push() to add to array
-                        $studyMaterials = $studyMaterials->merge([$material]);  // not to use sub-array
-                    }
-                }
-                Cache::put($key, $studyMaterials->toJson(), now()->addMinutes(1));
-            }
-    
+            $upcomingClasses = $this->getUpcomingClasses($groupIds, $userId);
+            $myCourses = $this->getMyCourses($userId);
+            $studyMaterials = $this->getStudyMaterials($groupIds, $userId);
+
             return response()->json([
                 'message' => 'Fetched home,',
-                'upcomings' => $upcomingClasses->toArray(),
+                'upcomings' => $upcomingClasses,
                 'courses' => $myCourses,
-                'materials' => $studyMaterials->toArray()
+                'materials' => $studyMaterials
             ], 200);
-    
         } catch (\Throwable $e) {
-            Log::error("Web Home error : ". $e->getMessage());
+            Log::error("Web Home error : " . $e->getMessage() . "\n" . $e->getTraceAsString());
             return response()->json(['message' => 'Internal server error'], 500);
         }
     }
+
+    private function getUpcomingClasses($groupIds, $userId){
+        $upcomingKey = 'upcoming_class_' . $userId;
+
+        if (Cache::has($upcomingKey)) {
+            return collect(json_decode(Cache::get($upcomingKey), true));
+        }
+
+        $upcomingClasses = collect();
+
+        foreach ($groupIds as $groupId) {
+            $upcoming = TeacherClass::with(['group', 'group.course'])
+                ->where('group_id', $groupId)
+                ->whereDate('class_time', '>=', Carbon::now()->format('Y-m-d'))
+                ->orderBy('class_time', 'desc')
+                ->get();
+
+            if ($upcoming) {
+                $upcomingClasses = $upcomingClasses->merge($upcoming);
+            }
+        }
+
+        Cache::put($upcomingKey, $upcomingClasses->toJson(), now()->addMinutes(3));
+
+        return $upcomingClasses;
+    }
+
+    private function getMyCourses($userId){
+        $key = 'mygroups' . $userId;
+
+        if (Cache::has($key)) {
+            return json_decode(Cache::get($key), true);
+        }
+
+        $myCourses = GroupUser::with(['course', 'group', 'user', 'plan'])
+            ->where('user_id', $userId)
+            ->get();
+
+        Cache::put($key, $myCourses->toJson(), now()->addMinutes(21));
+
+        return $myCourses;
+    }
+
+    private function getStudyMaterials($groupIds, $userId){
+        $key = 'material_home' . $userId;
+    
+        if (Cache::has($key)) {
+            return collect(json_decode(Cache::get($key), true));
+        }
+    
+        $studyMaterials = collect();
+    
+        foreach ($groupIds as $groupId) {
+            $material = StudyMaterial::with(['course', 'group'])
+                ->where('group_id', $groupId)
+                ->orderBy('created_at', 'desc')
+                ->first();
+    
+            if ($material) {
+                $studyMaterials = $studyMaterials->merge([$material]);
+            }
+        }
+    
+        Cache::put($key, $studyMaterials->toJson(), now()->addMinutes(1));
+    
+        return $studyMaterials;
+    }
+    
+   
+
     
     
     
