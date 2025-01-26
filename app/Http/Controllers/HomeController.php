@@ -98,8 +98,7 @@ class HomeController extends Controller
     }
 
 
-    public function getHomePage()
-    {
+    public function getHomePage(){
         try {
             $userId = auth()->id();
 
@@ -138,7 +137,7 @@ class HomeController extends Controller
                 ->get();
 
             if ($upcoming) {
-                $upcomingClasses = $upcomingClasses->merge($upcoming);
+                $upcomingClasses = $upcomingClasses->merge([$upcoming]);
             }
         }
 
