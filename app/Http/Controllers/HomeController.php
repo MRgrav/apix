@@ -126,7 +126,7 @@ class HomeController extends Controller
                         ->get(); // Fetch all classes for the given group
                         
                     // If there are any upcoming classes, add them to the array
-                    if ($upcoming->isNotEmpty()) {
+                    if ($upcoming) {
                         // $upcomingClasses->push($upcoming); // Use push() to add to array
                         $upcomingClasses = $upcomingClasses->merge($upcoming);  // not to use sub-array
                     }
@@ -153,7 +153,7 @@ class HomeController extends Controller
                 $material = StudyMaterial::where('group_id', $groupId)
                                         ->orderBy('created_at', 'desc')
                                         ->first();
-                if ($material->isNotEmpty()) {
+                if ($material) {
                     // $upcomingClasses->push($upcoming); // Use push() to add to array
                     $studyMaterials = $studyMaterials->merge($material);  // not to use sub-array
                 }
