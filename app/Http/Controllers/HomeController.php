@@ -148,16 +148,23 @@ class HomeController extends Controller
                 Cache::put($key, $myCourses->toJson(), now()->addMinutes(21));
             }
 
+            $key = 'material_home' . $userId;
             $studyMaterials = collect();
-            foreach ($groupIds as $groupId) {
-                $material = StudyMaterial::with(['course','group'])
-                                        ->where('group_id', $groupId)
-                                        ->orderBy('created_at', 'desc')
-                                        ->first();
-                if ($material) {
-                    // $upcomingClasses->push($upcoming); // Use push() to add to array
-                    $studyMaterials = $studyMaterials->merge([$material]);  // not to use sub-array
+    
+            if (Cache::has($key)) {
+                $studyMaterials = json_decode(Cache::get($key), true); // Decode the JSON data
+            } else {
+                foreach ($groupIds as $groupId) {
+                    $material = StudyMaterial::with(['course','group'])
+                                            ->where('group_id', $groupId)
+                                            ->orderBy('created_at', 'desc')
+                                            ->first();
+                    if ($material) {
+                        // $upcomingClasses->push($upcoming); // Use push() to add to array
+                        $studyMaterials = $studyMaterials->merge([$material]);  // not to use sub-array
+                    }
                 }
+                Cache::put($key, $studyMaterials->toJson(), now()->addMinutes(1));
             }
     
             return response()->json([
