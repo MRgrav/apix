@@ -137,12 +137,12 @@ class GroupController extends Controller
 
         // Generate the class code using the group ID and formatted date
         $new_class_code = $formattedGroupId . '&' .
-            $codeString[$currentDate->year % 26] . // Year (mod 26 for index)
+            $codeString[$currentDate->year % 50] . // Year (mod 50 for index)
             $codeString[$currentDate->month - 1] . // Month (0-indexed)
             $codeString[$currentDate->day - 1]; // Day (0-indexed)
 
         $new_next_class_code = $formattedGroupId . '&' .
-            $codeString[$nextDate->year % 26] . // Year (mod 26 for index)
+            $codeString[$nextDate->year % 50] . // Year (mod 50 for index)
             $codeString[$nextDate->month - 1] . // Month (0-indexed)
             $codeString[$nextDate->day - 1]; // Day (0-indexed)
 
