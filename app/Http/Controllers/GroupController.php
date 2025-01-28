@@ -111,7 +111,7 @@ class GroupController extends Controller
         if (Cache::has($key)) {
             $groupData = json_decode(Cache::get($key), true); // Decode the JSON data
             return response()->json([
-                'message' => 'Group retrieved successfully from cache',
+                'message' => 'Group retrieved successfully from cache,',
                 'group' => $groupData['group'],
                 'class_status' => $groupData['class_status'],
                 'class_code' => $groupData['class_code'],
@@ -151,6 +151,8 @@ class GroupController extends Controller
                                     ->orderBy('created_at', 'desc')
                                     ->first();
             // ->value('class_code');
+
+        Log::info('testing class code: ' . $teacherClass['class_code'] .'\n' . $new_class_code . '\n' . $new_next_class_code);
 
         $class_status = false;
         $code = null;
