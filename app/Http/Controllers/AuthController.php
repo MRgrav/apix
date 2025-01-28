@@ -89,7 +89,7 @@ class AuthController extends Controller
                 $tempOTP = mt_rand(1000, 9999); // Generate new OTP
                 $user->otp = $tempOTP;
                 $user->save();
-                $this->sendSms($user->country_code . $user->phone, $tempOTP);
+                $this->sendSms($user->phone, $tempOTP);
 
                 return response()->json(['error' => 'Please verify your phone first.'], 403);
             }
@@ -174,7 +174,7 @@ public function verifyPhoneOtp(Request $request)
         $user->save();
 
         // Send OTP via Fast2SMS
-        $this->sendSms($user->country_code . $user->phone, $tempOTP); // Send only numeric OTP
+        $this->sendSms($user->phone, $tempOTP); // Send only numeric OTP
 
         return response()->json(['message' => 'OTP resent successfully'], 200);
     }
