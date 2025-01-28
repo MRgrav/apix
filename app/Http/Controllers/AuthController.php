@@ -224,6 +224,8 @@ public function verifyPhoneOtp(Request $request)
             'numbers' => $phone, 
         ]);
 
+        Log::info("numbers : ".$phone .'\nvalue: '. $otp);
+
         Log::info('Fast2SMS Response:', ['response' => $response->json()]);
 
         if ($response->successful()) {
