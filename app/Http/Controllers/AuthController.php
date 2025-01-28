@@ -172,7 +172,7 @@ public function verifyPhoneOtp(Request $request)
         $user->save();
 
         // Send OTP via Fast2SMS
-        $this->sendSms($user->phone, $user->otp); // Send only numeric OTP
+        $this->sendSms($user->country_code . $user->phone, $user->otp); // Send only numeric OTP
 
         return response()->json(['message' => 'OTP resent successfully'], 200);
     }
