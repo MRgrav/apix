@@ -147,16 +147,15 @@ class GroupController extends Controller
             $codeString[$nextDate->day - 1]; // Day (0-indexed)
 
         // Check if the class code exists for the group
-        $code = TeacherClass::where('group_id', $groupId)
-            ->whereIn('class_code', [$new_class_code, $new_next_class_code])
-            ->orderBy('created_at', 'desc')
-            ->value('class_code');
+        $teacherClass = TeacherClass::where('group_id', $groupId)
+                                    ->orderBy('created_at', 'desc')
+                                    ->first();
+            // ->value('class_code');
 
-        // Determine class status
         $class_status = false;
-        if ($code === $new_class_code) {
-            $class_status = true;
-        } elseif ($code === $new_next_class_code) {
+        $code = null;
+        if ($teacherClass['class_code'] === $new_class_code || $teacherClass['class_code'] === $new_next_class_code) {
+            $code = $teacherClass['class_code'];
             $class_status = true;
         }
 
