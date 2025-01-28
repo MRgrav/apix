@@ -86,9 +86,10 @@ class AuthController extends Controller
         if (Auth::attempt(['phone' => $request->phone, 'password' => $request->password])) {
             $user = Auth::user();
             if (is_null($user->phone_verified_at)) {
-                $user->otp = mt_rand(1000, 9999); // Generate new OTP
+                $tempOTP = mt_rand(1000, 9999); // Generate new OTP
+                $user->otp = $tempOTP;
                 $user->save();
-                $this->sendSms($user->country_code . $user->phone, $user->otp);
+                $this->sendSms($user->country_code . $user->phone, $tempOTP);
 
                 return response()->json(['error' => 'Please verify your phone first.'], 403);
             }
@@ -168,11 +169,12 @@ public function verifyPhoneOtp(Request $request)
             return response()->json(['error' => 'Phone number not registered'], 400);
         }
 
-        $user->otp = mt_rand(1000, 9999); // Generate new OTP
+        $tempOTP = mt_rand(1000, 9999); // Generate new OTP
+        $user->otp = $tempOTP;
         $user->save();
 
         // Send OTP via Fast2SMS
-        $this->sendSms($user->country_code . $user->phone, $user->otp); // Send only numeric OTP
+        $this->sendSms($user->country_code . $user->phone, $tempOTP); // Send only numeric OTP
 
         return response()->json(['message' => 'OTP resent successfully'], 200);
     }
