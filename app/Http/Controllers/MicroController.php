@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Cache;
 use App\Models\Course;
 use App\Models\Instructor;
 use App\Models\User;
+use App\Models\Purchase;
+use App\Models\GroupUser;
 
 class MicroController extends Controller
 {
@@ -135,5 +137,28 @@ class MicroController extends Controller
         $keyAcademics = 'dash_academics';
         $keyMusics = 'dash_musics';
 
+    }
+
+    public function enrollableStudents($courseId) {
+        try {
+            // Get user IDs who purchased the course
+            $userIds = Purchase::where('course_id', $courseId)->pluck('user_id')->toArray();
+
+            // Get users who are part of the group for the course
+            $groupUsers = GroupUser::where('course_id', $courseId)->whereIn('user_id', $userIds)->pluck('user_id')->toArray();
+
+            // Find users who are not in the group
+            $enrollableUserIds = array_diff($userIds, $groupUsers);
+
+            // Prepare the response
+            return response()->json([
+                'message' => 'Enrollable students retrieved successfully.',
+                'students' => $enrollableUserIds
+            ], 200);
+        } catch (\Throwable $e) {
+            //throw $e;
+            Log::error("enrollable students Error: ". $e->getMessage());
+            return response()->json(['message' => 'internal server error'], 500);
+        }
     }
 }

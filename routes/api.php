@@ -172,6 +172,7 @@ Route::get('/micro/courses', [MicroController::class, 'getCoursesName']);
 Route::get('/micro/instructors', [MicroController::class, 'getInstructors']);
 Route::get('/micro/students', [MicroController::class, 'getStudents']);
 Route::get('/micro/users', [MicroController::class, 'getUsers']);
+Route::get('/micro/enrollables/{courseId}', [MicroController::class, 'enrollableStudents']);
 
 Route::prefix('attendance')->group(function(){
     Route::post('/', [AttendanceController::class, 'store'])->middleware('auth:sanctum');
