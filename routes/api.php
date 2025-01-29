@@ -179,5 +179,7 @@ Route::prefix('attendance')->group(function(){
 
 Route::prefix('admin')->group(function() {
     Route::get('/groups/{groupId}', [AdminController::class, 'getGroupDetails']);
+    Route::post('/payroll', [AdminController::class, 'createPayroll']);
+    Route::get('/groups', [GroupController::class, 'getInstructorsGroups']);
 })->middleware('auth:sanctum');
 

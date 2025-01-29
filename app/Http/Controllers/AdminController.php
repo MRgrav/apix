@@ -9,6 +9,7 @@ use App\Models\Group;
 use App\Models\GroupUser;
 use App\Models\StudyMaterial;
 use App\Models\TeacherClass;
+use App\Models\InstructorPayment;
 
 class AdminController extends Controller
 {
@@ -71,6 +72,44 @@ class AdminController extends Controller
             //throw $th;
             Log::error("Error in Admin Group Details : ". $e->getMessage());
             return response()->json(['message' => 'internal server error'], 500,);
+        }
+    }
+
+    public function createPayroll (Request $request) {
+        try {
+            //code...
+            $userId = auth()->id();
+            if (!$userId) {
+                return response()->json(['message'=>'You are not authorized.'], 401);
+            }
+
+            $validated = $request->validate([
+                'instructor' => 'required',
+                'group_id' => 'required',
+                'no_of_classes' => 'required|integer',
+                'per_class_payment' => 'required|numeric',
+                'transaction' => 'required|string',
+            ]);
+
+            $total = $validated['no_of_classes'] * $validated['per_class_payment'];
+
+            $payment = InstructorPayment::create([
+                'instructor_id' => $validated['instructor'],
+                'group_id' => $validated['group_id'],
+                'no_of_classes' => $validated['no_of_classes'],
+                'per_class_payment' => $validated['per_class_payment'],
+                'transaction' => $validated['transaction'],
+                'total_amount' => $total,
+            ]);
+
+            return response()->json([
+                'message' => 'Payment successful'
+            ], 201);
+
+        } catch (\Throwable $e) {
+            //throw $th;
+            Log::error("Payroll Error: ". $e->getMessage());
+            return response()->json(['message' => 'internal server error'], 500);
         }
     }
 }

@@ -31,7 +31,7 @@ class NotificationController extends Controller
 
     public function fetchRecentUpdates () {
         
-        $userId = auth()->id;
+        $userId = auth()->id();
 
         $key = 'updates_' . $userId;
 

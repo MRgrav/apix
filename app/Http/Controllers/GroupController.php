@@ -299,4 +299,32 @@ class GroupController extends Controller
         }
     }
 
+    // redis : done
+    public function getInstructorsGroups()
+    {
+        $userId = auth()->id();
+
+        $key = 'instructors_groups_' . $userId;
+
+        if (Cache::has($key)) {
+            $groups = json_decode(Cache::get($key), true); // Decode the JSON data
+            return response()->json([
+                'message' => 'Groups retrieved successfully',
+                'groups' => $groups
+            ], 200);
+        }  
+
+        $groups = Group::with('users', 'course')->where('instructor_id',$userId)->get();
+        Cache::put($key, $groups->toJson(), now()->addMinutes(12));
+
+        if (!$groups) {
+            return response()->json(['message'=>'no group found'], 404);
+        }
+
+        return response()->json([
+            'message' => 'Instructors Groups retrieved successfully',
+            'groups' => $groups
+        ], 200);
+    }
+
 }
