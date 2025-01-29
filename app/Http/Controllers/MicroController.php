@@ -141,24 +141,27 @@ class MicroController extends Controller
 
     public function enrollableStudents($courseId) {
         try {
-            // Get user IDs who purchased the course
-            $userIds = Purchase::where('course_id', $courseId)->pluck('user_id')->toArray();
-
-            // Get users who are part of the group for the course
-            $groupUsers = GroupUser::where('course_id', $courseId)->whereIn('user_id', $userIds)->pluck('user_id')->toArray();
-
-            // Find users who are not in the group
-            $enrollableUserIds = array_diff($userIds, $groupUsers);
-
+            // Get user IDs who purchased the course but are not in the group
+            $students = User::whereIn('id', function($query) use ($courseId) {
+                $query->select('user_id')
+                      ->from('purchases') // Assuming your purchases table is named 'purchases'
+                      ->where('course_id', $courseId);
+            })
+            ->whereNotIn('id', function($query) use ($courseId) {
+                $query->select('user_id')
+                      ->from('group_users') // Assuming your group users table is named 'group_users'
+                      ->where('course_id', $courseId);
+            })
+            ->get();
+    
             // Prepare the response
             return response()->json([
                 'message' => 'Enrollable students retrieved successfully.',
-                'students' => $enrollableUserIds
+                'students' => $students
             ], 200);
         } catch (\Throwable $e) {
-            //throw $e;
-            Log::error("enrollable students Error: ". $e->getMessage());
-            return response()->json(['message' => 'internal server error'], 500);
+            Log::error("Enrollable students Error: " . $e->getMessage());
+            return response()->json(['message' => 'Internal server error'], 500);
         }
     }
 }
