@@ -3,6 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
+use App\Models\Group;
+use App\Models\GroupUser;
+use App\Models\StudyMaterial;
+use App\Models\TeacherClass;
 
 class AdminController extends Controller
 {
@@ -36,7 +42,9 @@ class AdminController extends Controller
                 $students = json_decode(Cache::get($studentsKey), true); // Decode the JSON data
             } else {
                 // Fetch the group user with related data
-                $students = GroupUsers::where('group_id', $groupId)->get();
+                $students = GroupUser::with('user')
+                                    ->where('group_id', $groupId)
+                                    ->get();
                 Cache::put($studentsKey, $students->toJson(), now()->addMinutes(1));
             }
 
