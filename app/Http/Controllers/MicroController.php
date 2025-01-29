@@ -142,17 +142,23 @@ class MicroController extends Controller
     public function enrollableStudents($courseId) {
         try {
             // Get user IDs who purchased the course but are not in the group
-            $students = User::whereIn('id', function($query) use ($courseId) {
-                $query->select('user_id')
-                      ->from('purchases') // Assuming your purchases table is named 'purchases'
-                      ->where('course_id', $courseId);
-            })
-            ->whereNotIn('id', function($query) use ($courseId) {
-                $query->select('user_id')
-                      ->from('group_user') // Assuming your group users table is named 'group_user'
-                      ->where('course_id', $courseId);
-            })
-            ->get();
+            // $students = User::whereIn('id', function($query) use ($courseId) {
+            //     $query->select('user_id')
+            //           ->from('purchases') // Assuming your purchases table is named 'purchases'
+            //           ->where('course_id', $courseId);
+            // })
+            // ->whereNotIn('id', function($query) use ($courseId) {
+            //     $query->select('user_id')
+            //           ->from('group_user') // Assuming your group users table is named 'group_user'
+            //           ->where('course_id', $courseId);
+            // })
+            // ->get();
+
+            $students = GroupUser::with('user')->where('course_id', $courseId)->whereNull('group_id')->get();
+
+            if (!$students) {
+                return response()->json(['message' => 'No new students'], 404);
+            }
     
             // Prepare the response
             return response()->json([
