@@ -21,6 +21,7 @@ use App\Http\Controllers\StatusController;
 use App\Http\Controllers\MicroController;
 use App\Http\Controllers\TeacherClassController;
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\AdminController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -175,4 +176,8 @@ Route::get('/micro/users', [MicroController::class, 'getUsers']);
 Route::prefix('attendance')->group(function(){
     Route::post('/', [AttendanceController::class, 'store'])->middleware('auth:sanctum');
 });
+
+Route::prefix('admin')->group(function() {
+    Route::get('/groups/{groupId}', [AdminController::class, 'getGroupDetails']);
+})->middleware('auth:sanctum');
 
