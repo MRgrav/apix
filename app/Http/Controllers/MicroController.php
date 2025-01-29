@@ -141,33 +141,29 @@ class MicroController extends Controller
 
     public function enrollableStudents($courseId) {
         try {
-            // Get user IDs who purchased the course but are not in the group
-            // $students = User::whereIn('id', function($query) use ($courseId) {
-            //     $query->select('user_id')
-            //           ->from('purchases') // Assuming your purchases table is named 'purchases'
-            //           ->where('course_id', $courseId);
-            // })
-            // ->whereNotIn('id', function($query) use ($courseId) {
-            //     $query->select('user_id')
-            //           ->from('group_user') // Assuming your group users table is named 'group_user'
-            //           ->where('course_id', $courseId);
-            // })
-            // ->get();
-
-            $students = GroupUser::with('user')->where('course_id', $courseId)->whereNull('group_id')->get();
-
-            if (!$students) {
-                return response()->json(['message' => 'No new students'], 404);
+            // Get students who are not in a group and belong to the given course
+            $students = GroupUser::with('user')
+                ->where('course_id', $courseId)
+                ->whereNull('group_id')
+                ->get();
+            
+            // Check if the collection is empty
+            if ($students->isEmpty()) {
+                return response()->json([
+                    'message' => 'No enrollable students found.'
+                ], 200); // No students, but it's a valid request.
             }
     
-            // Prepare the response
+            // Return the response with students
             return response()->json([
                 'message' => 'Enrollable students retrieved successfully.',
                 'students' => $students
             ], 200);
+            
         } catch (\Throwable $e) {
             Log::error("Enrollable students Error: " . $e->getMessage());
             return response()->json(['message' => 'Internal server error'], 500);
         }
     }
+    
 }
