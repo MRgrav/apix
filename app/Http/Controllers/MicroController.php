@@ -149,7 +149,7 @@ class MicroController extends Controller
             })
             ->whereNotIn('id', function($query) use ($courseId) {
                 $query->select('user_id')
-                      ->from('group_users') // Assuming your group users table is named 'group_users'
+                      ->from('group_user') // Assuming your group users table is named 'group_user'
                       ->where('course_id', $courseId);
             })
             ->get();
