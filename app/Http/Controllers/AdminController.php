@@ -51,8 +51,8 @@ class AdminController extends Controller
             if (Cache::has($materialsKey)) {
                 $materials = json_decode(Cache::get($materials), true); // Decode the JSON data
             } else {
-                $studyMaterials = StudyMaterial::where('group_id', $groupId)->get();
-                Cache::put($materialsKey, $studyMaterials->toJson(), now()->addSeconds(5));
+                $materials = StudyMaterial::where('group_id', $groupId)->get();
+                Cache::put($materialsKey, $materials->toJson(), now()->addSeconds(5));
             }
 
             $classes = TeacherClass::where('group_id', $groupId)
