@@ -177,10 +177,10 @@ Route::prefix('attendance')->group(function(){
     Route::post('/', [AttendanceController::class, 'store'])->middleware('auth:sanctum');
 });
 
-Route::prefix('admin')->middleware('auth:sanctum')->group(function() {
+Route::prefix('admin')->group(function() {
     Route::get('/groups/{groupId}', [AdminController::class, 'getGroupDetails']);
     Route::post('/payroll', [AdminController::class, 'createPayroll']);
-    Route::get('/groups', [GroupController::class, 'getInstructorsGroups']);
+    Route::get('/groups', [GroupController::class, 'getInstructorsGroups'])->middleware('auth:sanctum');
 });
 
 

@@ -112,4 +112,34 @@ class AdminController extends Controller
             return response()->json(['message' => 'internal server error'], 500);
         }
     }
+
+    public function createRoutine (Request $request) {
+        try {
+            //code...
+            $validated = $request->validate([
+                'group_id' => 'required',
+                'insructor_id' => 'required',
+                'session' => 'required',
+            ]);
+
+            $routine = Routine::create([
+                'group_id' => $request['group_id'],
+                'insructor_id' => $request['insructor_id'],
+                'sun' => $request['sun'],
+                'mon' => $request['mon'],
+                'tue' => $request['tue'],
+                'wed' => $request['wed'],
+                'thu' => $request['thu'],
+                'fri' => $request['fri'],
+                'sat' => $request['sat'],
+                'session' => $request['session'],
+            ]);
+
+            
+        } catch (\Throwable $e) {
+            //throw $e;
+            Log::error("create routine error: ". $e->getMessage());
+            return response()->json(['message' => 'internal server error'], 500);
+        }
+    }
 }
