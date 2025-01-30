@@ -154,13 +154,19 @@ class GroupController extends Controller
                                         ->first();
                 // ->value('class_code');
 
-            Log::info('testing class code: ' . $teacherClass['class_code'] .'\n' . $new_class_code . '\n' . $new_next_class_code);
-
-            $class_status = false;
-            $code = null;
-            if ($teacherClass['class_code'] === $new_class_code || $teacherClass['class_code'] === $new_next_class_code) {
-                $code = $teacherClass['class_code'];
-                $class_status = true;
+            
+            if ($teacherClass->isEmpty()) {
+                // return response()->json(['message' => 'Teacher class not found'], 404);
+                $class_status = false;
+                $code = null;
+            } else {
+                $class_status = false;
+                $code = null;
+                Log::info('testing class code: ' . $teacherClass['class_code'] .'\n' . $new_class_code . '\n' . $new_next_class_code);
+                if ($teacherClass['class_code'] === $new_class_code || $teacherClass['class_code'] === $new_next_class_code) {
+                    $code = $teacherClass['class_code'];
+                    $class_status = true;
+                }
             }
 
             // Cache the group data
