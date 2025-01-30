@@ -37,7 +37,7 @@ class MicroController extends Controller
             return response()->json(['message' => 'You have not enrolled any course yet'], 404);
         }
 
-        Cache::put($key, $micro->toJson(), now()->addMinutes(15));
+        Cache::put($key, $micro->toJson(), now()->addMinutes(2));
 
         return response()->json([
             'message' => 'Fetched courses names,',
@@ -66,7 +66,7 @@ class MicroController extends Controller
             return response()->json(['message' => 'You have not enrolled any course yet'], 404);
         }
 
-        Cache::put($key, $micro->toJson(), now()->addMinutes(10));
+        Cache::put($key, $micro->toJson(), now()->addMinutes(2));
 
         return response()->json([
             'message' => 'Fetched students names,',
@@ -97,7 +97,7 @@ class MicroController extends Controller
             return response()->json(['message' => 'You have no users'], 404);
         }
 
-        Cache::put($key, $micro->toJson(), now()->addMinutes(30));
+        Cache::put($key, $micro->toJson(), now()->addMinutes(2));
 
         return response()->json([
             'message' => 'Fetched instructors names,',
@@ -124,7 +124,7 @@ class MicroController extends Controller
             return response()->json(['message' => 'You have no users'], 404);
         }
 
-        Cache::put($key, $micro->toJson(), now()->addMinutes(30));
+        Cache::put($key, $micro->toJson(), now()->addMinutes(2));
 
         return response()->json([
             'message' => 'Fetched users,',

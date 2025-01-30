@@ -94,7 +94,7 @@ class GroupController extends Controller
         }  
 
         $groups = Group::with('users', 'course')->get();
-        Cache::put($key, $groups->toJson(), now()->addMinutes(23));
+        Cache::put($key, $groups->toJson(), now()->addMinutes(1));
 
         return response()->json([
             'message' => 'Groups retrieved successfully',
@@ -177,7 +177,7 @@ class GroupController extends Controller
                 'group' => $group,
                 'class_status' => $class_status,
                 'class_code' => $code
-            ]), now()->addMinutes(16));
+            ]), now()->addMinutes(1));
 
             return response()->json([
                 'message' => 'Group retrieved successfully',
@@ -302,7 +302,7 @@ class GroupController extends Controller
                 return response()->json(['message' => 'You have not enrolled any course yet'], 404);
             }
 
-            Cache::put($key, $myCourses->toJson(), now()->addMinutes(21));
+            Cache::put($key, $myCourses->toJson(), now()->addMinutes(1));
 
             return response()->json([
                 'message' => 'Fetched enrolled courses',

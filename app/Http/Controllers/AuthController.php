@@ -251,7 +251,7 @@ public function verifyPhoneOtp(Request $request)
 
         $users = User::all(); // Fetch all users
 
-        Cache::put($key, $users->toJson(), now()->addMinutes(10));
+        Cache::put($key, $users->toJson(), now()->addMinutes(1));
 
         return response()->json([
             'message' => 'Users retrieved successfully',

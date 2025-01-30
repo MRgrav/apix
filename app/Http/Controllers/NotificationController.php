@@ -51,7 +51,7 @@ class NotificationController extends Controller
                     ->limit(15)
                     ->get();
 
-        Cache::put($key, $updates->toJson(), now()->addMinutes(5));
+        Cache::put($key, $updates->toJson(), now()->addMinutes(1));
 
         if (!$updates) {
             return response()->json(['message' => 'No Updates'], 404);

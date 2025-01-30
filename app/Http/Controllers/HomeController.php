@@ -84,7 +84,7 @@ class HomeController extends Controller
                 return response()->json(['message' => 'Course not yet approved by classwix'], 404);
             }
 
-            Cache::put($key, $content->toJson(), now()->addMinutes(39));
+            Cache::put($key, $content->toJson(), now()->addMinutes(1));
 
             return response()->json([
                 'message' => 'Data fetched successfully',
@@ -123,9 +123,9 @@ class HomeController extends Controller
     private function getUpcomingClasses($groupIds, $userId){
         $upcomingKey = 'upcoming_class_' . $userId;
 
-        if (Cache::has($upcomingKey)) {
-            return collect(json_decode(Cache::get($upcomingKey), true));
-        }
+        // if (Cache::has($upcomingKey)) {
+        //     return collect(json_decode(Cache::get($upcomingKey), true));
+        // }
 
         $upcomingClasses = collect();
 
@@ -141,7 +141,7 @@ class HomeController extends Controller
             }
         }
 
-        Cache::put($upcomingKey, $upcomingClasses->toJson(), now()->addMinutes(3));
+        // Cache::put($upcomingKey, $upcomingClasses->toJson(), now()->addMinutes(1));
 
         return $upcomingClasses;
     }
@@ -157,7 +157,7 @@ class HomeController extends Controller
             ->where('user_id', $userId)
             ->get();
 
-        Cache::put($key, $myCourses->toJson(), now()->addMinutes(21));
+        Cache::put($key, $myCourses->toJson(), now()->addMinutes(1));
 
         return $myCourses;
     }

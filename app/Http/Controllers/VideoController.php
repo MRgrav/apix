@@ -24,7 +24,7 @@ class VideoController extends Controller
 
         $videos = Video::where('group_id', $group_id)->get();
 
-        Cache::put($key, $videos->toJson(), now()->addMinutes(48));
+        Cache::put($key, $videos->toJson(), now()->addMinutes(1));
 
         return response()->json($videos);
     }
@@ -45,6 +45,7 @@ public function store(Request $request)
             'video_link' => 'required|url', // Ensure the video link is a valid URL
             'play_limit' => 'nullable|integer|min:1',
         ]);
+        Cache::forget('videos'.$validatedData['group_id']);
 
         $video = new Video();
         $video->group_id = $validatedData['group_id'];
@@ -53,8 +54,6 @@ public function store(Request $request)
         $video->video_path = $validatedData['video_link']; // Store the video link
         $video->play_limit = $validatedData['play_limit'] ?? 3; // Default to 3 plays if not provided
         $video->save();
-
-        Cache::forget('videos'.$validatedData['group_id']);
 
         return response()->json(['message' => 'Video link saved successfully'], 201);
     } catch (\Exception $e) {

@@ -64,7 +64,7 @@ class CourseController extends Controller
             $course = Course::with('category', 'sections', 'instructor')->findOrFail($id)->first();
 
             // Cache the course data for future requests (e.g., cache for 1 hour)
-            Cache::put($cacheKey, $course, now()->addMinutes(17));
+            Cache::put($cacheKey, $course, now()->addMinutes(1));
 
             // If the course is purchased, show the content
             return response()->json($course, 200);
@@ -459,7 +459,7 @@ class CourseController extends Controller
             }
 
             // Cache the purchased courses in Redis for future requests (cache for 1 hour)
-            Cache::put($key, $courses->toJson(), now()->addMinutes(29)); // Store the courses as JSON string
+            Cache::put($key, $courses->toJson(), now()->addMinutes(1)); // Store the courses as JSON string
 
             return response()->json([
                 'message' => 'Purchased courses retrieved successfully',

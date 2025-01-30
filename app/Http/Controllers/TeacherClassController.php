@@ -27,7 +27,7 @@ class TeacherClassController extends Controller
             ], 200);
         }  
 
-        Cache::put($key, $teacherClasses->toJson(), now()->addMinutes(18));
+        Cache::put($key, $teacherClasses->toJson(), now()->addMinutes(1));
 
         $teacherClasses = TeacherClass::all();
         return response()->json([
