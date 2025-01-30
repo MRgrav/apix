@@ -236,7 +236,7 @@ class MicroController extends Controller
                 ->pluck('group_id');
 
             // Fetch the videos for the user's groups
-            $videos = StudyMaterial::whereIn('group_id', $groupIds)
+            $materials = StudyMaterial::whereIn('group_id', $groupIds)
                 ->get()
                 ->toArray();
 
