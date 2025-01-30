@@ -12,6 +12,8 @@ use App\Models\User;
 use App\Models\Purchase;
 use App\Models\GroupUser;
 use App\Models\Group;
+use App\Models\Video;
+use App\Models\StudyMaterial;
 
 class MicroController extends Controller
 {
@@ -188,4 +190,65 @@ class MicroController extends Controller
         }
     }
     
+    public function getRecordedClasses(){
+        try {
+            $key = 'my_videos_' . auth()->id();
+
+            // Check if the data is cached
+            if (Cache::has($key)) {
+                $videos = json_decode(Cache::get($key), true);
+                return response()->json($videos, 200);
+            }
+
+            // Fetch the group IDs for the authenticated user
+            $groupIds = GroupUser::where('user_id', auth()->id())
+                ->orderBy('created_at', 'desc')
+                ->pluck('group_id');
+
+            // Fetch the videos for the user's groups
+            $videos = Video::whereIn('group_id', $groupIds)
+                ->get()
+                ->toArray();
+
+            // Cache the videos for 1 minute
+            Cache::put($key, json_encode($videos), now()->addMinutes(1));
+
+            return response()->json($videos, 200);
+        } catch (\Throwable $e) {
+            Log::error("Recorded classes ERROR: " . $e->getMessage());
+            return response()->json(['message' => 'Internal server error'], 500);
+        }
+    }
+
+    public function getStudyMaterials(){
+        try {
+            $key = 'my_materials_' . auth()->id();
+
+            // Check if the data is cached
+            if (Cache::has($key)) {
+                $materials = json_decode(Cache::get($key), true);
+                return response()->json($materials, 200);
+            }
+
+            // Fetch the group IDs for the authenticated user
+            $groupIds = GroupUser::where('user_id', auth()->id())
+                ->orderBy('created_at', 'desc')
+                ->pluck('group_id');
+
+            // Fetch the videos for the user's groups
+            $videos = StudyMaterial::whereIn('group_id', $groupIds)
+                ->get()
+                ->toArray();
+
+            // Cache the videos for 1 minute
+            Cache::put($key, json_encode($materials), now()->addMinutes(1));
+
+            return response()->json($materials, 200);
+        } catch (\Throwable $e) {
+            Log::error("Study material ERROR: " . $e->getMessage());
+            return response()->json(['message' => 'Internal server error'], 500);
+        }
+    }
+
+
 }
