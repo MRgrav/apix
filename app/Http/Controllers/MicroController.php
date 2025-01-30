@@ -11,6 +11,7 @@ use App\Models\Instructor;
 use App\Models\User;
 use App\Models\Purchase;
 use App\Models\GroupUser;
+use App\Models\Group;
 
 class MicroController extends Controller
 {
@@ -163,6 +164,27 @@ class MicroController extends Controller
         } catch (\Throwable $e) {
             Log::error("Enrollable students Error: " . $e->getMessage());
             return response()->json(['message' => 'Internal server error'], 500);
+        }
+    }
+
+
+    public function getGroupsByCourseId ($courseId) {
+        try {
+            //code...
+            $groups = Group::select('name')->where('course_id', $courseId)->get();
+
+            if ($groups->isEmpty()) {
+                return response()->json(['message' => 'No groups found'], 404);
+            }
+
+            return response()->json([
+                'message'=>'Groups of this instructor',
+                'groups'=>$groups
+            ], 200);
+        } catch (\Throwable $e) {
+            //throw $e;
+            Log::error("Groups by Course, ERROR: ". $e->getMessage());
+            return response()->json(['message'=>'internal server error'], 500);
         }
     }
     
