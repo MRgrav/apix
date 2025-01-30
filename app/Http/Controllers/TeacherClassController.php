@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\TeacherClass;
+use App\Models\Group;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
@@ -59,6 +60,8 @@ class TeacherClassController extends Controller
             // Validate the incoming request data
             $validated = $request->validate([
                 'group_id' => 'required|integer',
+                'class_time' => 'nullable|date',
+                'live_class_link' => 'nullable|url',
             ]);
     
             // Get the current date using Carbon
@@ -78,11 +81,19 @@ class TeacherClassController extends Controller
                 'user_id' => $userId,
                 'group_id' => $validated['group_id'],
                 'class_code' => $class_code,
+                'class_time' => $validated['class_time'] ?? $currentDate,
             ]);
 
             $key = 'group_details_' . $validated['group_id'];
             Cache::forget($key);
     
+            // Update the live_class_link if provided
+            if ($validated['live_class_link']) {
+                $group = Group::findOrFail($validated['group_id']);
+                $group->live_class_link = $validated['live_class_link'];
+                $group->save();
+            }
+
             // Return a success response
             return response()->json(['message' => 'Teacher attendance created successfully.'], 201);
     
