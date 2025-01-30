@@ -14,6 +14,7 @@ use App\Models\GroupUser;
 use App\Models\Group;
 use App\Models\Video;
 use App\Models\StudyMaterial;
+use App\Models\PaymentOrder;
 
 class MicroController extends Controller
 {
@@ -206,9 +207,11 @@ class MicroController extends Controller
                 ->pluck('group_id');
 
             // Fetch the videos for the user's groups
-            $videos = Video::with('course','group')->whereIn('group_id', $groupIds)
-                ->get()
-                ->toArray();
+            $videos = Video::with('course','group')
+                        ->whereIn('group_id', $groupIds)
+                        ->orderBy('created_at','desc')
+                        ->get()
+                        ->toArray();
 
             // Cache the videos for 1 minute
             Cache::put($key, json_encode($videos), now()->addMinutes(1));
@@ -232,13 +235,15 @@ class MicroController extends Controller
 
             // Fetch the group IDs for the authenticated user
             $groupIds = GroupUser::where('user_id', auth()->id())
-                ->orderBy('created_at', 'desc')
-                ->pluck('group_id');
+                                ->orderBy('created_at', 'desc')
+                                ->pluck('group_id');
 
             // Fetch the videos for the user's groups
-            $materials = StudyMaterial::with('course','group')->whereIn('group_id', $groupIds)
-                ->get()
-                ->toArray();
+            $materials = StudyMaterial::with('course','group')
+                                    ->whereIn('group_id', $groupIds)
+                                    ->orderBy('created_at','desc')
+                                    ->get()
+                                    ->toArray();
 
             // Cache the videos for 1 minute
             Cache::put($key, json_encode($materials), now()->addMinutes(1));
@@ -253,7 +258,9 @@ class MicroController extends Controller
     public function getPaymentHistory () {
         try {
             //code...
-            $payments = PaymentOrder::where('user_id',auth()->id())->get();
+            $payments = PaymentOrder::where('user_id',auth()->id())
+                                    ->orderBy('created_at','desc')
+                                    ->get();
             if($payments->isEmpty()) {
                 return response()->json(['message' => 'No purchase yet'], 404);
             }
