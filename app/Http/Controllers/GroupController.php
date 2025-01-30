@@ -155,7 +155,7 @@ class GroupController extends Controller
                 // ->value('class_code');
 
             
-            if ($teacherClass->isEmpty()) {
+            if (!$teacherClass) {
                 return response()->json([
                     'message' => 'Group retrieved successfully',
                     'group' => $group,
@@ -171,7 +171,7 @@ class GroupController extends Controller
                 $code = $teacherClass['class_code'];
                 $class_status = true;
             }
-            
+
             // Cache the group data
             Cache::put($key, json_encode([
                 'group' => $group,
