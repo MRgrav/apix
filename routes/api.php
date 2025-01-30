@@ -176,7 +176,7 @@ Route::get('/micro/enrollables/{courseId}', [MicroController::class, 'enrollable
 Route::get('/micro/groups/{courseId}', [MicroController::class, 'getGroupsByCourseId']);
 Route::get('/micro/recorded-classes', [MicroController::class, 'getRecordedClasses'])->middleware('auth:sanctum');
 Route::get('/micro/study-materials', [MicroController::class, 'getStudyMaterials'])->middleware('auth:sanctum');
-
+Route::get('/micro/payment-history', [MicroController::class, 'getPaymentHistory'])->middleware('auth:sanctum');
 Route::prefix('attendance')->group(function(){
     Route::post('/', [AttendanceController::class, 'store'])->middleware('auth:sanctum');
 });

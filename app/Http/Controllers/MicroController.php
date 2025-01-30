@@ -206,7 +206,7 @@ class MicroController extends Controller
                 ->pluck('group_id');
 
             // Fetch the videos for the user's groups
-            $videos = Video::whereIn('group_id', $groupIds)
+            $videos = Video::with('course','group')->whereIn('group_id', $groupIds)
                 ->get()
                 ->toArray();
 
@@ -236,7 +236,7 @@ class MicroController extends Controller
                 ->pluck('group_id');
 
             // Fetch the videos for the user's groups
-            $materials = StudyMaterial::whereIn('group_id', $groupIds)
+            $materials = StudyMaterial::with('course','group')->whereIn('group_id', $groupIds)
                 ->get()
                 ->toArray();
 
@@ -250,5 +250,19 @@ class MicroController extends Controller
         }
     }
 
+    public function getPaymentHistory () {
+        try {
+            //code...
+            $payments = PaymentOrder::where('user_id',auth()->id())->get();
+            if($payments->isEmpty()) {
+                return response()->json(['message' => 'No purchase yet'], 404);
+            }
+            return response()->json($payments, 200);
+        } catch (\Throwable $e) {
+            //throw $e;
+            Log::error("Payment History Error: ".$e->getMessage());
+            return response()->json(['message' => 'internal server error'], 500);
+        }
+    }
 
 }
