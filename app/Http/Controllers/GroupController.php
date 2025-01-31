@@ -223,7 +223,7 @@ class GroupController extends Controller
             // if $isAvailable is false means, user will not get some data [videos, class code status false]
 
             // Fetch the group with related data
-            if ($isContentAvailable) {
+            if (!$isContentAvailable) {
                 $group = Group::with(['users', 'course', 'videos', 'instructor'])->find($groupId);
             } else {
                 $group = Group::with(['users', 'course', 'instructor'])->find($groupId);
