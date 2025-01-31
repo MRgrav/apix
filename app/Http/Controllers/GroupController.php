@@ -78,7 +78,6 @@ class GroupController extends Controller
             'group_user' => $groupUser // Optionally return the updated GroupUser record
         ], 201);
     }
-
     
     // redis : done
     public function getAllGroups()
@@ -107,6 +106,11 @@ class GroupController extends Controller
     {
         try {
             //code...
+            $isAvailable = GroupUser::where('user_id', auth()->id())
+                                    ->where('group_id', $groupId)
+                                    ->whereColumn('class_counted', '<=', 'total_classes')
+                                    ->exists();
+
             $key = 'group_details_' . $groupId; // Use $groupId instead of $id
 
             // Check if the group details are cached
@@ -115,13 +119,19 @@ class GroupController extends Controller
                 return response()->json([
                     'message' => 'Group retrieved successfully from cache,',
                     'group' => $groupData['group'],
-                    'class_status' => $groupData['class_status'],
+                    'class_status' => $isAvailable?$groupData['class_status']:false,
                     'class_code' => $groupData['class_code'],
                 ], 200);
             }
+            
+            // if $isAvailable is false means, user will not get some data [videos, class code status false]
 
             // Fetch the group with related data
-            $group = Group::with(['users', 'course', 'videos', 'instructor'])->find($groupId);
+            if ($isAvailable) {
+                $group = Group::with(['users', 'course', 'videos', 'instructor'])->find($groupId);
+            } else {
+                $group = Group::with(['users', 'course', 'instructor'])->find($groupId);
+            }
 
             if (!$group) {
                 return response()->json(['message' => 'Group not found'], 404);
@@ -182,7 +192,7 @@ class GroupController extends Controller
             return response()->json([
                 'message' => 'Group retrieved successfully',
                 'group' => $group,
-                'class_status' => $class_status,
+                'class_status' => ($class_status && $isAvailable),
                 'class_code' => $code
             ], 200);
         } catch (\Throwable $e) {

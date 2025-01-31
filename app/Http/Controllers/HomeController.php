@@ -102,7 +102,10 @@ class HomeController extends Controller
         try {
             $userId = auth()->id();
 
-            $groupIds = GroupUser::where('user_id', $userId)->pluck('group_id');
+            // Fetch group IDs where class_counted is less than or equal to total_classes
+            $groupIds = GroupUser::where('user_id', $userId)
+                                ->whereColumn('class_counted', '<=', 'total_classes')
+                                ->pluck('group_id');
 
             $upcomingClasses = $this->getUpcomingClasses($groupIds, $userId);
             $myCourses = $this->getMyCourses($userId);

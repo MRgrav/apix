@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Attendance;
+use App\Models\GroupUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
@@ -68,6 +69,11 @@ class AttendanceController extends Controller
                     'group_id' => $request['group_id'],
                     'class_code' => $request['class_code'],
                 ]);
+
+                $classCounter = GroupUser::where('user_id', auth()->id())->first();
+                // $classCounter->class_counted = $classCounter->class_counted + 1;
+                $classCounter->increment('class_counted');
+                $classCounter->save();
             }
 
 
