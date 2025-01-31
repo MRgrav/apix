@@ -106,6 +106,98 @@ class GroupController extends Controller
     {
         try {
             //code...
+
+            $key = 'group_details_' . $groupId; // Use $groupId instead of $id
+
+            // Check if the group details are cached
+            if (Cache::has($key)) {
+                $groupData = json_decode(Cache::get($key), true); // Decode the JSON data
+                return response()->json([
+                    'message' => 'Group retrieved successfully from cache,',
+                    'group' => $groupData['group'],
+                    'class_status' => $groupData['class_status'],
+                    'class_code' => $groupData['class_code'],
+                ], 200);
+            }
+            
+            // if $isAvailable is false means, user will not get some data [videos, class code status false]
+
+            // Fetch the group with related data
+            $group = Group::with(['users', 'course', 'videos', 'instructor'])->find($groupId);
+
+            if (!$group) {
+                return response()->json(['message' => 'Group not found'], 404);
+            }
+
+            // Get the current date
+            $currentDate = Carbon::now(); // Use Laravel's now() helper for the current date
+            $nextDate = $currentDate->copy()->addDay();
+
+            // Create the class code
+            $codeString = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+            // Format the group_id as a four-digit string with leading zeros
+            $formattedGroupId = str_pad($groupId, 4, '0', STR_PAD_LEFT);
+
+            // Generate the class code using the group ID and formatted date
+            $new_class_code = $formattedGroupId . '&' .
+                $codeString[$currentDate->year % 50] . // Year (mod 50 for index)
+                $codeString[$currentDate->month - 1] . // Month (0-indexed)
+                $codeString[$currentDate->day - 1]; // Day (0-indexed)
+
+            $new_next_class_code = $formattedGroupId . '&' .
+                $codeString[$nextDate->year % 50] . // Year (mod 50 for index)
+                $codeString[$nextDate->month - 1] . // Month (0-indexed)
+                $codeString[$nextDate->day - 1]; // Day (0-indexed)
+
+            // Check if the class code exists for the group
+            $teacherClass = TeacherClass::where('group_id', $groupId)
+                                        ->orderBy('created_at', 'desc')
+                                        ->first();
+                // ->value('class_code');
+
+            
+            if (!$teacherClass) {
+                return response()->json([
+                    'message' => 'Group retrieved successfully',
+                    'group' => $group,
+                    'class_status' => false,
+                    'class_code' => null
+                ], 200);
+            }
+
+            $class_status = false;
+            $code = null;
+            Log::info('testing class code: ' . $teacherClass['class_code'] .'\n' . $new_class_code . '\n' . $new_next_class_code);
+            if ($teacherClass['class_code'] === $new_class_code || $teacherClass['class_code'] === $new_next_class_code) {
+                $code = $teacherClass['class_code'];
+                $class_status = true;
+            }
+
+            // Cache the group data
+            Cache::put($key, json_encode([
+                'group' => $group,
+                'class_status' => $class_status,
+                'class_code' => $code
+            ]), now()->addMinutes(1));
+
+            return response()->json([
+                'message' => 'Group retrieved successfully',
+                'group' => $group,
+                'class_status' => $class_status,
+                'class_code' => $code
+            ], 200);
+        } catch (\Throwable $e) {
+            //throw $e;
+            Log::error("Get Group ERROR : " . $e->getMessage());
+            return response()->json(['message' => 'internal server error'], 500);
+        }
+    }
+
+    public function getGroupStudent($groupId)
+    {
+        try {
+            //code...
             $isAvailable = GroupUser::where('user_id', auth()->id())
                                     ->where('group_id', $groupId)
                                     ->whereColumn('class_counted', '<=', 'total_classes')
