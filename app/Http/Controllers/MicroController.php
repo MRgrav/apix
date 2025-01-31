@@ -275,16 +275,24 @@ class MicroController extends Controller
 
     public function getCourseStatus($courseId) {
         try {
-            //code...
-            // auth()->id();
-            $data = GroupUser::where('course_id',$courseId)
-                                ->where('user_id', auth()->id())
-                                ->where('expiry_date', '<=', Carbon::now())
-                                ->exists();
+            $data = GroupUser::where('course_id', $courseId)
+                            ->where('user_id', auth()->id())
+                            ->first();
 
-            return response()->json([
-                'expiry' => !$data
-            ], 200);
+            if ($data) {
+                // Check if the course is expired
+                $isExpired = $data->expiry_date <= Carbon::now();
+
+                return response()->json([
+                    'expiry' => !$isExpired, // true if not expired, false if expired
+                    'message' => $isExpired ? 'Course has expired.' : 'Course is active.'
+                ], 200);
+            } else {
+                return response()->json([
+                    'expiry' => null,
+                    'message' => 'Course not found for the user.'
+                ], 404); // Return 404 if the course is not found
+            }
         } catch (\Throwable $e) {
             //throw $e;
             Log::error("Course Status ERROR: ". $e->getMessage());
