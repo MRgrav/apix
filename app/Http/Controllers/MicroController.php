@@ -272,4 +272,23 @@ class MicroController extends Controller
         }
     }
 
+    public function getCourseStatus($courseId) {
+        try {
+            //code...
+            // auth()->id();
+            $data = GroupUser::where('course_id',$courseId)
+                                ->where('user_id', auth()->id())
+                                ->where('expiry_date', '<=', Carbon::now())
+                                ->exists();
+
+            return response()->json([
+                'expiry' => !$data
+            ], 200);
+        } catch (\Throwable $e) {
+            //throw $e;
+            Log::error("Course Status ERROR: ". $e->getMessage());
+            return response()->json(['message' => 'internal server error'], 500);
+        }
+    }
+
 }
