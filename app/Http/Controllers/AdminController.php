@@ -69,7 +69,7 @@ class AdminController extends Controller
                 'classes' => $classes,
                 'students' => $students,
                 'materials' => $materials,
-                'routine' => $routine || null
+                'routine' => $routine?$routine:[]
             ], 200);
 
         } catch (\Throwable $e) {
