@@ -114,40 +114,48 @@ class AdminController extends Controller
         }
     }
 
-    public function createRoutine (Request $request, $groupId) {
-        try {
-            //code...
-            $validated = $request->validate([
-                'instructor_id' => 'required',
-                'day' => 'required',
-                'time' => 'required',
-            ]);
+    public function createRoutine(Request $request, $groupId)
+{
+    try {
+        $validated = $request->validate([
+            'instructor_id' => 'required',
+            'day' => 'required',
+            'time' => 'required',
+        ]);
 
-            $routine = Routine::findOrFail('group_id', $groupId)->first();
+        $dayMap = [
+            'sunday' => 'sun',
+            'monday' => 'mon',
+            'tuesday' => 'tue',
+            'wednesday' => 'wed',
+            'thursday' => 'thu',
+            'friday' => 'fri',
+            'saturday' => 'sat',
+        ];
 
-            if (!$routine) {
-                // return response()->json(['message' => 'not found'], 404);
-                $routine = Routine::create([
-                    'group_id' => $groupId,
-                    'instructor_id' => $validated->instructor_id,
-                    'session' => null
-                ]);
-            }
+        $routine = Routine::firstOrCreate(
+            ['group_id' => $groupId],
+            [
+                'instructor_id' => $validated['instructor_id'],
+                'session' => null,
+            ]
+        );
 
-            $routine->$request['day'] = $request['time'];
-            $routine->save();
+        $routine->{$dayMap[$validated['day']]} = $validated['time'];
+        $routine->save();
 
-            Log::info('Class time added: '. $request['day']. ' : '.$request['time']);
+        Log::info('Class time added: ' . $validated['day'] . ' : ' . $validated['time']);
 
-            return response()->json(['message' => 'Class time added'], 201);
-
-            
-        } catch (\Throwable $e) {
-            //throw $e;
-            Log::error("create routine error: ". $e->getMessage());
-            return response()->json(['message' => 'internal server error'], 500);
-        }
+        return response()->json(['message' => 'Class time added'], 201);
+    } catch (ModelNotFoundException $e) {
+        Log::error("Routine not found for group ID: " . $groupId);
+        return response()->json(['message' => 'Routine not found'], 404);
+    } catch (\Throwable $e) {
+        Log::error("Create routine error: " . $e->getMessage());
+        return response()->json(['message' => 'Internal server error'], 500);
     }
+}
+
 
     // danger : no soft delete
     public function deleteRoutine($id) {
