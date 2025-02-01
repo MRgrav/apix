@@ -108,6 +108,8 @@ public function store(Request $request)
         $video = Video::findOrFail($id);
         $video->delete();
 
+        Cache::forget('videos'.$id);
+
         return response()->json(['message' => 'Video deleted successfully']);
     }
 
