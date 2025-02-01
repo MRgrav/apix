@@ -10,6 +10,7 @@ use App\Models\GroupUser;
 use App\Models\StudyMaterial;
 use App\Models\TeacherClass;
 use App\Models\InstructorPayment;
+use App\Models\Routine;
 
 class AdminController extends Controller
 {
@@ -46,7 +47,7 @@ class AdminController extends Controller
                 $students = GroupUser::with('user')
                                     ->where('group_id', $groupId)
                                     ->get();
-                Cache::put($studentsKey, $students->toJson(), now()->addMinutes(1));
+                Cache::put($studentsKey, $students->toJson(), now()->addSeconds(10));
             }
 
             if (Cache::has($materialsKey)) {
@@ -113,32 +114,52 @@ class AdminController extends Controller
         }
     }
 
-    public function createRoutine (Request $request) {
+    public function createRoutine (Request $request, $groupId) {
         try {
             //code...
             $validated = $request->validate([
-                'group_id' => 'required',
-                'insructor_id' => 'required',
-                'session' => 'required',
+                'instructor_id' => 'required',
+                'day' => 'required',
+                'time' => 'required',
             ]);
 
-            $routine = Routine::create([
-                'group_id' => $request['group_id'],
-                'insructor_id' => $request['insructor_id'],
-                'sun' => $request['sun'],
-                'mon' => $request['mon'],
-                'tue' => $request['tue'],
-                'wed' => $request['wed'],
-                'thu' => $request['thu'],
-                'fri' => $request['fri'],
-                'sat' => $request['sat'],
-                'session' => $request['session'],
-            ]);
+            $routine = Routine::findOrFail('group_id', $groupId)->first();
+
+            if (!$routine) {
+                // return response()->json(['message' => 'not found'], 404);
+                $routine = Routine::create([
+                    'group_id' => $groupId,
+                    'instructor_id' => $validated->instructor_id,
+                    'session' => null
+                ]);
+            }
+
+            $routine->$request['day'] = $request['time'];
+            $routine->save();
+
+            Log::info('Class time added: '. $request['day']. ' : '.$request['time']);
+
+            return response()->json(['message' => 'Class time added'], 201);
 
             
         } catch (\Throwable $e) {
             //throw $e;
             Log::error("create routine error: ". $e->getMessage());
+            return response()->json(['message' => 'internal server error'], 500);
+        }
+    }
+
+    // danger : no soft delete
+    public function deleteRoutine($id) {
+        try {
+            //code...
+            $routine = Routine::findOrFail($id);
+            $routine->delete();
+
+            return response()->json(['message' => 'Time deleted'], 200);
+        } catch (\Throwable $e) {
+            //throw $th;
+            Log::error("Routine Deletion: ". $e->getMessage());
             return response()->json(['message' => 'internal server error'], 500);
         }
     }

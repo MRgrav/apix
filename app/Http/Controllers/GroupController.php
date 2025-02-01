@@ -6,6 +6,7 @@ use App\Models\Course;
 use App\Models\Group;
 use App\Models\GroupUser;
 use App\Models\TeacherClass;
+use App\Models\Routine;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -34,6 +35,12 @@ class GroupController extends Controller
                 'course_id' => $courseId,   // This is not required
                 'instructor_id' => $request->instructor_id,
                 'created_by' => auth()->id(),
+            ]);
+
+            Routine::create([
+                'group_id' => $group->id,
+                'instructor_id' => $request->instructor_id,
+                'session' => null
             ]);
 
             Cache::forget('allgroup');
@@ -258,7 +265,6 @@ class GroupController extends Controller
             $teacherClass = TeacherClass::where('group_id', $groupId)
                                         ->orderBy('created_at', 'desc')
                                         ->first();
-                // ->value('class_code');
 
             
             if (!$teacherClass) {
