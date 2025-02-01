@@ -22,6 +22,8 @@ class AdminController extends Controller
     public function getGroupDetails ($groupId) {
         try {
             //code...
+            $routine = Routine::where('group_id', $groupId)->first();
+
             $key = 'group_details_' . $groupId; // Use $groupId instead of $id
             $studentsKey = 'group_students_' . $groupId;       // students enrolled under the group
             $materialsKey = 'group_materials' . $groupId;
@@ -66,7 +68,8 @@ class AdminController extends Controller
                 'details' => $group,
                 'classes' => $classes,
                 'students' => $students,
-                'materials' => $materials
+                'materials' => $materials,
+                'routine' => $routine || null
             ], 200);
 
         } catch (\Throwable $e) {
@@ -115,46 +118,46 @@ class AdminController extends Controller
     }
 
     public function createRoutine(Request $request, $groupId)
-{
-    try {
-        $validated = $request->validate([
-            'instructor_id' => 'required',
-            'day' => 'required',
-            'time' => 'required',
-        ]);
+    {
+        try {
+            $validated = $request->validate([
+                'instructor_id' => 'required',
+                'day' => 'required',
+                'time' => 'required',
+            ]);
 
-        $dayMap = [
-            'sunday' => 'sun',
-            'monday' => 'mon',
-            'tuesday' => 'tue',
-            'wednesday' => 'wed',
-            'thursday' => 'thu',
-            'friday' => 'fri',
-            'saturday' => 'sat',
-        ];
+            $dayMap = [
+                'sunday' => 'sun',
+                'monday' => 'mon',
+                'tuesday' => 'tue',
+                'wednesday' => 'wed',
+                'thursday' => 'thu',
+                'friday' => 'fri',
+                'saturday' => 'sat',
+            ];
 
-        $routine = Routine::firstOrCreate(
-            ['group_id' => $groupId],
-            [
-                'instructor_id' => $validated['instructor_id'],
-                'session' => null,
-            ]
-        );
+            $routine = Routine::firstOrCreate(
+                ['group_id' => $groupId],
+                [
+                    'instructor_id' => $validated['instructor_id'],
+                    'session' => null,
+                ]
+            );
 
-        $routine->{$dayMap[$validated['day']]} = $validated['time'];
-        $routine->save();
+            $routine->{$dayMap[$validated['day']]} = $validated['time'];
+            $routine->save();
 
-        Log::info('Class time added: ' . $validated['day'] . ' : ' . $validated['time']);
+            Log::info('Class time added: ' . $validated['day'] . ' : ' . $validated['time']);
 
-        return response()->json(['message' => 'Class time added'], 201);
-    } catch (ModelNotFoundException $e) {
-        Log::error("Routine not found for group ID: " . $groupId);
-        return response()->json(['message' => 'Routine not found'], 404);
-    } catch (\Throwable $e) {
-        Log::error("Create routine error: " . $e->getMessage());
-        return response()->json(['message' => 'Internal server error'], 500);
+            return response()->json(['message' => 'Class time added'], 201);
+        } catch (ModelNotFoundException $e) {
+            Log::error("Routine not found for group ID: " . $groupId);
+            return response()->json(['message' => 'Routine not found'], 404);
+        } catch (\Throwable $e) {
+            Log::error("Create routine error: " . $e->getMessage());
+            return response()->json(['message' => 'Internal server error'], 500);
+        }
     }
-}
 
 
     // danger : no soft delete
