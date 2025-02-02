@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Redis;
+use Carbon\Carbon;
 
 class CourseController extends Controller
 {
@@ -368,7 +369,7 @@ class CourseController extends Controller
             $paymentStatus = $payment->status; // Payment status (e.g., 'captured', 'failed', etc.)
             
             // Calculate the expiry date based on the plan's duration
-            $expiryDate = now()->addMonths($validatedData['duration']);  // Assuming duration is in months
+            $expiryDate = Carbon::now()->addMonths($request->duration);  // Assuming duration is in months
     
             // If the payment is valid, store the purchase details
             Purchase::create([
@@ -385,7 +386,7 @@ class CourseController extends Controller
 
             $existGroup = GroupUser::where('user_id', auth()->id())
                                     ->where('course_id',$validatedData['course_id'])
-                                    ->whereNotNull('group_id')
+                                    // ->whereNotNull('group_id')
                                     ->exists();
 
             if (!$existGroup) {
@@ -395,12 +396,18 @@ class CourseController extends Controller
                     'course_id' => $validatedData['course_id'],
                     'expiry_date' => $expiryDate,
                     'plan_id' => $validatedData['plan_id'],
+                    'class_counted' => 0,
+                    'total_classes' => $request['number_of_classes'],
                 ]);
             } else {
                 // Find the GroupUser record by user_id and course_id
-                GroupUser::where('user_id', auth()->id())
-                    ->where('course_id', $validatedData['course_id'])
-                    ->update(['expiry_date' => $expiryDate, 'plan_id' => $validatedData['plan_id']]);
+                $groupUser = GroupUser::where('user_id', auth()->id())
+                                        ->where('course_id', $validatedData['course_id'])
+                                        ->first();
+                $groupUser->expiry_date = $expiryDate;
+                $groupUser->plan_id = $request->plan_id;
+                $groupUser->total_classes = $groupUser->total_classes + $request->number_of_classes;
+                $groupUser->save();
             }
 
     
