@@ -300,4 +300,31 @@ class MicroController extends Controller
         }
     }
 
+
+    public function upcomingClassesTodayByInstructor() {
+        try {
+            //code...
+            $dayName = date('D', strtotime('today')); // Get the current day name (e.g., 'Mon', 'Tue', 'Wed')
+            $dayColumn = strtolower($dayName); // Convert the day name to lowercase (e.g., 'mon', 'tue', 'wed')
+
+            // $day = get week day name like 'sun', 'mon' , ...
+            $routines = Routine::with('group')->where('instructor_id', auth()->id())->whereNotNull($dayColumn)->get();
+
+            $upcomingClasses = $routines->map(function ($routine) use ($dayColumn) {
+                return [
+                    'group' => $routine->group,
+                    'course' => $routine->group->course,
+                    'time' => $routine->{$dayColumn},
+                ];
+            });
+    
+            return response()->json(['upcoming_classes' => $upcomingClasses]);
+
+        } catch (\Throwable $e) {
+            //throw $e;
+            Log::error("message ". $e->getMessage());
+            return response()->json(['message' => 'internal server error'], 500);
+        }
+    }
+
 }

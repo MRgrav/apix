@@ -321,10 +321,10 @@ class CourseController extends Controller
             'course_id' => 'required|integer',
             'plan_id' => 'required|integer',
             'payment_id' => 'required|string',
-            'payment_signature' => 'required|string',
+            'payment_signature' => 'required',
             'duration' => 'required|integer|min:1',  // Ensure duration is positive
-            'razorpay_order_id' => 'required|string',  // Ensure order_id is passed
-            'class_frequency_id' => 'required|string',
+            'razorpay_order_id' => 'required',  // Ensure order_id is passed
+            'class_frequency_id' => 'required',
         ]);
     
         try {
