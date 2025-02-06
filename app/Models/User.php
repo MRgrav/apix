@@ -20,7 +20,13 @@ class User extends Authenticatable
         'password',
         'otp',
         'role_id',
-        'is_nri'
+        'is_nri',
+        'whatsapp',
+        'gender',
+        'country',
+        'state',
+        'address',
+        'district',
     ];
 
     protected $hidden = [

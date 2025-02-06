@@ -28,6 +28,12 @@ class AuthController extends Controller
             'country_code' => 'required|string|max:5',
             'is_nri' => 'required|boolean',
             'password' => 'required|string|min:6|confirmed',
+            // 'whatsapp' => 'nullable',
+            // 'gender' => 'nullable',
+            // 'country' => 'nullable',
+            // 'state' => 'nullable',
+            // 'address' => 'nullable',
+            // 'pin' => 'nullable',
         ]);
 
         if ($validator->fails()) {
@@ -48,6 +54,12 @@ class AuthController extends Controller
                 'is_nri' => $request->is_nri,
                 'password' => Hash::make($request->password),
                 'otp' => mt_rand(1000, 9999),
+                'whatsapp' => $request->whatsapp || null,
+                'gender' => $request->gender || null,
+                'country' => $request->country || null,
+                'state' => $request->state || null,
+                'address' => $request->address || null,
+                'district' => $request->district || null,
             ]);
 
             // Send OTP using country code and phone
