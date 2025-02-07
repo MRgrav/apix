@@ -151,7 +151,7 @@ public function verifyPhoneOtp(Request $request)
     if (!$user || $user->otp !== $request->otp) {
         // Log the failure
         Log::warning('Invalid phone number or OTP', ['phone' => $request->phone, 'provided_otp' => $request->otp]);
-        return response()->json(['error' => 'Invalid phone number or OTP'], 400);
+        return response()->json(['error' => 'Invalid phone number or OTP'], 400); 
     }
 
     // Mark the phone as verified
