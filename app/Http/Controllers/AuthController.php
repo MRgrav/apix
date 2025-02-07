@@ -33,7 +33,7 @@ class AuthController extends Controller
             // 'country' => 'nullable',
             // 'state' => 'nullable',
             // 'address' => 'nullable',
-            // 'pin' => 'nullable',
+            // 'district' => 'nullable',
         ]);
 
         if ($validator->fails()) {

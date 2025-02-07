@@ -29,7 +29,8 @@ class GroupController extends Controller
     
             $course = Course::findOrFail($courseId);
     
-            $group = $course->groups()->create([
+            // $group = $course->groups()->
+            $group = Group::create([
                 'name' => $request->name,
                 'description' => $request->description,
                 'course_id' => $courseId,   // This is not required
