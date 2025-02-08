@@ -244,7 +244,7 @@ class CourseController extends Controller
             'class_frequency_id' => 'required',
         ]);
 
-        $classFrequecny = ClassFrequency::findOrFail($validatedData['class_frequency_id']);
+        $classFrequency = ClassFrequency::findOrFail($validatedData['class_frequency_id']);
 
         $course = Course::findOrFail($courseId);
         if (!$course) {
@@ -290,8 +290,8 @@ class CourseController extends Controller
                 'currency' => $currency,
                 'user_id' => auth()->id(),
                 'course_id' => $courseId,
-                'class_frequency_id' => $classFrequecny->id,
-                'number_of_classes' => $classFrequecny->classes_per_month,
+                'class_frequency_id' => $classFrequency->id,
+                'number_of_classes' => $classFrequency->classes_per_month,
             ]);
 
             // Return response with order details
