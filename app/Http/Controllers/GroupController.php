@@ -210,6 +210,9 @@ class GroupController extends Controller
                                     ->where('group_id', $groupId)
                                     ->whereColumn('class_counted', '<', 'total_classes')
                                     ->exists();
+            if (!$isAvailable) {
+                return response()->json(['message' => 'Not Purchased yet'], 403);
+            }
             $isContentAvailable = GroupUser::where('user_id', auth()->id())
                                     ->where('group_id', $groupId)
                                     ->where('expiry_date', '<=', Carbon::now())
