@@ -54,12 +54,12 @@ class AuthController extends Controller
                 'is_nri' => $request->is_nri,
                 'password' => Hash::make($request->password),
                 'otp' => mt_rand(1000, 9999),
-                'whatsapp' => $request->whatsapp || null,
-                'gender' => $request->gender || null,
-                'country' => $request->country || null,
-                'state' => $request->state || null,
-                'address' => $request->address || null,
-                'district' => $request->district || null,
+                'whatsapp' => $request->whatsapp ?? null,
+                'gender' => $request->gender ?? null,
+                'country' => $request->country ?? null,
+                'state' => $request->state ?? null,
+                'address' => $request->address ?? null,
+                'district' => $request->district ?? null,
             ]);
 
             // Send OTP using country code and phone
