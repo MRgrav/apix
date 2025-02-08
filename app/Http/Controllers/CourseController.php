@@ -266,7 +266,7 @@ class CourseController extends Controller
         // Convert price to the smallest unit (paise for INR, cents for USD)
         // $amount = 100 * $validatedData['duration'] * $plan->current_rate + ($plan->current_rate * $plan->GST);    
         // Calculate the base price
-        $basePrice = $validatedData['duration'] * $plan->current_rate;
+        $basePrice = $validatedData['duration'] * $plan->current_rate * $classFrequency['classes_per_month'];
         // Calculate GST
         $gstAmount = $basePrice * ($plan->GST / 100);
         // Total amount in smallest unit
