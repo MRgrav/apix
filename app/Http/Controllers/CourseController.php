@@ -234,7 +234,7 @@ class CourseController extends Controller
                 return response()->json(['message'=>'not authorized'], 403);
             }
 
-            $cacheKey = 'renew' . auth()->id() . $id;
+            $cacheKey = 'renew' . auth()->id() . $courseId;
 
             if (Cache::has($cacheKey)) {
                 // If data exists in cache, retrieve it
