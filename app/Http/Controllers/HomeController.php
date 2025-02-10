@@ -107,6 +107,26 @@ class HomeController extends Controller
                                 ->whereColumn('class_counted', '<=', 'total_classes')
                                 ->pluck('group_id');
 
+            $renewalKey = 'renewal'.auth()->id();
+            if (Cache::has($renewalKey)) {
+                $renewals = json_decode(Cache::get($renewalKey), true); // Decode the JSON data
+            } else {
+                // Fetch renewals for groups where there are 2 or fewer classes left
+                // OR the expiry date is within the next month
+                $renewals = GroupUser::with('course','plan')
+                            ->where('user_id', $userId)
+                            ->where(function($query) {
+                                $query->whereColumn('class_counted', '>=', 'total_classes - 2') // 2 or fewer classes left
+                                    ->orWhere(function($subQuery) {
+                                        $subQuery->where('expiry_date', '>=', Carbon::now()->startOfMonth()->addMonth())
+                                                    ->where('expiry_date', '<=', Carbon::now()->endOfMonth()->addMonth());
+                                    });
+                            })
+                            ->get();
+                Cache::put($renewalKey, $renewals->toJson(), now()->addMinutes(45));
+            }  
+
+
             $upcomingClasses = $this->getUpcomingClasses($groupIds, $userId);
             $myCourses = $this->getMyCourses($userId);
             $studyMaterials = $this->getStudyMaterials($groupIds, $userId);
@@ -115,7 +135,8 @@ class HomeController extends Controller
                 'message' => 'Fetched home,',
                 'upcomings' => $upcomingClasses,
                 'courses' => $myCourses,
-                'materials' => $studyMaterials
+                'materials' => $studyMaterials,
+                'renewals' => $renewals,
             ], 200);
         } catch (\Throwable $e) {
             Log::error("Web Home error : " . $e->getMessage() . "\n" . $e->getTraceAsString());

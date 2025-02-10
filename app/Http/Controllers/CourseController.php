@@ -227,6 +227,40 @@ class CourseController extends Controller
     return response()->json(['message' => 'Trial started successfully', 'trial' => $trial], 200);
 }
 
+    public function renewal($courseId) {
+        try {
+            //code...
+            if (!auth()->id()) {
+                return response()->json(['message'=>'not authorized'], 403);
+            }
+
+            $cacheKey = 'renew' . auth()->id() . $id;
+
+            if (Cache::has($cacheKey)) {
+                // If data exists in cache, retrieve it
+                $content = json_decode(Cache::get($cacheKey), true);
+                return response()->json($content, 200);
+            }
+
+            $groupUser = Purchase::with('course','plan')
+                                    ->where('user_id', auth()->id())
+                                    ->where('course_id', $courseId)
+                                    ->first();
+            // return plans
+            // return class frequency id
+            if ($groupUser->isEmpty()) {
+                return response()->json(['message'=>'Nothing to renew'], 404);
+            }
+
+            Cache::put($cacheKey, json_encode($course), now()->addMinutes(1));
+            
+            return response()->json($groupUser, 200);
+
+        } catch (\Throwable $e) {
+            //throw $e;
+        }
+    }
+
 
     /**
      * Create an order for the course
