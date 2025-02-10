@@ -248,11 +248,11 @@ class CourseController extends Controller
                                     ->first();
             // return plans
             // return class frequency id
-            if ($groupUser->isEmpty()) {
+            if (!$groupUser) {
                 return response()->json(['message'=>'Nothing to renew'], 404);
             }
 
-            Cache::put($cacheKey, json_encode($course), now()->addMinutes(1));
+            Cache::put($cacheKey, json_encode($groupUser), now()->addMinutes(3));
             
             return response()->json($groupUser, 200);
 
@@ -448,6 +448,8 @@ class CourseController extends Controller
 
     
             Log::info('Payment confirmed and purchase recorded', $validatedData);
+
+            Cache::forget('renew' . auth()->id() . $validatedData['course_id']);
     
             return response()->json(['message' => 'Payment successful'], 200);
     
