@@ -258,6 +258,8 @@ class CourseController extends Controller
 
         } catch (\Throwable $e) {
             //throw $e;
+            Log::error("Renew : ". $e->getMessage());
+            return response()->json(['message'=>'internal server error'], 500);
         }
     }
 
