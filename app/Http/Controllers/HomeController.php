@@ -104,7 +104,7 @@ class HomeController extends Controller
 
             // Fetch group IDs where class_counted is less than or equal to total_classes
             $groupIds = GroupUser::where('user_id', $userId)
-                                ->whereColumn('class_counted', '<=', 'total_classes')
+                                ->whereColumn('class_counted', '>=', 'total_classes')
                                 ->pluck('group_id');
 
             $renewalKey = 'renewal'.auth()->id();
@@ -116,7 +116,7 @@ class HomeController extends Controller
                 $renewals = GroupUser::with('course','plan')
                             ->where('user_id', $userId)
                             ->where(function($query) {
-                                $query->whereColumn('class_counted', '>=', 'total_classes - 2') // 2 or fewer classes left
+                                $query->whereColumn('class_counted', '>=', 'total_classes') // 2 or fewer classes left
                                     ->orWhere(function($subQuery) {
                                         $subQuery->where('expiry_date', '>=', Carbon::now()->startOfMonth()->addMonth())
                                                     ->where('expiry_date', '<=', Carbon::now()->endOfMonth()->addMonth());
