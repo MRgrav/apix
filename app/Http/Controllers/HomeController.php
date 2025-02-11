@@ -115,12 +115,19 @@ class HomeController extends Controller
                 // OR the expiry date is within the next month
                 $renewals = GroupUser::with('course','plan')
                             ->where('user_id', $userId)
+                            // ->where(function($query) {
+                            //     $query->whereColumn('class_counted', '>=', 'total_classes') // 2 or fewer classes left
+                            //         ->orWhere(function($subQuery) {
+                            //             $subQuery->where('expiry_date', '>=', Carbon::now()->startOfMonth()->addMonth())
+                            //                         ->where('expiry_date', '<=', Carbon::now()->endOfMonth()->addMonth());
+                            //         });
+                            // })
                             ->where(function($query) {
-                                $query->whereColumn('class_counted', '>=', 'total_classes') // 2 or fewer classes left
-                                    ->orWhere(function($subQuery) {
-                                        $subQuery->where('expiry_date', '>=', Carbon::now()->startOfMonth()->addMonth())
-                                                    ->where('expiry_date', '<=', Carbon::now()->endOfMonth()->addMonth());
-                                    });
+                                $query->whereBetween('expiry_date', [
+                                    Carbon::now()->startOfMonth()->addMonth(),
+                                    Carbon::now()->endOfMonth()->addMonth()
+                                ])
+                                ->orWhere('class_counted', '>=', DB::raw('total_classes'));
                             })
                             ->get();
                 Log::info($renewals);
