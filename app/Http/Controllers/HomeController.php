@@ -126,8 +126,8 @@ class HomeController extends Controller
                                 $query->whereBetween('expiry_date', [
                                     Carbon::now()->startOfMonth()->addMonth(),
                                     Carbon::now()->endOfMonth()->addMonth()
-                                ])
-                                ->orWhere('class_counted', '>=', DB::raw('total_classes'));
+                                ]);
+                                // ->orWhere('class_counted', '>=', DB::raw('total_classes'));
                             })
                             ->get();
                 Log::info($renewals);
