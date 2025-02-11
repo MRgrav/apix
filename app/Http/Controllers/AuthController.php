@@ -83,6 +83,69 @@ class AuthController extends Controller
         }
     }
 
+    public function signUpInstructor(Request $request)
+    {
+        // Log the incoming request payload for debugging
+        Log::info('SignUp Request Payload:', $request->all());
+
+        // Validate the request input
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'email' => 'nullable|email|unique:users',
+            'phone' => 'required|digits:10|unique:users',
+            'country_code' => 'required|string|max:5',
+            'is_nri' => 'required|boolean',
+            'password' => 'required|string|min:6|confirmed',
+        ]);
+
+        if ($validator->fails()) {
+            Log::warning('Validation Failed:', $validator->errors()->toArray());
+            return response()->json([
+                'message' => 'Validation failed. Please check your input.',
+                'errors' => $validator->errors()
+            ], 400);
+        }
+
+        DB::beginTransaction();
+        try {
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'phone' => $request->phone,
+                'country_code' => $request->country_code,
+                'is_nri' => $request->is_nri,
+                'password' => Hash::make($request->password),
+                'otp' => mt_rand(1000, 9999),
+                'whatsapp' => $request->whatsapp ?? null,
+                'gender' => $request->gender ?? null,
+                'country' => $request->country ?? null,
+                'state' => $request->state ?? null,
+                'address' => $request->address ?? null,
+                'district' => $request->district ?? null,
+                'role_id' => 2,
+            ]);
+
+            // Send OTP using country code and phone
+            $this->sendSms($user->country_code . $user->phone, $user->otp);
+
+            DB::commit();
+
+            Log::info('Instructor registered successfully:', ['user_id' => $user->id]);
+
+            return response()->json([
+                'message' => 'Instructor registered successfully. Please verify your phone with the OTP sent.',
+                'user_id' => $user->id
+            ], 201);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Instructor registration failed:', ['error' => $e->getMessage()]);
+            return response()->json([
+                'message' => 'Registration failed due to a server error. Please try again later.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     // Login a user
     public function signIn(Request $request)
     {

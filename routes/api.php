@@ -35,6 +35,7 @@ use App\Http\Controllers\AdminController;
 
 
 Route::post('signup', [AuthController::class, 'signUp']);
+Route::post('signup/instuctor', [AuthController::class, 'signUpInstructor']);
 Route::post('signin', [AuthController::class, 'signIn']);
 Route::post('verify', [AuthController::class, 'verifyPhoneOtp']);
 Route::post('resend-otp', [AuthController::class, 'resendOtp']);
