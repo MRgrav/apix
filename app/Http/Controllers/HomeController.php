@@ -123,6 +123,7 @@ class HomeController extends Controller
                                     });
                             })
                             ->get();
+                Log::info($renewals);
                 Cache::put($renewalKey, $renewals->toJson(), now()->addMinutes(45));
             }  
 
