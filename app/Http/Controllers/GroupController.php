@@ -215,7 +215,7 @@ class GroupController extends Controller
             }
             $isContentAvailable = GroupUser::where('user_id', auth()->id())
                                     ->where('group_id', $groupId)
-                                    ->where('expiry_date', '>', Carbon::now())
+                                    ->where('expiry_date', '<', Carbon::now())
                                     ->exists();
 
             // Log::debug("here: ". GroupUser::where('user_id', auth()->id())->first() . " Now: ". Carbon::now());
