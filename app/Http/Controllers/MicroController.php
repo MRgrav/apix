@@ -275,7 +275,8 @@ class MicroController extends Controller
 
     public function getCourseStatus($courseId) {
         try {
-            $data = GroupUser::where('course_id', $courseId)
+            $data = GroupUser::with('course')
+                            ->where('course_id', $courseId)
                             ->where('user_id', auth()->id())
                             ->first();
 
@@ -285,6 +286,8 @@ class MicroController extends Controller
 
                 return response()->json([
                     'expiry' => !$isExpired, // true if not expired, false if expired
+                    'title' => $data->course->title,
+                    'id' => $data->group_id,
                     'message' => $isExpired ? 'Course has expired.' : 'Course is active.'
                 ], 200);
             } else {

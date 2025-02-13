@@ -218,7 +218,7 @@ class GroupController extends Controller
                                     ->where('expiry_date', '>', Carbon::now())
                                     ->exists();
 
-            Log::debug("here: ". GroupUser::where('user_id', auth()->id())->first() . " Now: ". Carbon::now());
+            // Log::debug("here: ". GroupUser::where('user_id', auth()->id())->first() . " Now: ". Carbon::now());
 
             $key = 'group_details_' . $groupId; // Use $groupId instead of $id
 
