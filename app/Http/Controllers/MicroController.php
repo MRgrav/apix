@@ -260,7 +260,8 @@ class MicroController extends Controller
     public function getPaymentHistory () {
         try {
             //code...
-            $payments = PaymentOrder::where('user_id',auth()->id())
+            $payments = Purchase::with('course', 'plan')
+                                    ->where('user_id',auth()->id())
                                     ->orderBy('created_at','desc')
                                     ->get();
             if($payments->isEmpty()) {
