@@ -26,7 +26,18 @@ class StudentController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $student = Student::create($request->all());
+        $student = Student::create([
+            'name' => $request->name,
+            'age' => $request->age,
+            'class' => $request->class,
+            'skill_level' => $request->skill_level,
+            'subject' => $request->subject,
+            'contact_number' => $request->contact_number,
+            'whatsapp_number' => $request->whatsapp_number,
+            'email' => $request->email,
+            'address' => $request->address,
+            'plan_id' => $request->plan_id,
+        ]);
 
         return response()->json([
             'message' => 'Student created successfully!',
@@ -35,7 +46,7 @@ class StudentController extends Controller
     }
     public function getAllStudents()
     {
-        $students = Student::all();
+        $students = Student::with('plan')->get();
 
         return response()->json([
             'message' => 'Students retrieved successfully!',

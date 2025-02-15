@@ -19,5 +19,16 @@ class Student extends Model
         'whatsapp_number',
         'email',
         'address',
+        'plan_id',
     ];
+
+    /**
+     * Get the plan that owns the Student
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function plan(): BelongsTo
+    {
+        return $this->belongsTo(Plan::class, 'plan_id');
+    }
 }

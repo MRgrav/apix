@@ -358,6 +358,7 @@ class MicroController extends Controller
             ], 200);
         } catch (\Throwable $e) {
             //throw $e;
+            Log::error("Renewals : ". $e->getMesage());
             return response()->json(['message' => 'Internal server error.'], 500);
         }
     }
