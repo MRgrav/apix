@@ -16,6 +16,7 @@ use App\Models\Group;
 use App\Models\Video;
 use App\Models\StudyMaterial;
 use App\Models\PaymentOrder;
+use App\Models\Routine;
 
 class MicroController extends Controller
 {
@@ -326,6 +327,57 @@ class MicroController extends Controller
         } catch (\Throwable $e) {
             //throw $e;
             Log::error("message ". $e->getMessage());
+            return response()->json(['message' => 'internal server error'], 500);
+        }
+    }
+
+    public function myRenewals() {
+        try {
+            //code...
+            $renewalKey = 'renewal'.auth()->id();
+            if (Cache::has($renewalKey)) {
+                $renewals = json_decode(Cache::get($renewalKey), true); // Decode the JSON data
+            }
+            // Fetch renewals for groups where there are 2 or fewer classes left
+            // OR the expiry date is within the next month
+            $renewals = GroupUser::with('course','plan')
+                        ->where('user_id', $userId)
+                        ->where('expiry_date', '>=', Carbon::now()->addMonth()->firstOfMonth()) // Start of next month
+                        ->where('expiry_date', '<=', Carbon::now()->addMonth()->lastOfMonth())  // End of next month
+                        ->get();
+
+            if ($renewals->isEmpty()) {
+                return response()->json(['message' => 'No Pending renewals'], 404);
+            }
+
+            Log::info($renewals);
+            Cache::put($renewalKey, $renewals->toJson(), now()->addMinutes(45));
+
+            return response()->json([
+                'renewals' => $renewals
+            ], 200);
+        } catch (\Throwable $e) {
+            //throw $e;
+            return response()->json(['message' => 'Internal server error.'], 500);
+        }
+    }
+
+    public function myClassSchedules() {
+        try {
+            //code...
+            $routines = Routine::with('group')->where('instructor_id', auth()->id())->get();
+
+            if ($routines->isEmpty()) {
+                return response()->json(['message'=>'Not found'], 404);
+            }
+
+            return response()->json([
+                'message' => 'fetched routines',
+                'routines' => $routines,
+            ], 200);
+        } catch (\Throwable $e) {
+            //throw $e;
+            Log::error("Class Schedule : ". $e->getMessage());
             return response()->json(['message' => 'internal server error'], 500);
         }
     }
