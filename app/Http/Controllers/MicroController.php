@@ -341,7 +341,7 @@ class MicroController extends Controller
             // Fetch renewals for groups where there are 2 or fewer classes left
             // OR the expiry date is within the next month
             $renewals = GroupUser::with('course','plan')
-                        ->where('user_id', $userId)
+                        ->where('user_id', auth()->id())
                         ->where('expiry_date', '>=', Carbon::now()->addMonth()->firstOfMonth()) // Start of next month
                         ->where('expiry_date', '<=', Carbon::now()->addMonth()->lastOfMonth())  // End of next month
                         ->get();
