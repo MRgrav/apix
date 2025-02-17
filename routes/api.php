@@ -86,6 +86,7 @@ Route::prefix('courses')->group(function() {
     Route::middleware('auth:sanctum')->post('/{id}/trial', [CourseController::class, 'startTrial']);
     Route::middleware('auth:sanctum')->post('/buy', [CourseController::class, 'confirmPayment']);
     Route::get('/renewal/{courseId}', [CourseController::class, 'renewal'])->middleware('auth:sanctum');
+    Route::middleware('auth:sanctum')->post('/renew', [CourseController::class, 'confirmRenewalPayment']);
 });
 
 Route::prefix('categories')->group(function() {

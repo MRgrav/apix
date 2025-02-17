@@ -458,6 +458,91 @@ class CourseController extends Controller
             return response()->json(['message' => 'Payment confirmation failed', 'error' => $e->getMessage()], 500);
         }
     }
+
+    public function confirmRenewalPayment(Request $request)
+    {
+        Log::info('Incoming payment request', $request->all());
+    
+        // Validate the incoming request data
+        $validatedData = $request->validate([
+            'course_id' => 'required|integer',
+            'plan_id' => 'required|integer',
+            'payment_id' => 'required|string',
+            'payment_signature' => 'required',
+            'duration' => 'required|integer|min:1',  // Ensure duration is positive
+            'razorpay_order_id' => 'required',  // Ensure order_id is passed
+            'class_frequency_id' => 'required',
+        ]);
+    
+        try {
+            $classFrequecny = ClassFrequency::findOrFail($validatedData['class_frequency_id']);
+            $course = Course::findOrFail($validatedData['course_id']);
+            $razorpay = new \Razorpay\Api\Api(env('RAZORPAY_KEY'), env('RAZORPAY_SECRET'));
+    
+            // Verify the payment signature
+            $attributes = [
+                'razorpay_order_id' => $validatedData['razorpay_order_id'], // Use validated order_id
+                'razorpay_payment_id' => $validatedData['payment_id'],
+                'razorpay_signature' => $validatedData['payment_signature'],
+            ];
+            Log::info('Verifying payment signature', $attributes);
+
+            // Fetch the payment details using Razorpay API
+            $payment = $razorpay->payment->fetch($validatedData['payment_id']);
+            // Ensure the payment was captured successfully
+            if ($payment->status !== 'captured') {
+                return response()->json(['message' => 'Payment not captured'], 400);
+            }
+            // You can now access payment details like amount, status, and more
+            $amount = $payment->amount; // Amount paid in the smallest unit (e.g., paise for INR, cents for USD)
+            $paymentStatus = $payment->status; // Payment status (e.g., 'captured', 'failed', etc.)
+
+            Purchase::create([
+                'user_id' => auth()->id(),
+                'course_id' => $validatedData['course_id'],
+                'payment_id' => $validatedData['payment_id'],
+                'plan_id' => $validatedData['plan_id'],
+                'amount' => $amount / 100,  // Convert from smallest unit to main unit
+                'status' => $paymentStatus,  // Store the payment status
+                'expiry_date' => Carbon::parse($existingPurchase->expiry_date)->addMonths($request->duration),  // Store the calculated expiry date
+                'class_frequency_id' => $classFrequency->id,
+                'number_of_classes' => $classFrequency->classes_per_month * $request->duration,
+            ]);
+
+            $existGroup = GroupUser::where('user_id', auth()->id())
+                                    ->where('course_id',$validatedData['course_id'])
+                                    ->exists();
+
+            if (!$existGroup) {
+                // initializing groups for users
+                GroupUser::create([
+                    'user_id' => auth()->id(),
+                    'course_id' => $validatedData['course_id'],
+                    'expiry_date' => $expiryDate,
+                    'plan_id' => $validatedData['plan_id'],
+                    'class_counted' => 0,
+                    'total_classes' => $classFrequency->classes_per_month * $request->duration,
+                ]);
+            } else {
+                // Find the GroupUser record by user_id and course_id
+                $groupUser = GroupUser::where('user_id', auth()->id())
+                                        ->where('course_id', $validatedData['course_id'])
+                                        ->first();
+                $groupUser->expiry_date = Carbon::parse($groupUser->expiry_date)->addMonths($request->duration);
+                $groupUser->plan_id = $request->plan_id;
+                $groupUser->total_classes += $classFrequency->classes_per_month * $request->duration;
+                $groupUser->save();
+            }
+
+    
+            Log::info('Payment confirmed and purchase recorded', $validatedData);
+            Cache::forget('renew' . auth()->id() . $validatedData['course_id']);
+            return response()->json(['message' => 'Payment successful'], 200);
+        } catch (\Exception $e) {
+            Log::error('Payment confirmation failed: ' . $e->getMessage());
+            return response()->json(['message' => 'Payment confirmation failed', 'error' => $e->getMessage()], 500);
+        }
+    }
     
 
     public function getPurchasedCourses()
