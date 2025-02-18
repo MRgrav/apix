@@ -19,7 +19,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['*'],
+    'allowed_origins' => ['https://www.classwix.com','https://adm.classwix.com','https://classwix.com'],
 
     'allowed_origins_patterns' => [],
 
@@ -32,3 +32,4 @@ return [
     'supports_credentials' => false,
 
 ];
+
