@@ -11,13 +11,41 @@ use App\Models\StudyMaterial;
 use App\Models\TeacherClass;
 use App\Models\InstructorPayment;
 use App\Models\Routine;
+use App\Models\Purchase;
+use App\Models\Students;
+use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
 {
     //
-    public function getAdminDashboard () {
-        return response()->json("hello", 200);
+    public function getAdminDashboard() {
+        // Define cache keys
+        $cacheKeys = [
+            'adm_student_count' => 'SELECT COUNT(*) FROM group_users',
+            'adm_class_count' => 'SELECT COUNT(*) FROM teacher_classes',
+            'adm_transaction_count' => 'SELECT COUNT(*) FROM purchases',
+            'adm_trial_count' => 'SELECT COUNT(*) FROM students',
+        ];    
+    
+        // Initialize an array to hold counts
+        $counts = [];
+    
+        // Check cache and fetch counts
+        foreach ($cacheKeys as $key => $model) {
+            if (Cache::has($key)) {
+                $counts[$key] = json_decode(Cache::get($key), true);
+            } else {
+                // $counts[$key] = $model::count();
+                // Use DB facade to execute raw SQL count query
+                $counts[$key] = DB::selectOne($query)->count; // Assuming the count is returned as an object with a 'count' property
+                Cache::put($key, json_encode($counts[$key]), now()->addMinutes(1));
+            }
+        }
+    
+        // Return the counts in a JSON response
+        return response()->json($counts, 200);
     }
+    
 
     public function getGroupDetails ($groupId) {
         try {
