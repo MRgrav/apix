@@ -21,7 +21,7 @@ class AdminController extends Controller
     public function getAdminDashboard() {
         // Define cache keys
         $cacheKeys = [
-            'adm_student_count' => 'SELECT COUNT(*) FROM group_users',
+            'adm_student_count' => 'SELECT COUNT(*) FROM group_user',
             'adm_class_count' => 'SELECT COUNT(*) FROM teacher_classes',
             'adm_transaction_count' => 'SELECT COUNT(*) FROM purchases',
             'adm_trial_count' => 'SELECT COUNT(*) FROM students',
