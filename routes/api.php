@@ -194,6 +194,7 @@ Route::prefix('admin')->group(function() {
     Route::get('/groups', [GroupController::class, 'getInstructorsGroups'])->middleware('auth:sanctum');
     Route::put('/routine/{groupId}', [AdminController::class, 'createRoutine'])->middleware('auth:sanctum');
     Route::delete('/routine/{id}', [AdminController::class, 'deleteRoutine'])->middleware('auth:sanctum');;
+    Route::get('/', [AdminController::class, 'getAdminDashboard'])->middleware('auth:sanctum');
 });
 
 
