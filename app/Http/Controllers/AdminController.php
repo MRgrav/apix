@@ -31,7 +31,7 @@ class AdminController extends Controller
         $counts = [];
     
         // Check cache and fetch counts
-        foreach ($cacheKeys as $key => $model) {
+        foreach ($cacheKeys as $key => $query) {
             if (Cache::has($key)) {
                 $counts[$key] = json_decode(Cache::get($key), true);
             } else {
