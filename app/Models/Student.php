@@ -30,6 +30,6 @@ class Student extends Model
      */
     public function plan(): BelongsTo
     {
-        return $this->belongsTo(Plan::class, 'plan_id');
+        return $this->belongsTo(CoursePlan::class, 'plan_id');
     }
 }
