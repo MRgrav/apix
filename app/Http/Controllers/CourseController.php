@@ -327,7 +327,7 @@ class CourseController extends Controller
                 'user_id' => auth()->id(),
                 'course_id' => $courseId,
                 'class_frequency_id' => $classFrequency->id,
-                'number_of_classes' => $classFrequency->classes_per_month,
+                'number_of_classes' => $classFrequency->classes_per_month * $request->duration,
             ]);
 
             // Return response with order details

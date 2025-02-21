@@ -145,6 +145,26 @@ class AdminController extends Controller
         }
     }
 
+    public function getMyPayroll () {
+        try {
+            //code...
+            if (!auth()->id()) {
+                return response()->json(['message'=>'You are not authorized.'], 401);
+            }
+
+            $myPayments = InstructorPayment::with('group')->where('instructor_id', auth()->id())->get();
+
+            return response()->json([
+                'payments' => $myPayments
+            ], 200);
+
+        } catch (\Throwable $e) {
+            //throw $th;
+            Log::error("Payroll Error: ". $e->getMessage());
+            return response()->json(['message' => 'internal server error'], 500);
+        }
+    }
+
     public function createRoutine(Request $request, $groupId)
     {
         try {
