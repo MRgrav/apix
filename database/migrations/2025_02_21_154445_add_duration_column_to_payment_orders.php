@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('payment_orders', function (Blueprint $table) {
             //
-            $table->integer('duration',3)->nullable();
+            $table->integer('duration')->nullable();
         });
     }
 
