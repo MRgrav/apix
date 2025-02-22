@@ -41,7 +41,7 @@ $app->singleton(
     App\Exceptions\Handler::class
 );
 
-$app->configure('laravel-fcm');   
+// $app->configure('laravel-fcm');   
 
 $app->register(Kawankoding\Fcm\FcmServiceProvider::class);
 
