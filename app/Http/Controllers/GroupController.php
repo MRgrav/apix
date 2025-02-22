@@ -208,7 +208,7 @@ class GroupController extends Controller
             //code...
             $isAvailable = GroupUser::where('user_id', auth()->id())
                                     ->where('group_id', $groupId)
-                                    ->whereColumn('class_counted', '<', 'total_classes')
+                                    ->whereColumn('class_counted', '<=', 'total_classes')
                                     ->exists();
             if (!$isAvailable) {
                 return response()->json(['message' => 'Not Purchased yet'], 403);
