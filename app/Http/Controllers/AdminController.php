@@ -13,6 +13,7 @@ use App\Models\InstructorPayment;
 use App\Models\Routine;
 use App\Models\Purchase;
 use App\Models\Students;
+use App\Models\Carousel;
 use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
@@ -220,6 +221,28 @@ class AdminController extends Controller
             //throw $th;
             Log::error("Routine Deletion: ". $e->getMessage());
             return response()->json(['message' => 'internal server error'], 500);
+        }
+    }
+
+    public function getSlides() {
+        try {
+            //code...
+            $key = 'carousels';
+
+            if (Cache::has($key)) {
+                $carousels = json_decode(Cache::get($key), true); // Decode the JSON data
+                return response()->json(['carousels' => $carousels], 200);
+            }
+
+            $carousels = Carousel::all();
+            Cache::put($key, $carousels->toJson(), now()->addHours(2));
+            return response()->json(['carousels' => $carousels], 200);
+
+
+        } catch (\Throwable $e) {
+            //throw $e;
+            Log::error("Carousels: ". $e->getMessage());
+            return response()->json(['message'=>'internal server error'], 500);
         }
     }
 }
