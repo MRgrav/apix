@@ -196,6 +196,7 @@ Route::prefix('admin')->group(function() {
     Route::put('/routine/{groupId}', [AdminController::class, 'createRoutine'])->middleware('auth:sanctum');
     Route::delete('/routine/{id}', [AdminController::class, 'deleteRoutine'])->middleware('auth:sanctum');;
     Route::get('/', [AdminController::class, 'getAdminDashboard'])->middleware('auth:sanctum');
+    Route::get('/config/carousels', [AdminController::class, 'getSlides']);
 });
 
 
