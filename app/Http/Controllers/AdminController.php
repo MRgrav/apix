@@ -14,6 +14,7 @@ use App\Models\Routine;
 use App\Models\Purchase;
 use App\Models\Students;
 use App\Models\Carousel;
+use App\Models\SocialContact;
 use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
@@ -243,6 +244,20 @@ class AdminController extends Controller
             //throw $e;
             Log::error("Carousels: ". $e->getMessage());
             return response()->json(['message'=>'internal server error'], 500);
+        }
+    }
+
+    public function getSocialContacts() {
+        try {
+            //code...
+            $res = SocialContact::all();
+            return response()->json([
+                $res
+            ], 200);
+        } catch (\Throwable $e) {
+            //throw $e;
+            Log::error("Get Social Contacts: ". $e->getMessage());
+            return response()->json(['message' => 'internal server error.'], 500);
         }
     }
 }
