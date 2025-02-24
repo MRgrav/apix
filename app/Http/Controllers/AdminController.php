@@ -250,7 +250,7 @@ class AdminController extends Controller
     public function getSocialContacts() {
         try {
             //code...
-            $res = SocialContact::all();
+            $res = SocialContact::get();
             return response()->json([
                 $res
             ], 200);

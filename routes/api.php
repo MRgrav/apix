@@ -110,6 +110,7 @@ Route::prefix('home')->group(function() {
     Route::get('/', [HomeController::class, 'index']);
     Route::get('/users/purchase', [HomeController::class, 'getPurchasedCoursesWithGroupVideos'])->middleware('auth:sanctum');
     Route::get('/v2', [HomeController::class, 'getHomePage'])->middleware('auth:sanctum');
+    Route::get('/promotions/active', [PromotedCourseController::class, 'getActivePromotions']);
 
 });
 Route::apiResource('materials', StudyMaterialController::class);
@@ -198,6 +199,21 @@ Route::prefix('admin')->group(function() {
     Route::get('/', [AdminController::class, 'getAdminDashboard'])->middleware('auth:sanctum');
     Route::get('/config/carousels', [AdminController::class, 'getSlides']);
     Route::get('/config/social-contacts', [AdminController::class, 'getSocialContacts']);
+});
+
+Route::prefix('admin')->middleware('auth:sanctum')->group(function () {
+    // Create a new promotion
+    Route::post('/promotions', [PromotedCourseController::class, 'createPromotion']);
+    // Retrieve all promotions
+    Route::get('/promotions', [PromotedCourseController::class, 'getAllPromotions']);
+    // Update a promotion
+    Route::patch('/promotions/{promotionId}', [PromotedCourseController::class, 'updatePromotion']);
+    // Delete a promotion
+    Route::delete('/promotions/{promotionId}', [PromotedCourseController::class, 'deletePromotion']);
+    // Activate/Deactivate a promotion
+    Route::patch('/promotions/{promotionId}/toggle', [PromotedCourseController::class, 'togglePromotionStatus']);
+    // Set display order
+    Route::patch('/promotions/{promotionId}/display-order', [PromotedCourseController::class, 'setDisplayOrder']);
 });
 
 

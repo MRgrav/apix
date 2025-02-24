@@ -214,11 +214,16 @@ class GroupController extends Controller
             // if class is expired or not.
             $isContentAvailable = GroupUser::where('user_id', auth()->id())
                                     ->where('group_id', $groupId)
-                                    ->where('expiry_date', '<', Carbon::now())
-                                    ->exists();
+                                    ->get();
+                                    // ->where('expiry_date', '<', Carbon::now())
+                                    // ->exists();
+            $isRenewable = false;
             // course expiry date reached
             if (!$isContentAvailable) {
                 return response()->json(['message' => 'Not Purchased yet'], 403);
+            } else if ($isContentAvailable->expiry_date >= Carbon::now()) {
+                Log::debug("is course expired : ". $isContentAvailable->expiry_date . ' < '. Carbon::now() . ' = '. $isContentAvailable->expiry_date < Carbon::now());
+                $isRenewable = true;
             }
 
             // Log::debug("here: ". GroupUser::where('user_id', auth()->id())->first() . " Now: ". Carbon::now());
@@ -232,6 +237,7 @@ class GroupController extends Controller
                     'group' => $groupData['group'],
                     'class_status' => $isAvailable?$groupData['class_status']:false,
                     'class_code' => $groupData['class_code'],
+                    'is_renewable' => $isRenewable,
                 ], 200);
             }
             
@@ -280,7 +286,8 @@ class GroupController extends Controller
                     'message' => 'Group retrieved successfully',
                     'group' => $group,
                     'class_status' => false,
-                    'class_code' => null
+                    'class_code' => null,
+                    'is_renewable' => $isRenewable,
                 ], 200);
             }
 
@@ -296,14 +303,16 @@ class GroupController extends Controller
             Cache::put($key, json_encode([
                 'group' => $group,
                 'class_status' => ($class_status && $isAvailable),
-                'class_code' => $code
+                'class_code' => $code,
+                'is_renewable' => $isRenewable,
             ]), now()->addMinutes(1));
 
             return response()->json([
                 'message' => 'Group retrieved successfully',
                 'group' => $group,
                 'class_status' => ($class_status && $isAvailable),
-                'class_code' => $code
+                'class_code' => $code,
+                'is_renewable' => $isRenewable,
             ], 200);
         } catch (\Throwable $e) {
             //throw $e;
