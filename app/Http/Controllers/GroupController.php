@@ -205,21 +205,23 @@ class GroupController extends Controller
     public function getGroupStudent($groupId)
     {
         try {
-            //code...
+            //for live class link available or not
             $isAvailable = GroupUser::where('user_id', auth()->id())
                                     ->where('group_id', $groupId)
-                                    ->whereColumn('class_counted', '<=', 'total_classes')
+                                    ->whereColumn('class_counted', '<', 'total_classes')
                                     ->exists();
-            if (!$isAvailable) {
-                return response()->json(['message' => 'Not Purchased yet'], 403);
-            }
+
+            // if class is expired or not.
             $isContentAvailable = GroupUser::where('user_id', auth()->id())
                                     ->where('group_id', $groupId)
                                     ->where('expiry_date', '<', Carbon::now())
                                     ->exists();
+            // course expiry date reached
+            if (!$isContentAvailable) {
+                return response()->json(['message' => 'Not Purchased yet'], 403);
+            }
 
             // Log::debug("here: ". GroupUser::where('user_id', auth()->id())->first() . " Now: ". Carbon::now());
-
             $key = 'group_details_' . $groupId; // Use $groupId instead of $id
 
             // Check if the group details are cached

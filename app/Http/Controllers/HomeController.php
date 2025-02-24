@@ -153,6 +153,14 @@ class HomeController extends Controller
         //     return collect(json_decode(Cache::get($upcomingKey), true));
         // }
 
+        $class = GroupUser::where('user_id', auth()->id())
+                        ->where('group_id', $groupId)
+                        ->whereColumn('class_counted', '<=', 'total_classes')
+                        ->exists();
+        if (!$class) {
+            return null;
+        }
+
         $upcomingClasses = collect();
 
         foreach ($groupIds as $groupId) {

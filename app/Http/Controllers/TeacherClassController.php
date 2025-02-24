@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class TeacherClassController extends Controller
 {
@@ -84,6 +85,12 @@ class TeacherClassController extends Controller
                 'class_time' => $validated['class_time'] ?? $currentDate,
             ]);
 
+            
+            DB::table('group_user')
+                ->where('group_id', $validated['group_id'])
+                ->whereColumn('class_counted', '<=', 'total_classes')
+                ->increment('class_counted');
+                
             $key = 'group_details_' . $validated['group_id'];
             Cache::forget($key);
     
