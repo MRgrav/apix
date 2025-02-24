@@ -221,8 +221,8 @@ class GroupController extends Controller
             // course expiry date reached
             if (!$isContentAvailable) {
                 return response()->json(['message' => 'Not Purchased yet'], 403);
-            } else if ($isContentAvailable->expiry_date >= Carbon::now()) {
-                Log::debug("is course expired : ". $isContentAvailable->expiry_date . ' < '. Carbon::now() . ' = '. $isContentAvailable->expiry_date < Carbon::now());
+            } else if ($isContentAvailable->expiry_date <= Carbon::now()) {
+                Log::info("is course expired : ". $isContentAvailable->expiry_date . ' < '. Carbon::now() . ' = '. $isContentAvailable->expiry_date < Carbon::now());
                 $isRenewable = true;
             }
 
