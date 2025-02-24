@@ -214,7 +214,7 @@ class GroupController extends Controller
             // if class is expired or not.
             $isContentAvailable = GroupUser::where('user_id', auth()->id())
                                     ->where('group_id', $groupId)
-                                    ->get();
+                                    ->first();
                                     // ->where('expiry_date', '<', Carbon::now())
                                     // ->exists();
             $isRenewable = false;
