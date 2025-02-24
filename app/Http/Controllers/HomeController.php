@@ -153,25 +153,23 @@ class HomeController extends Controller
         //     return collect(json_decode(Cache::get($upcomingKey), true));
         // }
 
-        $class = GroupUser::where('user_id', auth()->id())
-                        ->where('group_id', $groupId)
-                        ->whereColumn('class_counted', '<=', 'total_classes')
-                        ->exists();
-        if (!$class) {
-            return null;
-        }
-
         $upcomingClasses = collect();
 
         foreach ($groupIds as $groupId) {
-            $upcoming = TeacherClass::with(['group', 'group.course'])
-                ->where('group_id', $groupId)
-                ->whereDate('class_time', '>=', Carbon::now()->format('Y-m-d'))
-                ->orderBy('class_time', 'desc')
-                ->first();
+            $class = GroupUser::where('user_id', auth()->id())
+                        ->where('group_id', $groupId)
+                        ->whereColumn('class_counted', '<=', 'total_classes')
+                        ->exists();
+            if ($class) {
+                $upcoming = TeacherClass::with(['group', 'group.course'])
+                                        ->where('group_id', $groupId)
+                                        ->whereDate('class_time', '>=', Carbon::now()->format('Y-m-d'))
+                                        ->orderBy('class_time', 'desc')
+                                        ->first();
 
-            if ($upcoming) {
-                $upcomingClasses = $upcomingClasses->merge([$upcoming]);
+                if ($upcoming) {
+                    $upcomingClasses = $upcomingClasses->merge([$upcoming]);
+                }   
             }
         }
 
