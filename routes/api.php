@@ -111,6 +111,7 @@ Route::prefix('home')->group(function() {
     Route::get('/users/purchase', [HomeController::class, 'getPurchasedCoursesWithGroupVideos'])->middleware('auth:sanctum');
     Route::get('/v2', [HomeController::class, 'getHomePage'])->middleware('auth:sanctum');
     Route::get('/promotions/active', [PromotedCourseController::class, 'getActivePromotions']);
+    Route::get('/share-app', [AdminController::class, 'getShareAppLink']);
 
 });
 Route::apiResource('materials', StudyMaterialController::class);
@@ -201,19 +202,19 @@ Route::prefix('admin')->group(function() {
     Route::get('/config/social-contacts', [AdminController::class, 'getSocialContacts']);
 });
 
-Route::prefix('admin')->middleware('auth:sanctum')->group(function () {
+Route::prefix('admin/promotions')->middleware('auth:sanctum')->group(function () {
     // Create a new promotion
-    Route::post('/promotions', [PromotedCourseController::class, 'createPromotion']);
+    Route::post('/', [PromotedCourseController::class, 'createPromotion']);
     // Retrieve all promotions
-    Route::get('/promotions', [PromotedCourseController::class, 'getAllPromotions']);
+    Route::get('/', [PromotedCourseController::class, 'getAllPromotions']);
     // Update a promotion
-    Route::patch('/promotions/{promotionId}', [PromotedCourseController::class, 'updatePromotion']);
+    Route::patch('/{promotionId}', [PromotedCourseController::class, 'updatePromotion']);
     // Delete a promotion
-    Route::delete('/promotions/{promotionId}', [PromotedCourseController::class, 'deletePromotion']);
+    Route::delete('/{promotionId}', [PromotedCourseController::class, 'deletePromotion']);
     // Activate/Deactivate a promotion
-    Route::patch('/promotions/{promotionId}/toggle', [PromotedCourseController::class, 'togglePromotionStatus']);
+    Route::patch('/{promotionId}/toggle', [PromotedCourseController::class, 'togglePromotionStatus']);
     // Set display order
-    Route::patch('/promotions/{promotionId}/display-order', [PromotedCourseController::class, 'setDisplayOrder']);
+    Route::patch('/{promotionId}/display-order', [PromotedCourseController::class, 'setDisplayOrder']);
 });
 
 

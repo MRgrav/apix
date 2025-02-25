@@ -252,12 +252,17 @@ class AdminController extends Controller
             //code...
             $res = SocialContact::get();
             return response()->json([
-                $res
+                'contact' =>$res
             ], 200);
         } catch (\Throwable $e) {
             //throw $e;
             Log::error("Get Social Contacts: ". $e->getMessage());
             return response()->json(['message' => 'internal server error.'], 500);
         }
+    }
+
+    public function getShareAppLink () {
+        $link = env('SHARE_APP_LINK');
+        return response()->json($link, 200);
     }
 }
