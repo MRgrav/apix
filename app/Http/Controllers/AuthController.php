@@ -25,15 +25,27 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'nullable|email|unique:users',
             'phone' => 'required|digits:10|unique:users',
-            'country_code' => 'required|string|max:5',
+            'country_code' => 'required|max:5',
             'is_nri' => 'required|boolean',
             'password' => 'required|string|min:6|confirmed',
-            // 'whatsapp' => 'nullable',
-            // 'gender' => 'nullable',
-            // 'country' => 'nullable',
-            // 'state' => 'nullable',
-            // 'address' => 'nullable',
-            // 'district' => 'nullable',
+        ], [
+            'name.required' => 'The name field is required.',
+            'name.string' => 'The name must be a string.',
+            'name.max' => 'The name may not be greater than 255 characters.',
+            'email.email' => 'The email must be a valid email address.',
+            'email.unique' => 'The email has already been taken.',
+            'phone.required' => 'The phone number is required.',
+            'phone.digits' => 'The phone number must be exactly 10 digits.',
+            'phone.unique' => 'The phone number has already been taken.',
+            'country_code.required' => 'The country code is required.',
+            // 'country_code.string' => 'The country code must be a string.',
+            'country_code.max' => 'The country code may not be greater than 5 characters.',
+            'is_nri.required' => 'Please reselect your country code.',
+            'is_nri.boolean' => 'Please select a valid option for the status.',
+            'password.required' => 'The password field is required.',
+            'password.string' => 'The password must be a string.',
+            'password.min' => 'The password must be at least 6 characters.',
+            'password.confirmed' => 'The password confirmation does not match.',
         ]);
 
         if ($validator->fails()) {
@@ -96,6 +108,24 @@ class AuthController extends Controller
             'country_code' => 'required|string|max:5',
             'is_nri' => 'required|boolean',
             'password' => 'required|string|min:6|confirmed',
+        ], [
+            'name.required' => 'The name field is required.',
+            'name.string' => 'The name must be a string.',
+            'name.max' => 'The name may not be greater than 255 characters.',
+            'email.email' => 'The email must be a valid email address.',
+            'email.unique' => 'The email has already been taken.',
+            'phone.required' => 'The phone number is required.',
+            'phone.digits' => 'The phone number must be exactly 10 digits.',
+            'phone.unique' => 'The phone number has already been taken.',
+            'country_code.required' => 'The country code is required.',
+            // 'country_code.string' => 'The country code must be a string.',
+            'country_code.max' => 'The country code may not be greater than 5 characters.',
+            'is_nri.required' => 'Please reselect your country code.',
+            'is_nri.boolean' => 'Please select a valid option for the status.',
+            'password.required' => 'The password field is required.',
+            'password.string' => 'The password must be a string.',
+            'password.min' => 'The password must be at least 6 characters.',
+            'password.confirmed' => 'The password confirmation does not match.',
         ]);
 
         if ($validator->fails()) {
@@ -152,6 +182,13 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'phone' => 'required|digits:10',
             'password' => 'required|string',
+        ], [
+            'phone.required' => 'The phone number is required.',
+            'phone.digits' => 'The phone number must be exactly 10 digits.',
+            'phone.unique' => 'The phone number has already been taken.',
+            'password.required' => 'The password field is required.',
+            'password.string' => 'The password must be a string.',
+            'password.min' => 'The password must be at least 6 characters.',
         ]);
 
         if ($validator->fails()) {

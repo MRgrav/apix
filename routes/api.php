@@ -22,6 +22,7 @@ use App\Http\Controllers\MicroController;
 use App\Http\Controllers\TeacherClassController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\PromotedCourseController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -112,6 +113,7 @@ Route::prefix('home')->group(function() {
     Route::get('/v2', [HomeController::class, 'getHomePage'])->middleware('auth:sanctum');
     Route::get('/promotions/active', [PromotedCourseController::class, 'getActivePromotions']);
     Route::get('/share-app', [AdminController::class, 'getShareAppLink']);
+    Route::get('/carousels', [AdminController::class, 'getSlides']);
 
 });
 Route::apiResource('materials', StudyMaterialController::class);
@@ -186,6 +188,7 @@ Route::get('/micro/payment-history', [MicroController::class, 'getPaymentHistory
 Route::get('/micro/expiry/{courseId}', [MicroController::class, 'getCourseStatus'])->middleware('auth:sanctum');
 Route::get('/micro/renewals', [MicroController::class, 'myRenewals'])->middleware('auth:sanctum');
 Route::get('/micro/routines', [MicroController::class, 'myClassSchedules'])->middleware('auth:sanctum');
+Route::get('/micro/instructors-profile/{instructorId}', [MicroController::class, 'getInstructorProfile'])->middleware('auth:sanctum');
 Route::prefix('attendance')->group(function(){
     Route::post('/', [AttendanceController::class, 'store'])->middleware('auth:sanctum');
 });

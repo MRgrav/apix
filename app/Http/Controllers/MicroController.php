@@ -384,4 +384,21 @@ class MicroController extends Controller
         }
     }
 
+    public function getInstructorProfile($instructorId) {
+        try {
+            //code...
+            $user = Instructor::with('user', 'course')->where('', $instructorId)->first();
+
+            if (!$user) {
+                return response()->json(['message' => 'not found'], 404);
+            }
+
+            return response()->json(['instructor' => $user], 200);
+        } catch (\Throwable $e) {
+            //throw $e;
+            Log::error("inst profile : ". $e->getMessage());
+            return response()->json(['message' => 'internal server error'], 500);
+        }
+    }
+
 }
