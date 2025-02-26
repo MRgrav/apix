@@ -176,6 +176,77 @@ class AuthController extends Controller
         }
     }
 
+    public function profileUpdate(Request $request){
+        // Log the incoming request payload for debugging
+        Log::info('Profile Update Request Payload:', $request->all());
+
+        // Validate the request input
+        $validator = Validator::make($request->all(), [
+            'name' => 'nullable|string|max:255',
+            'whatsapp' => 'nullable|string|max:15',
+            'gender' => 'nullable|string|max:10',
+            'state' => 'nullable|string|max:100',
+            'address' => 'nullable|string|max:255',
+            'district' => 'nullable|string|max:100',
+        ], [
+            'name.string' => 'The name must be a string.',
+            'name.max' => 'The name may not be greater than 255 characters.',
+            'whatsapp.string' => 'The WhatsApp number must be a string.',
+            'whatsapp.max' => 'The WhatsApp number may not be greater than 15 characters.',
+            'gender.string' => 'The gender must be a string.',
+            'gender.max' => 'The gender may not be greater than 10 characters.',
+            'state.string' => 'The state must be a string.',
+            'state.max' => 'The state may not be greater than 100 characters.',
+            'address.string' => 'The address must be a string.',
+            'address.max' => 'The address may not be greater than 255 characters.',
+            'district.string' => 'The district must be a string.',
+            'district.max' => 'The district may not be greater than 100 characters.',
+        ]);
+
+        if ($validator->fails()) {
+            Log::warning('Validation Failed:', $validator->errors()->toArray());
+            return response()->json([
+                'message' => 'Validation failed. Please check your input.',
+                'errors' => $validator->errors()
+            ], 400);
+        }
+
+        DB::beginTransaction();
+        try {
+            // $user = ; // Get the authenticated user
+            // $user = User::findOrFail(auth()->id());
+            $user = auth()->user();
+
+            // Update user information, excluding restricted fields
+            $user->update(array_filter($request->only([
+                'name',
+                'email',
+                'whatsapp',
+                'gender',
+                'state',
+                'address',
+                'district',
+            ]))); // Use array_filter to ignore null values
+
+            DB::commit();
+
+            Log::info('User profile updated successfully:', ['user_id' => $user->id]);
+
+            return response()->json([
+                'message' => 'Profile updated successfully.',
+                'user' => $user
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Profile update failed:', ['error' => $e->getMessage()]);
+            return response()->json([
+                'message' => 'Profile update failed due to a server error. Please try again later.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+
     // Login a user
     public function signIn(Request $request)
     {

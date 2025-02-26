@@ -41,6 +41,7 @@ Route::post('signin', [AuthController::class, 'signIn']);
 Route::post('verify', [AuthController::class, 'verifyPhoneOtp']);
 Route::post('resend-otp', [AuthController::class, 'resendOtp']);
 Route::post('reset', [AuthController::class, 'resetPassword']);
+Route::patch('/my-profile/update', [AdminController::class, 'profileUpdate'])->middleware('auth:sanctum');
 Route::get('purchase', [CourseController::class, 'getPurchasedCourses'])->middleware('auth:sanctum');
 Route::get('/users', [AuthController::class, 'getAllUsers']); // Get all users
 Route::delete('/users/{id}', [AuthController::class, 'deleteUser']); // Delete a user by ID
