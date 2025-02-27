@@ -119,21 +119,23 @@ class AdminController extends Controller
 
             $validated = $request->validate([
                 'instructor' => 'required',
-                'group_id' => 'required',
+                // 'group_id' => 'required',
                 'no_of_classes' => 'required|integer',
                 'per_class_payment' => 'required|numeric',
-                'transaction' => 'required|string',
+                // 'transaction' => 'required|string',
             ]);
 
             $total = $validated['no_of_classes'] * $validated['per_class_payment'];
 
             $payment = InstructorPayment::create([
                 'instructor_id' => $validated['instructor'],
-                'group_id' => $validated['group_id'],
+                // 'group_id' => $validated['group_id'],
                 'no_of_classes' => $validated['no_of_classes'],
                 'per_class_payment' => $validated['per_class_payment'],
-                'transaction' => $validated['transaction'],
+                'transaction' => $request['transaction'],
                 'total_amount' => $total,
+                'group_student_name' => $request['group_student_name'],
+                'month' => $request['month'],
             ]);
 
             return response()->json([
@@ -154,7 +156,7 @@ class AdminController extends Controller
                 return response()->json(['message'=>'You are not authorized.'], 401);
             }
 
-            $myPayments = InstructorPayment::with('group')->where('instructor_id', auth()->id())->get();
+            $myPayments = InstructorPayment::where('instructor_id', auth()->id())->get();
 
             return response()->json([
                 'payments' => $myPayments

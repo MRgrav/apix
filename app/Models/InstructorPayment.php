@@ -17,6 +17,8 @@ class InstructorPayment extends Model
         'per_class_payment',
         'total_amount', 
         'transaction',
+        'group_student_name',
+        'month',
     ];
 
     /**
