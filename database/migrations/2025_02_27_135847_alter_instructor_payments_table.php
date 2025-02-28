@@ -13,8 +13,9 @@ return new class extends Migration
     {
         Schema::table('instructor_payments', function (Blueprint $table) {
             // Rename 'group_id' to 'group_student_name' and change its type to string
-            $table->renameColumn('group_id', 'group_student_name');
-            $table->string('group_student_name')->nullable()->change();
+            $table->dropColumn('group_id');
+            // $table->renameColumn('group_id', 'group_student_name');
+            $table->string('group_student_name',200)->nullable();
 
             // Add a new integer column for months
             $table->integer('month')->nullable();
@@ -28,11 +29,11 @@ return new class extends Migration
     {
         Schema::table('instructor_payments', function (Blueprint $table) {
             // Revert the changes made in the up method
-            $table->renameColumn('group_student_name', 'group_id');
-            $table->unsignedBigInteger('group_id')->nullable()->change();
-
+            // $table->renameColumn('group_student_name', 'group_id');
+            // $table->unsignedBigInteger('group_id')->nullable()->change();
+            $table->unsignedBigInteger('group_id')->nullable();
             // Drop the 'months' column
-            $table->dropColumn('month');
+            $table->dropColumn(['month','group_student_name']);
         });
     }
 };
