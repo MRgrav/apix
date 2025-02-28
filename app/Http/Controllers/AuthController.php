@@ -202,7 +202,7 @@ class AuthController extends Controller
             'district.string' => 'The district must be a string.',
             'district.max' => 'The district may not be greater than 100 characters.',
         ]);
-
+ 
         if ($validator->fails()) {
             Log::warning('Validation Failed:', $validator->errors()->toArray());
             return response()->json([
