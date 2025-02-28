@@ -12,7 +12,6 @@ class InstructorPayrollController extends Controller
 {
     public function createPayroll (Request $request) {
         try {
-            // $userId = auth()->id();
             if (!auth()->id()) {
                 return response()->json(['message'=>'You are not authorized.'], 401);
             }
@@ -21,28 +20,60 @@ class InstructorPayrollController extends Controller
                 'instructor' => 'required',
                 'no_of_classes' => 'required|integer',
                 'per_class_payment' => 'required|numeric',
+                'month' => 'required|integer',
+                'year' => 'required|integer',
+                'group_student_name' => 'required|string', // Validate group_student_name
+                'transaction' => 'required|string', // Validate transaction
             ], [
                 'instructor.required' => 'Select one instructor.',
                 'no_of_classes.required' => 'No of Classes is required.',
                 'no_of_classes.integer' => 'No of Classes must be a number.',
                 'per_class_payment.required' => 'Per class payment rate is required.',
-                'per_class_payment.numeric' => 'Payment should be in number.'
+                'per_class_payment.numeric' => 'Payment should be in number.',
+                'month.required' => 'Select one month.',
+                'group_student_name.required' => 'Group student name is required.',
+                'transaction.required' => 'Transaction details are required.',
             ]);
 
             $total = $validated['no_of_classes'] * $validated['per_class_payment'];
 
-            $payment = InstructorPayment::create([
-                'instructor_id' => $validated['instructor'],
+            $instructorPayment = InstructorPayment::where('instructor_id', $validated['instructor'])
+                                                    ->where('month', $validated['month'])
+                                                    ->where('year', $validated['year'])
+                                                    ->exists();
+
+            if (!$instructorPaymentExists) {
+                $payment = InstructorPayment::create([
+                    'instructor_id' => $validated['instructor'],
+                    'total_amount' => $total,
+                    'month' => $validated['month'],
+                    'year' => $validated['year'],
+                ]);
+            } else {
+                $payment = InstructorPayment::where('instructor_id', $validated['instructor'])
+                    ->where('month', $validated['month'])
+                    ->where('year', $validated['year'])
+                    ->first();
+                $payment->total_amount += $total; // Update total amount
+                $payment->save();
+            }
+                                            
+            // Create payment detail
+            $details = InstructorPaymentDetail::create([
+                'instructor_payment_id' => $payment->id, // Fixed typo here
+                'group_student_name' => $validated['group_student_name'],
                 'no_of_classes' => $validated['no_of_classes'],
                 'per_class_payment' => $validated['per_class_payment'],
-                'transaction' => $request['transaction'],
                 'total_amount' => $total,
-                'group_student_name' => $request['group_student_name'],
-                'month' => $request['month'],
+                'transaction' => $validated['transaction'],
             ]);
+                                  
+            $key = 'all_payrolls';
+            Cache::forget($key);
 
             return response()->json([
-                'message' => 'Payment successful'
+                'message' => 'Payment successful',
+                'payment' => $payment, 
             ], 201);
 
         } catch (\Throwable $e) {
@@ -68,23 +99,25 @@ class InstructorPayrollController extends Controller
             }
 
             // Fetch distinct instructor payments with user details
-            $myPayments = InstructorPayment::with(['user' => function($query) {
-                $query->select('id', 'name', 'phone', 'email'); // Select only the necessary fields
-            }])
-                        ->select('instructor_id', DB::raw('MAX(created_at) as last_payment_date')) // Get the last payment date
-                        ->groupBy('instructor_id')
-                        ->get();
+            // $myPayments = InstructorPayment::with(['user' => function($query) {
+            //     $query->select('id', 'name', 'phone', 'email'); // Select only the necessary fields
+            // }])
+            //             ->select('instructor_id', DB::raw('MAX(created_at) as last_payment_date')) // Get the last payment date
+            //             ->groupBy('instructor_id')
+            //             ->get();
 
-            // Prepare the response data
-            $payments = $myPayments->map(function($payment) {
-                return [
-                    'instructor_id' => $payment->instructor_id,
-                    'name' => $payment->user->name,
-                    'phone' => $payment->user->phone,
-                    'email' => $payment->user->email,
-                    'last_payment_date' => $payment->last_payment_date // Use the last payment date from the query
-                ];
-            });
+            // // Prepare the response data
+            // $payments = $myPayments->map(function($payment) {
+            //     return [
+            //         'instructor_id' => $payment->instructor_id,
+            //         'name' => $payment->user->name,
+            //         'phone' => $payment->user->phone,
+            //         'email' => $payment->user->email,
+            //         'last_payment_date' => $payment->last_payment_date // Use the last payment date from the query
+            //     ];
+            // });
+
+            $payments = InstructorPayment::orderBy('year','desc')->get();
 
             Cache::put($key, $payments->toJson(), now()->addMinutes(13));
 
@@ -106,7 +139,7 @@ class InstructorPayrollController extends Controller
                 return response()->json(['message'=>'You are not authorized.'], 401);
             }
 
-            $myPayments = InstructorPayment::where('instructor_id', auth()->id())->orderBy('created_at', 'desc')->get();
+            $myPayments = InstructorPayment::where('instructor_id', auth()->id())->orderBy('year', 'desc')->get();
 
             return response()->json([
                 'payments' => $myPayments
@@ -124,7 +157,7 @@ class InstructorPayrollController extends Controller
             if (!$instructorId) {
                 return response()->json(['message'=>'You are not authorized.'], 401);
             }
-            $myPayments = InstructorPayment::where('instructor_id', $instructorId)->orderBy('created_at', 'desc')->get();
+            $myPayments = InstructorPayment::where('instructor_id', $instructorId)->orderBy('year', 'desc')->get();
             return response()->json([
                 'payments' => $myPayments
             ], 200);

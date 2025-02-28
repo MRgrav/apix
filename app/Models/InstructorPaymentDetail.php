@@ -6,24 +6,21 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class InstructorPayment extends Model
+class InstructorPaymentDetail extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'instructor_id',
-        // 'group_id',
+        'instructor_paymeny_id',
+        'group_student_name',
         'no_of_classes',
         'per_class_payment',
-        'total_amount', 
+        'total_amount',
         'transaction',
-        'group_student_name',
-        'month',
-        'year',
     ];
 
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'instructor_id');
-    }
+    // public function user(): BelongsTo
+    // {
+    //     return $this->belongsTo(User::class, 'foreign_key', 'other_key');
+    // }
 }
