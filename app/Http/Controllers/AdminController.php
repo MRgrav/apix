@@ -123,6 +123,12 @@ class AdminController extends Controller
                 'no_of_classes' => 'required|integer',
                 'per_class_payment' => 'required|numeric',
                 // 'transaction' => 'required|string',
+            ], [
+                'instructor.required' => 'Select one instructor.',
+                'no_of_classes.required' => 'No of Classes is required.',
+                'no_of_classes.integer' => 'No of Classes must be a number.',
+                'per_class_payment.required' => 'Per class payment rate is required.',
+                'per_class_payment.numeric' => 'Payment should be in number.'
             ]);
 
             $total = $validated['no_of_classes'] * $validated['per_class_payment'];
