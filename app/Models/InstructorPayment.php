@@ -24,6 +24,6 @@ class InstructorPayment extends Model
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'instructor_id');
+        return $this->belongsTo(Instructor::class, 'instructor_id');
     }
 }
