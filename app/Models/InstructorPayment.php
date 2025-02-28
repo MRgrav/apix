@@ -12,7 +12,7 @@ class InstructorPayment extends Model
 
     protected $fillable = [
         'instructor_id',
-        'group_id',
+        // 'group_id',
         'no_of_classes',
         'per_class_payment',
         'total_amount', 
@@ -36,8 +36,8 @@ class InstructorPayment extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function group(): BelongsTo
-    {
-        return $this->belongsTo(Group::class, 'group_id');
-    }
+    // public function group(): BelongsTo
+    // {
+    //     return $this->belongsTo(Group::class, 'group_id');
+    // }
 }

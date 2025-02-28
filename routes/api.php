@@ -23,6 +23,7 @@ use App\Http\Controllers\TeacherClassController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\PromotedCourseController;
+use App\Http\Controllers\InstructorPayrollController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -196,8 +197,9 @@ Route::prefix('attendance')->group(function(){
 
 Route::prefix('admin')->group(function() {
     Route::get('/groups/{groupId}', [AdminController::class, 'getGroupDetails']);
-    Route::post('/payrolls', [AdminController::class, 'createPayroll'])->middleware('auth:sanctum');
-    Route::get('/payrolls', [AdminController::class, 'getMyPayroll'])->middleware('auth:sanctum');
+    Route::post('/payrolls', [InstructorPayrollController::class, 'createPayroll'])->middleware('auth:sanctum');
+    Route::get('/payrolls', [InstructorPayrollController::class, 'getAllPayroll'])->middleware('auth:sanctum');
+    Route::get('/my-payrolls', [InstructorPayrollController::class, 'getMyPayroll'])->middleware('auth:sanctum');
     Route::get('/groups', [GroupController::class, 'getInstructorsGroups'])->middleware('auth:sanctum');
     Route::put('/routine/{groupId}', [AdminController::class, 'createRoutine'])->middleware('auth:sanctum');
     Route::delete('/routine/{id}', [AdminController::class, 'deleteRoutine'])->middleware('auth:sanctum');;

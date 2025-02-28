@@ -162,7 +162,7 @@ class AdminController extends Controller
                 return response()->json(['message'=>'You are not authorized.'], 401);
             }
 
-            $myPayments = InstructorPayment::where('instructor_id', auth()->id())->get();
+            $myPayments = InstructorPayment::get();
 
             return response()->json([
                 'payments' => $myPayments
