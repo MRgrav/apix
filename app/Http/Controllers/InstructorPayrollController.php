@@ -98,26 +98,7 @@ class InstructorPayrollController extends Controller
                 ], 200);
             }
 
-            // Fetch distinct instructor payments with user details
-            // $myPayments = InstructorPayment::with(['user' => function($query) {
-            //     $query->select('id', 'name', 'phone', 'email'); // Select only the necessary fields
-            // }])
-            //             ->select('instructor_id', DB::raw('MAX(created_at) as last_payment_date')) // Get the last payment date
-            //             ->groupBy('instructor_id')
-            //             ->get();
-
-            // // Prepare the response data
-            // $payments = $myPayments->map(function($payment) {
-            //     return [
-            //         'instructor_id' => $payment->instructor_id,
-            //         'name' => $payment->user->name,
-            //         'phone' => $payment->user->phone,
-            //         'email' => $payment->user->email,
-            //         'last_payment_date' => $payment->last_payment_date // Use the last payment date from the query
-            //     ];
-            // });
-
-            $payments = InstructorPayment::orderBy('year','desc')->get();
+            $payments = InstructorPayment::with('user')->orderBy('year', 'desc')->get();
 
             Cache::put($key, $payments->toJson(), now()->addMinutes(13));
 
