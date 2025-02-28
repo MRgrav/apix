@@ -15,7 +15,7 @@ return new class extends Migration
             //
             $table->renameColumn('instructor_paymeny_id', 'instructor_payment_id');
         });
-    }DBDB
+    }
 
     /**
      * Reverse the migrations.
