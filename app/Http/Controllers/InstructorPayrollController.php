@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use App\Models\InstructorPayment;
 
 class InstructorPayrollController extends Controller
@@ -53,8 +55,16 @@ class InstructorPayrollController extends Controller
     public function getAllPayroll () {
         try {
             //code...
+            $key = 'all_payrolls';
             if (!auth()->id()) {
                 return response()->json(['message'=>'You are not authorized.'], 401);
+            }
+
+            if (Cache::has($key)) {
+                $payments = json_decode(Cache::get($key), true); // Decode the JSON data
+                return response()->json([
+                    'payments' => $payments
+                ], 200);
             }
 
             // Fetch distinct instructor payments with user details
@@ -75,6 +85,8 @@ class InstructorPayrollController extends Controller
                     'last_payment_date' => $payment->last_payment_date // Use the last payment date from the query
                 ];
             });
+
+            Cache::put($key, $payments->toJson(), now()->addMinutes(13));
 
             return response()->json([
                 'payments' => $payments
