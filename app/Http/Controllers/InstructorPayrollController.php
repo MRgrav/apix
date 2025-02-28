@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use App\Models\InstructorPayment;
+use App\Models\InstructorPaymentDetail;
 
 class InstructorPayrollController extends Controller
 {
