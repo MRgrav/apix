@@ -101,7 +101,6 @@ class InstructorPayrollController extends Controller
             ], 200);
 
         } catch (\Throwable $e) {
-            //throw $th;
             Log::error("Payroll Error: ". $e->getMessage());
             return response()->json(['message' => 'internal server error'], 500);
         }
@@ -113,13 +112,10 @@ class InstructorPayrollController extends Controller
             if (!$instructorId) {
                 return response()->json(['message'=>'You are not authorized.'], 401);
             }
-
             $myPayments = InstructorPayment::where('instructor_id', $instructorId)->orderBy('created_at', 'desc')->get();
-
             return response()->json([
                 'payments' => $myPayments
             ], 200);
-
         } catch (\Throwable $e) {
             //throw $th;
             Log::error("Payroll Error: ". $e->getMessage());
