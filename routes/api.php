@@ -200,7 +200,8 @@ Route::prefix('admin')->group(function() {
     Route::post('/payrolls', [InstructorPayrollController::class, 'createPayroll'])->middleware('auth:sanctum');
     Route::get('/payrolls', [InstructorPayrollController::class, 'getAllPayroll'])->middleware('auth:sanctum');
     Route::get('/my-payrolls', [InstructorPayrollController::class, 'getMyPayroll'])->middleware('auth:sanctum');
-    Route::get('/payrolls/{instructorId}', [InstructorPayrollController::class, 'getPayrollByInstructorId'])->middleware('auth:sanctum');
+    Route::get('/my-payrolls/{instructorId}', [InstructorPayrollController::class, 'getPayrollByInstructorId'])->middleware('auth:sanctum');
+    Route::get('/payrolls/{payrollId}', [InstructorPayrollController::class, 'getPayrollDetails'])->middleware('auth:sanctum');
     Route::get('/groups', [GroupController::class, 'getInstructorsGroups'])->middleware('auth:sanctum');
     Route::put('/routine/{groupId}', [AdminController::class, 'createRoutine'])->middleware('auth:sanctum');
     Route::delete('/routine/{id}', [AdminController::class, 'deleteRoutine'])->middleware('auth:sanctum');;

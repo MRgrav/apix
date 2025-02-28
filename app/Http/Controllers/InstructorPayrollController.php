@@ -37,7 +37,7 @@ class InstructorPayrollController extends Controller
 
             $total = $validated['no_of_classes'] * $validated['per_class_payment'];
 
-            $instructorPayment = InstructorPayment::where('instructor_id', $validated['instructor'])
+            $instructorPaymentExists = InstructorPayment::where('instructor_id', $validated['instructor'])
                                                     ->where('month', $validated['month'])
                                                     ->where('year', $validated['year'])
                                                     ->exists();
@@ -141,6 +141,19 @@ class InstructorPayrollController extends Controller
             $myPayments = InstructorPayment::where('instructor_id', $instructorId)->orderBy('year', 'desc')->get();
             return response()->json([
                 'payments' => $myPayments
+            ], 200);
+        } catch (\Throwable $e) {
+            //throw $th;
+            Log::error("Payroll Error: ". $e->getMessage());
+            return response()->json(['message' => 'internal server error'], 500);
+        }
+    }
+
+    public function getPayrollDetails($payrollId) {
+        try {
+            $payments = InstructorPaymentDetail::where('instructor_payment_id', $payrollId)->get();
+            return response()->json([
+                'payments' => $payments
             ], 200);
         } catch (\Throwable $e) {
             //throw $th;
