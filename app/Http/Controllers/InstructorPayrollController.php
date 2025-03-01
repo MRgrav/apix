@@ -49,30 +49,35 @@ class InstructorPayrollController extends Controller
                                                     ->first();
 
             if (!$payment) {
-                InstructorPayment::create([
+                $newPayment = InstructorPayment::create([
                     'instructor_id' => $validated['instructor'],
                     'total_amount' => $total,
                     'month' => $validated['month'],
                     'year' => $validated['year'],
                 ]);
+
+                $details = InstructorPaymentDetail::create([
+                    'instructor_payment_id' => $newPayment->id, // Fixed typo here
+                    'group_student_name' => $validated['group_student_name'],
+                    'no_of_classes' => $validated['no_of_classes'],
+                    'per_class_payment' => $validated['per_class_payment'],
+                    'total_amount' => $total,
+                    'transaction' => $validated['transaction'],
+                ]);
             } else {
-                $payment = InstructorPayment::where('instructor_id', $validated['instructor'])
-                    ->where('month', $validated['month'])
-                    ->where('year', $validated['year'])
-                    ->first();
                 $payment->total_amount += $total; // Update total amount
                 $payment->save();
+
+                // Create payment detail
+                $details = InstructorPaymentDetail::create([
+                    'instructor_payment_id' => $payment->id, // Fixed typo here
+                    'group_student_name' => $validated['group_student_name'],
+                    'no_of_classes' => $validated['no_of_classes'],
+                    'per_class_payment' => $validated['per_class_payment'],
+                    'total_amount' => $total,
+                    'transaction' => $validated['transaction'],
+                ]);
             }
-                                            
-            // Create payment detail
-            $details = InstructorPaymentDetail::create([
-                'instructor_payment_id' => $payment->id, // Fixed typo here
-                'group_student_name' => $validated['group_student_name'],
-                'no_of_classes' => $validated['no_of_classes'],
-                'per_class_payment' => $validated['per_class_payment'],
-                'total_amount' => $total,
-                'transaction' => $validated['transaction'],
-            ]);
                                   
             $key = 'all_payrolls';
             Cache::forget($key);
