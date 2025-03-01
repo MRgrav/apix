@@ -52,6 +52,7 @@ class InstructorPayrollController extends Controller
                 $newPayment = InstructorPayment::create([
                     'instructor_id' => $validated['instructor'],
                     'total_amount' => $total,
+                    'no_of_classes' => $validated['no_of_classes'],
                     'month' => $validated['month'],
                     'year' => $validated['year'],
                 ]);
@@ -66,6 +67,7 @@ class InstructorPayrollController extends Controller
                 ]);
             } else {
                 $payment->total_amount += $total; // Update total amount
+                $payment->no_of_classes += $validated['no_of_classes']; // Update total amount
                 $payment->save();
 
                 // Create payment detail
