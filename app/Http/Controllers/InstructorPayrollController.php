@@ -164,8 +164,10 @@ class InstructorPayrollController extends Controller
 
     public function getPayrollDetails($payrollId) {
         try {
+            $parent = InstructorPayment::findOrFail($payrollId);
             $payments = InstructorPaymentDetail::where('instructor_payment_id', $payrollId)->get();
             return response()->json([
+                'masterPayment' => $parent,
                 'payments' => $payments
             ], 200);
         } catch (\Throwable $e) {
