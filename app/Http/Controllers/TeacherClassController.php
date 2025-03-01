@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\TeacherClass;
 use App\Models\Group;
+use App\Models\GroupUser;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
