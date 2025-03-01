@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use App\Models\InstructorPayment;
 use App\Models\InstructorPaymentDetail;
+use App\Models\User;
 
 class InstructorPayrollController extends Controller
 {
@@ -164,8 +165,13 @@ class InstructorPayrollController extends Controller
 
     public function getPayrollDetails($payrollId) {
         try {
+            $user = User::findOrFail(auth()->id());
+            if ($user->role_id != 3) {
+                $payments = InstructorPaymentDetail::where('instructor_payment_id', $payrollId)->where('instructor_id', auth()->id())->get();
+            } else {
+                $payments = InstructorPaymentDetail::where('instructor_payment_id', $payrollId)->get();
+            }
             $parent = InstructorPayment::findOrFail($payrollId);
-            $payments = InstructorPaymentDetail::where('instructor_payment_id', $payrollId)->get();
             return response()->json([
                 'masterPayment' => $parent,
                 'payments' => $payments
