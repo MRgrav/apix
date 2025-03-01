@@ -157,7 +157,7 @@ class HomeController extends Controller
         $upcomingClasses = collect();
 
         foreach ($groupIds as $groupId) {
-            $class = GroupUser::where('user_id', auth()->id())
+            $class = GroupUser::where('user_id', $userId)
                         ->where('group_id', $groupId)
                         ->whereColumn('class_counted', '<=', 'total_classes')
                         ->exists();
