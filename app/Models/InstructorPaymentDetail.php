@@ -11,7 +11,7 @@ class InstructorPaymentDetail extends Model
     use HasFactory;
 
     protected $fillable = [
-        'instructor_paymeny_id',
+        'instructor_payment_id',
         'group_student_name',
         'no_of_classes',
         'per_class_payment',
