@@ -171,13 +171,13 @@ class InstructorPayrollController extends Controller
             }
     
             // Retrieve the currently authenticated user
-            $user = User::findOrFail($userId);
+            $user = User::findOrFail(auth()->id());
     
             // Retrieve the parent payment record
             $parent = InstructorPayment::findOrFail($payrollId);
 
             // Not Accessible data.
-            if ($parent->instructor_id != $userId && $user->role_id != 3) {
+            if ($parent->instructor_id != auth()->id() && $user->role_id != 3) {
                 return response()->json(['message'=>'Oops, no data!'], 404);
             }
 
