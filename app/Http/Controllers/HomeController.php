@@ -121,8 +121,9 @@ class HomeController extends Controller
                             //         Carbon::now()->endOfMonth()->addMonth()
                             //     ]);
                             // })
-                            ->where('expiry_date', '>=', Carbon::now()->addMonth()->firstOfMonth()) // Start of next month
-                            ->where('expiry_date', '<=', Carbon::now()->addMonth()->lastOfMonth())  // End of next month
+                            // ->where('expiry_date', '>=', Carbon::now()->addMonth()->firstOfMonth()) // Start of next month
+                            // ->where('expiry_date', '<=', Carbon::now()->addMonth()->lastOfMonth())  // End of next month
+                            ->whereBetween('expiry_date',[Carbon::now(), Carbon::now()->addMonth()])
                             ->get();
                 Log::info($renewals);
                 Cache::put($renewalKey, $renewals->toJson(), now()->addMinutes(45));
