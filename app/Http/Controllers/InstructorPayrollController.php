@@ -38,13 +38,18 @@ class InstructorPayrollController extends Controller
 
             $total = $validated['no_of_classes'] * $validated['per_class_payment'];
 
-            $instructorPaymentExists = InstructorPayment::where('instructor_id', $validated['instructor'])
+            // $instructorPaymentExists = InstructorPayment::where('instructor_id', $validated['instructor'])
+            //                                         ->where('month', $validated['month'])
+            //                                         ->where('year', $validated['year'])
+            //                                         ->exists();
+
+            $payment = InstructorPayment::where('instructor_id', $validated['instructor'])
                                                     ->where('month', $validated['month'])
                                                     ->where('year', $validated['year'])
-                                                    ->exists();
+                                                    ->first();
 
-            if (!$instructorPaymentExists) {
-                $payment = InstructorPayment::create([
+            if (!$payment) {
+                InstructorPayment::create([
                     'instructor_id' => $validated['instructor'],
                     'total_amount' => $total,
                     'month' => $validated['month'],
@@ -74,7 +79,7 @@ class InstructorPayrollController extends Controller
 
             return response()->json([
                 'message' => 'Payment successful',
-                'payment' => $payment, 
+                'payment' => InstructorPayment::all(), 
             ], 201);
 
         } catch (\Throwable $e) {
