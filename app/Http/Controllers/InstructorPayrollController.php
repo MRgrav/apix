@@ -165,23 +165,47 @@ class InstructorPayrollController extends Controller
 
     public function getPayrollDetails($payrollId) {
         try {
-            $user = User::findOrFail(auth()->id());
-            if ($user->role_id != 3) {
-                $payments = InstructorPaymentDetail::where('instructor_payment_id', $payrollId)->where('instructor_id', auth()->id())->get();
-            } else {
-                $payments = InstructorPaymentDetail::where('instructor_payment_id', $payrollId)->get();
+            // Ensure the user is authenticated
+            $userId = auth()->id();
+            if (!$userId) {
+                return response()->json(['message' => 'Unauthorized'], 401);
             }
+    
+            // Retrieve the currently authenticated user
+            $user = User::findOrFail($userId);
+    
+            // Initialize the query for payments
+            $query = InstructorPaymentDetail::where('instructor_payment_id', $payrollId);
+    
+            // Check the user's role and adjust the query accordingly
+            if ($user->role_id != 3) {
+                // If the user is not an instructor, filter by instructor ID
+                $query->where('instructor_id', $userId);
+            }
+    
+            // Execute the query to get payment details
+            $payments = $query->get();
+    
+            // Retrieve the parent payment record
             $parent = InstructorPayment::findOrFail($payrollId);
+    
+            // Return a JSON response with the master payment and payment details
             return response()->json([
                 'masterPayment' => $parent,
                 'payments' => $payments
             ], 200);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            // Handle not found exceptions specifically
+            return response()->json(['message' => 'Resource not found'], 404);
         } catch (\Throwable $e) {
-            //throw $th;
-            Log::error("Payroll Error: ". $e->getMessage());
-            return response()->json(['message' => 'internal server error'], 500);
+            // Log the error message
+            Log::error("Payroll Error: " . $e->getMessage());
+    
+            // Return a JSON response indicating an internal server error
+            return response()->json(['message' => 'Internal server error'], 500);
         }
     }
+    
 }
 
 
