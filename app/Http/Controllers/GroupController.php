@@ -359,9 +359,8 @@ class GroupController extends Controller
             // Is class left, 
             // classes available able to attend live classes (1 or more) and other resources
             }
-
-                $upcoming = TeacherClass::with(['group', 'group.course'])
-                                        ->where('group_id', $groupId)
+                $groupData = Group::with(['users', 'course', 'videos', 'instructor'])->find($groupId);
+                $upcoming = TeacherClass::where('group_id', $groupId)
                                         ->whereDate('class_time', '>=', Carbon::now()->format('Y-m-d'))
                                         ->orderBy('class_time', 'desc')
                                         ->first();
@@ -369,7 +368,7 @@ class GroupController extends Controller
                 if ($upcoming) {
                     return response()->json([
                         'message' => 'Group retrieved successfully',
-                        'group' => $upcoming->group,
+                        'group' => $groupData,
                         'class_status' => true,
                         'class_code' => $upcoming->class_code,
                         'is_renewable' => false,
