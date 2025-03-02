@@ -139,32 +139,37 @@ class GroupController extends Controller
 
             // Get the current date
             $currentDate = Carbon::now(); // Use Laravel's now() helper for the current date
-            $nextDate = $currentDate->copy()->addDay();
+            // $nextDate = $currentDate->copy()->addDay();
 
-            // Create the class code
-            $codeString = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            // // Create the class code
+            // $codeString = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
-            // Format the group_id as a four-digit string with leading zeros
-            $formattedGroupId = str_pad($groupId, 4, '0', STR_PAD_LEFT);
+            // // Format the group_id as a four-digit string with leading zeros
+            // $formattedGroupId = str_pad($groupId, 4, '0', STR_PAD_LEFT);
 
-            // Generate the class code using the group ID and formatted date
-            $new_class_code = $formattedGroupId . '&' .
-                $codeString[$currentDate->year % 50] . // Year (mod 50 for index)
-                $codeString[$currentDate->month - 1] . // Month (0-indexed)
-                $codeString[$currentDate->day - 1]; // Day (0-indexed)
+            // // Generate the class code using the group ID and formatted date
+            // $new_class_code = $formattedGroupId . '&' .
+            //     $codeString[$currentDate->year % 50] . // Year (mod 50 for index)
+            //     $codeString[$currentDate->month - 1] . // Month (0-indexed)
+            //     $codeString[$currentDate->day - 1]; // Day (0-indexed)
 
-            $new_next_class_code = $formattedGroupId . '&' .
-                $codeString[$nextDate->year % 50] . // Year (mod 50 for index)
-                $codeString[$nextDate->month - 1] . // Month (0-indexed)
-                $codeString[$nextDate->day - 1]; // Day (0-indexed)
+            // $new_next_class_code = $formattedGroupId . '&' .
+            //     $codeString[$nextDate->year % 50] . // Year (mod 50 for index)
+            //     $codeString[$nextDate->month - 1] . // Month (0-indexed)
+            //     $codeString[$nextDate->day - 1]; // Day (0-indexed)
 
-            // Check if the class code exists for the group
-            $teacherClass = TeacherClass::where('group_id', $groupId)
-                                        ->orderBy('created_at', 'desc')
-                                        ->first();
+            // // Check if the class code exists for the group
+            // $teacherClass = TeacherClass::where('group_id', $groupId)
+            //                             ->orderBy('created_at', 'desc')
+            //                             ->first();
                 // ->value('class_code');
 
-            
+            $teacherClass = TeacherClass::where('group_id', $groupId)
+                ->whereDate('class_time', '>=', Carbon::now()->format('Y-m-d'))
+                ->orderBy('class_time', 'desc')
+                ->first();
+
+            // if class not available            
             if (!$teacherClass) {
                 return response()->json([
                     'message' => 'Group retrieved successfully',
@@ -174,27 +179,35 @@ class GroupController extends Controller
                 ], 200);
             }
 
-            $class_status = false;
-            $code = null;
-            Log::info('testing class code: ' . $teacherClass['class_code'] .'\n' . $new_class_code . '\n' . $new_next_class_code);
-            if ($teacherClass['class_code'] === $new_class_code || $teacherClass['class_code'] === $new_next_class_code) {
-                $code = $teacherClass['class_code'];
-                $class_status = true;
-            }
-
-            // Cache the group data
-            Cache::put($key, json_encode([
-                'group' => $group,
-                'class_status' => $class_status,
-                'class_code' => $code
-            ]), now()->addMinutes(1));
-
+            // if class available
             return response()->json([
                 'message' => 'Group retrieved successfully',
                 'group' => $group,
-                'class_status' => $class_status,
-                'class_code' => $code
+                'class_status' => true,
+                'class_code' => $teacherClass->class_code,
             ], 200);
+
+            // $class_status = false;
+            // $code = null;
+            // Log::info('testing class code: ' . $teacherClass['class_code'] .'\n' . $new_class_code . '\n' . $new_next_class_code);
+            // if ($teacherClass['class_code'] === $new_class_code || $teacherClass['class_code'] === $new_next_class_code) {
+            //     $code = $teacherClass['class_code'];
+            //     $class_status = true;
+            // }
+
+            // // Cache the group data
+            // Cache::put($key, json_encode([
+            //     'group' => $group,
+            //     'class_status' => $class_status,
+            //     'class_code' => $code
+            // ]), now()->addMinutes(1));
+
+            // return response()->json([
+            //     'message' => 'Group retrieved successfully',
+            //     'group' => $group,
+            //     'class_status' => $class_status,
+            //     'class_code' => $code
+            // ], 200);
         } catch (\Throwable $e) {
             //throw $e;
             Log::error("Get Group ERROR : " . $e->getMessage());
