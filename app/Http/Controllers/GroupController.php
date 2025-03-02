@@ -348,7 +348,7 @@ class GroupController extends Controller
             // Is class left, class_counted yet, >=  total_classes alloted to the student
             // if no class left then only show resources
             } else if ($isGroup->class_counted >= $isGroup->total_classes) {
-                $groupData = GroupUser::with(['users', 'course', 'videos', 'instructor'])->where('group_id', $groupId)->first();
+                $groupData = GroupUser::with(['user', 'course', 'videos', 'instructor'])->where('group_id', $groupId)->first();
                 return response()->json([
                     'message' => 'Group retrieved successfully',
                     'group' => $groupData,
@@ -376,7 +376,7 @@ class GroupController extends Controller
 
                 // Check if the class code exists for the group
                 $teacherClass = TeacherClass::where('group_id', $groupId)->orderBy('created_at', 'desc')->first();
-                $groupData = GroupUser::with(['users', 'course', 'videos', 'instructor'])->where('group_id', $groupId)->first(); 
+                $groupData = GroupUser::with(['user', 'course', 'videos', 'instructor'])->where('group_id', $groupId)->first(); 
                 Log::info('testing class code: ' . $teacherClass['class_code'] .'\n' . $new_class_code . '\n' . $new_next_class_code);
                 
                 
