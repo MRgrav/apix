@@ -335,7 +335,7 @@ class GroupController extends Controller
             // Is course plan expired
             } else if ($isGroup->expiry_date <= Carbon::now()) {
                 Log::info("is course expired : ". $isGroup->expiry_date . ' < '. Carbon::now() . ' = '. $isGroup->expiry_date < Carbon::now());
-                $groupData = GroupUser::with(['plan','course'])->where('group_id', $groupId)->first();
+                $groupData = Group::with(['plan','course'])->find($groupId);
                 return response()->json([
                     'message' => 'Plan expired on ',
                     'group' => $groupData,
@@ -348,7 +348,7 @@ class GroupController extends Controller
             // Is class left, class_counted yet, >=  total_classes alloted to the student
             // if no class left then only show resources
             } else if ($isGroup->class_counted >= $isGroup->total_classes) {
-                $groupData = GroupUser::with(['user', 'course', 'videos', 'instructor'])->where('group_id', $groupId)->first();
+                $groupData = Group::with(['user', 'course', 'videos', 'instructor'])->find($groupId);
                 return response()->json([
                     'message' => 'Group retrieved successfully',
                     'group' => $groupData,
@@ -376,7 +376,7 @@ class GroupController extends Controller
 
                 // Check if the class code exists for the group
                 $teacherClass = TeacherClass::where('group_id', $groupId)->orderBy('created_at', 'desc')->first();
-                $groupData = GroupUser::with(['user', 'course', 'videos', 'instructor'])->where('group_id', $groupId)->first(); 
+                $groupData = Group::with(['user', 'course', 'videos', 'instructor'])->find($groupId); 
                 Log::info('testing class code: ' . $teacherClass['class_code'] .'\n' . $new_class_code . '\n' . $new_next_class_code);
                 
                 
