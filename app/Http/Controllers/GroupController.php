@@ -358,51 +358,78 @@ class GroupController extends Controller
                 ], 200);
             // Is class left, 
             // classes available able to attend live classes (1 or more) and other resources
-            } else {
-                $currentDate = Carbon::now();                                           // Use Laravel's now() helper for the current date
-                $nextDate = $currentDate->copy()->addDay();                             // tomorrow date
-                $codeString = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';   // Create the class code master string
+            }
 
-                // Generate the class code using the group ID and formatted date
-                $new_class_code = str_pad($groupId, 4, '0', STR_PAD_LEFT) . '&' .
-                                    $codeString[$currentDate->year % 50] .              // Year (mod 50 for index)
-                                    $codeString[$currentDate->month - 1] .              // Month (0-indexed)
-                                    $codeString[$currentDate->day - 1];                 // Day (0-indexed)
+                $upcoming = TeacherClass::with(['group', 'group.course'])
+                                        ->where('group_id', $groupId)
+                                        ->whereDate('class_time', '>=', Carbon::now()->format('Y-m-d'))
+                                        ->orderBy('class_time', 'desc')
+                                        ->first();
 
-                $new_next_class_code = str_pad($groupId, 4, '0', STR_PAD_LEFT) . '&' .
-                                        $codeString[$nextDate->year % 50] .             // Year (mod 50 for index)
-                                        $codeString[$nextDate->month - 1] .             // Month (0-indexed)
-                                        $codeString[$nextDate->day - 1];                // Day (0-indexed)
-
-                // Check if the class code exists for the group
-                $teacherClass = TeacherClass::where('group_id', $groupId)->orderBy('created_at', 'desc')->first();
-                $groupData = Group::with(['users', 'course', 'videos', 'instructor'])->find($groupId); 
-                Log::info('testing class code: ' . $teacherClass['class_code'] .'\n' . $new_class_code . '\n' . $new_next_class_code);
-                
-                
-                // is class going to be today or tomorrow
-                if ($teacherClass->class_code === $new_class_code || $teacherClass->class_code === $new_next_class_code) {
-                    $code = $teacherClass->class_code;
-                    $class_status = true;
-                    // live class available to join
+                if ($upcoming) {
                     return response()->json([
                         'message' => 'Group retrieved successfully',
-                        'group' => $groupData,
+                        'group' => $upcoming->group,
                         'class_status' => true,
-                        'class_code' => $teacherClass->class_code,
+                        'class_code' => $upcoming->class_code,
                         'is_renewable' => false,
                     ], 200);
                 }
+            return response()->json([
+                'message' => 'Group retrieved successfully',
+                'group' => $groupData,
+                'class_status' => false,
+                'class_code' => null,
+                'is_renewable' => false,
+            ], 200);
 
-                // live class is not joinable
-                return response()->json([
-                    'message' => 'Group retrieved successfully',
-                    'group' => $groupData,
-                    'class_status' => false,
-                    'class_code' => null,
-                    'is_renewable' => false,
-                ], 200);
-            }
+            // } else {
+            //     $currentDate = Carbon::now();                                           // Use Laravel's now() helper for the current date
+            //     $nextDate = $currentDate->copy()->addDay();                             // tomorrow date
+            //     $codeString = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';   // Create the class code master string
+
+            //     // Generate the class code using the group ID and formatted date
+            //     $new_class_code = str_pad($groupId, 4, '0', STR_PAD_LEFT) . '&' .
+            //                         $codeString[$currentDate->year % 50] .              // Year (mod 50 for index)
+            //                         $codeString[$currentDate->month - 1] .              // Month (0-indexed)
+            //                         $codeString[$currentDate->day - 1];                 // Day (0-indexed)
+
+            //     $new_next_class_code = str_pad($groupId, 4, '0', STR_PAD_LEFT) . '&' .
+            //                             $codeString[$nextDate->year % 50] .             // Year (mod 50 for index)
+            //                             $codeString[$nextDate->month - 1] .             // Month (0-indexed)
+            //                             $codeString[$nextDate->day - 1];                // Day (0-indexed)
+
+            //     // Check if the class code exists for the group
+            //     $teacherClass = TeacherClass::where('group_id', $groupId)->orderBy('created_at', 'desc')->first();
+            //     $groupData = Group::with(['users', 'course', 'videos', 'instructor'])->find($groupId); 
+            //     Log::info('testing class code: ' . $teacherClass['class_code'] .'\n' . $new_class_code . '\n' . $new_next_class_code);
+                
+
+                
+                
+            //     // is class going to be today or tomorrow
+            //     if ($teacherClass->class_code === $new_class_code || $teacherClass->class_code === $new_next_class_code) {
+            //         $code = $teacherClass->class_code;
+            //         $class_status = true;
+            //         // live class available to join
+            //         return response()->json([
+            //             'message' => 'Group retrieved successfully',
+            //             'group' => $groupData,
+            //             'class_status' => true,
+            //             'class_code' => $teacherClass->class_code,
+            //             'is_renewable' => false,
+            //         ], 200);
+            //     }
+
+            //     // live class is not joinable
+            //     return response()->json([
+            //         'message' => 'Group retrieved successfully',
+            //         'group' => $groupData,
+            //         'class_status' => false,
+            //         'class_code' => null,
+            //         'is_renewable' => false,
+            //     ], 200);
+            // }
         } catch (\Throwable $e) {
             //throw $e;
             Log::error("Get Group ERROR : " . $e->getMessage());
