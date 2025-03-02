@@ -333,13 +333,14 @@ class GroupController extends Controller
 
 
             // Is course plan expired
-            } else if ($isGroup->expiry_date > Carbon::now()) {
+            } else if ($isGroup->expiry_date <= Carbon::now()) {
                 Log::info("is course expired : ". $isGroup->expiry_date . ' < '. Carbon::now() . ' = '. $isGroup->expiry_date < Carbon::now());
                 $groupData = GroupUser::with(['plan','course'])->where('group_id', $groupId)->first();
                 return response()->json([
                     'message' => 'Plan expired on ',
                     'group' => $groupData,
                     'expiry_date' => $isGroup->expiry_date,
+                    'today' => Carbon::now(),
                     'is_renewable' => true,
                 ], 200);
 
