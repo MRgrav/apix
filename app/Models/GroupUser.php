@@ -20,6 +20,7 @@ class GroupUser extends Model
         'plan_id',
         'class_counted',
         'total_classes',
+        'class',
     ];
 
     /**

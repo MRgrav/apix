@@ -115,18 +115,18 @@ class GroupController extends Controller
         try {
             //code...
 
-            $key = 'group_details_' . $groupId; // Use $groupId instead of $id
+            // $key = 'group_details_' . $groupId; // Use $groupId instead of $id
 
             // Check if the group details are cached
-            if (Cache::has($key)) {
-                $groupData = json_decode(Cache::get($key), true); // Decode the JSON data
-                return response()->json([
-                    'message' => 'Group retrieved successfully from cache,',
-                    'group' => $groupData['group'],
-                    'class_status' => $groupData['class_status'],
-                    'class_code' => $groupData['class_code'],
-                ], 200);
-            }
+            // if (Cache::has($key)) {
+            //     $groupData = json_decode(Cache::get($key), true); // Decode the JSON data
+            //     return response()->json([
+            //         'message' => 'Group retrieved successfully from cache,',
+            //         'group' => $groupData['group'],
+            //         'class_status' => $groupData['class_status'],
+            //         'class_code' => $groupData['class_code'],
+            //     ], 200);
+            // }
             
             // if $isAvailable is false means, user will not get some data [videos, class code status false]
 

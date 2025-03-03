@@ -18,6 +18,7 @@ class Purchase extends Model
         'expiry_date',
         'number_of_classes',
         'class_frequency_id',
+        'class',
     ];
 
     protected $casts = [
