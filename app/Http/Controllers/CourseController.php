@@ -309,7 +309,12 @@ class CourseController extends Controller
         // Convert price to the smallest unit (paise for INR, cents for USD)
         // $amount = 100 * $validatedData['duration'] * $plan->current_rate + ($plan->current_rate * $plan->GST);    
         // Calculate the base price
-        $basePrice = $duration * $plan->current_rate * $classFrequency['classes_per_month'];
+        
+        if ($request->category == 1) {
+            $basePrice = $duration * $plan->current_rate * $classFrequency['classes_per_month'];
+        } else {
+            $basePrice = $plan->current_rate;
+        }
         // Calculate GST
         $gstAmount = $basePrice * ($plan->GST / 100);
         // Total amount in smallest unit
@@ -336,6 +341,7 @@ class CourseController extends Controller
                 'class_frequency_id' => $classFrequency->id,
                 'number_of_classes' => $classFrequency->classes_per_month * $duration,
                 'class' => $request->class || 'na',
+                'duration' => $request->duration || null,
             ]);
 
             // Return response with order details
