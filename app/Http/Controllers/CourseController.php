@@ -340,8 +340,8 @@ class CourseController extends Controller
                 'course_id' => $courseId,
                 'class_frequency_id' => $classFrequency->id,
                 'number_of_classes' => $classFrequency->classes_per_month * $duration,
-                'class' => $request->class || 'na',
-                'duration' => $request->duration || null,
+                'class' => $request->class ?? 'na',
+                'duration' => $request->duration ?? null,
             ]);
 
             // Return response with order details
@@ -438,7 +438,7 @@ class CourseController extends Controller
                 'expiry_date' => $expiryDate,  // Store the calculated expiry date
                 'class_frequency_id' => $classFrequecny->id,
                 'number_of_classes' => $classFrequecny->classes_per_month,
-                'class' => $request->class || 'na',
+                'class' => $request->class ?? 'na',
             ]);
 
             $existGroup = GroupUser::where('user_id', auth()->id())
@@ -455,7 +455,7 @@ class CourseController extends Controller
                     'plan_id' => $validatedData['plan_id'],
                     'class_counted' => 0,
                     'total_classes' => $request['number_of_classes'],
-                    'class' => $request->class || 'na',
+                    'class' => $request->class ?? 'na',
                 ]);
             } else {
                 // Find the GroupUser record by user_id and course_id
@@ -535,7 +535,7 @@ class CourseController extends Controller
                 'expiry_date' => Carbon::parse($existingPurchase->expiry_date)->addMonths($duration),  // Store the calculated expiry date
                 'class_frequency_id' => $classFrequency->id,
                 'number_of_classes' => $classFrequency->classes_per_month * $duration,
-                'class' => $request->class || 'na',
+                'class' => $request->class ?? 'na',
             ]);
 
             $existGroup = GroupUser::where('user_id', auth()->id())
@@ -551,7 +551,7 @@ class CourseController extends Controller
                     'plan_id' => $validatedData['plan_id'],
                     'class_counted' => 0,
                     'total_classes' => $classFrequency->classes_per_month * $duration,
-                    'class' => $request->class || 'na',
+                    'class' => $request->class ?? 'na',
                 ]);
             } else {
                 // Find the GroupUser record by user_id and course_id
