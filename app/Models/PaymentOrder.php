@@ -20,6 +20,7 @@ class PaymentOrder extends Model
         'number_of_classes',
         'class_frequency_id',
         'class',
+        'duration',
     ];
 
     // Define relationships if needed
