@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('category')->nullable();
         });
 
-        Schema::table('purchase', function (Blueprint $table) {
+        Schema::table('purchases', function (Blueprint $table) {
             $table->string('class',20)->nullable();
         });
 
@@ -33,7 +33,7 @@ return new class extends Migration
         Schema::table('group_user', function (Blueprint $table) {
             $table->dropColumn(['class','category']);
         });
-        Schema::table('purchase', function (Blueprint $table) {
+        Schema::table('purchases', function (Blueprint $table) {
             $table->dropColumn('class');
         });
         Schema::table('payment_orders', function (Blueprint $table) {
