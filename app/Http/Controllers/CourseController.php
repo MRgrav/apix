@@ -278,6 +278,7 @@ class CourseController extends Controller
             'duration' => 'required',
             'plan_id' => 'required',
             'class_frequency_id' => 'required',
+            'category' => 'required',
         ]);
 
         $classFrequency = ClassFrequency::findOrFail($validatedData['class_frequency_id']);
@@ -299,10 +300,16 @@ class CourseController extends Controller
             $currency =  'INR';
         }
 
+        if ($request->category == 1) {      // 1 means music
+            $duration = $validatedData['duration'];
+        } else {
+            $duration = 12;
+        }
+
         // Convert price to the smallest unit (paise for INR, cents for USD)
         // $amount = 100 * $validatedData['duration'] * $plan->current_rate + ($plan->current_rate * $plan->GST);    
         // Calculate the base price
-        $basePrice = $validatedData['duration'] * $plan->current_rate * $classFrequency['classes_per_month'];
+        $basePrice = $duration * $plan->current_rate * $classFrequency['classes_per_month'];
         // Calculate GST
         $gstAmount = $basePrice * ($plan->GST / 100);
         // Total amount in smallest unit
@@ -327,7 +334,8 @@ class CourseController extends Controller
                 'user_id' => auth()->id(),
                 'course_id' => $courseId,
                 'class_frequency_id' => $classFrequency->id,
-                'number_of_classes' => $classFrequency->classes_per_month * $request->duration,
+                'number_of_classes' => $classFrequency->classes_per_month * $duration,
+                'class' => $request->class || 'na',
             ]);
 
             // Return response with order details
@@ -380,6 +388,12 @@ class CourseController extends Controller
                 'razorpay_signature' => $validatedData['payment_signature'],
             ];
 
+            if ($request->category == 1) {      // 1 means music
+                $duration = $validatedData['duration'];
+            } else {
+                $duration = 12;
+            }
+
             Log::info('Verifying payment signature', $attributes);
 
              // Log the expected signature for debugging
@@ -405,7 +419,7 @@ class CourseController extends Controller
             $paymentStatus = $payment->status; // Payment status (e.g., 'captured', 'failed', etc.)
             
             // Calculate the expiry date based on the plan's duration
-            $expiryDate = Carbon::now()->addMonths($request->duration);  // Assuming duration is in months
+            $expiryDate = Carbon::now()->addMonths($duration);  // Assuming duration is in months
     
             // If the payment is valid, store the purchase details
             Purchase::create([
@@ -418,6 +432,7 @@ class CourseController extends Controller
                 'expiry_date' => $expiryDate,  // Store the calculated expiry date
                 'class_frequency_id' => $classFrequecny->id,
                 'number_of_classes' => $classFrequecny->classes_per_month,
+                'class' => $request->class || 'na',
             ]);
 
             $existGroup = GroupUser::where('user_id', auth()->id())
@@ -434,6 +449,7 @@ class CourseController extends Controller
                     'plan_id' => $validatedData['plan_id'],
                     'class_counted' => 0,
                     'total_classes' => $request['number_of_classes'],
+                    'class' => $request->class || 'na',
                 ]);
             } else {
                 // Find the GroupUser record by user_id and course_id
@@ -475,6 +491,12 @@ class CourseController extends Controller
         ]);
     
         try {
+            if ($request->category == 1) {
+                $duration = $validatedData['duration'];
+            } else {
+                $duration = 12;
+            }
+
             $classFrequecny = ClassFrequency::findOrFail($validatedData['class_frequency_id']);
             $course = Course::findOrFail($validatedData['course_id']);
             $razorpay = new \Razorpay\Api\Api(env('RAZORPAY_KEY'), env('RAZORPAY_SECRET'));
@@ -504,9 +526,10 @@ class CourseController extends Controller
                 'plan_id' => $validatedData['plan_id'],
                 'amount' => $amount / 100,  // Convert from smallest unit to main unit
                 'status' => $paymentStatus,  // Store the payment status
-                'expiry_date' => Carbon::parse($existingPurchase->expiry_date)->addMonths($request->duration),  // Store the calculated expiry date
+                'expiry_date' => Carbon::parse($existingPurchase->expiry_date)->addMonths($duration),  // Store the calculated expiry date
                 'class_frequency_id' => $classFrequency->id,
-                'number_of_classes' => $classFrequency->classes_per_month * $request->duration,
+                'number_of_classes' => $classFrequency->classes_per_month * $duration,
+                'class' => $request->class || 'na',
             ]);
 
             $existGroup = GroupUser::where('user_id', auth()->id())
@@ -521,16 +544,17 @@ class CourseController extends Controller
                     'expiry_date' => $expiryDate,
                     'plan_id' => $validatedData['plan_id'],
                     'class_counted' => 0,
-                    'total_classes' => $classFrequency->classes_per_month * $request->duration,
+                    'total_classes' => $classFrequency->classes_per_month * $duration,
+                    'class' => $request->class || 'na',
                 ]);
             } else {
                 // Find the GroupUser record by user_id and course_id
                 $groupUser = GroupUser::where('user_id', auth()->id())
                                         ->where('course_id', $validatedData['course_id'])
                                         ->first();
-                $groupUser->expiry_date = Carbon::parse($groupUser->expiry_date)->addMonths($request->duration);
+                $groupUser->expiry_date = Carbon::parse($groupUser->expiry_date)->addMonths($duration);
                 $groupUser->plan_id = $request->plan_id;
-                $groupUser->total_classes += $classFrequency->classes_per_month * $request->duration;
+                $groupUser->total_classes += $classFrequency->classes_per_month * $duration;
                 $groupUser->save();
             }
 
