@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::table('group_user', function (Blueprint $table) {
             $table->string('class',20)->nullable();
+            $table->unsignedBigInteger('category')->nullable();
         });
 
         Schema::table('purchase', function (Blueprint $table) {
@@ -30,7 +31,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('group_user', function (Blueprint $table) {
-            $table->dropColumn('class');
+            $table->dropColumn(['class','category']);
         });
         Schema::table('purchase', function (Blueprint $table) {
             $table->dropColumn('class');
