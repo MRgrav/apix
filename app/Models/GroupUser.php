@@ -21,6 +21,7 @@ class GroupUser extends Model
         'class_counted',
         'total_classes',
         'class',
+        'category',
     ];
 
     /**
