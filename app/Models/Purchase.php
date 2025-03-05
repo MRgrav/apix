@@ -19,6 +19,7 @@ class Purchase extends Model
         'number_of_classes',
         'class_frequency_id',
         'class',
+        'category',
     ];
 
     protected $casts = [

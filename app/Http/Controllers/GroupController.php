@@ -357,7 +357,6 @@ class GroupController extends Controller
                     'is_renewable' => true,
                 ], 200);
 
-
             // Is class left, class_counted yet, >=  total_classes alloted to the student
             // if no class left then only show resources
             } else if ($isGroup->class_counted >= $isGroup->total_classes) {

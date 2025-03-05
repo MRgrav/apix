@@ -439,6 +439,7 @@ class CourseController extends Controller
                 'class_frequency_id' => $classFrequecny->id,
                 'number_of_classes' => $classFrequecny->classes_per_month,
                 'class' => $request->class ?? 'na',
+                'category' => $request->category,
             ]);
 
             $existGroup = GroupUser::where('user_id', auth()->id())
@@ -456,6 +457,7 @@ class CourseController extends Controller
                     'class_counted' => 0,
                     'total_classes' => $request['number_of_classes'],
                     'class' => $request->class ?? 'na',
+                    'category' => $request->category,
                 ]);
             } else {
                 // Find the GroupUser record by user_id and course_id

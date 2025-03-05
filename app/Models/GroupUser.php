@@ -22,6 +22,7 @@ class GroupUser extends Model
         'total_classes',
         'class',
         'category',
+        'expiry_date',
     ];
 
     /**

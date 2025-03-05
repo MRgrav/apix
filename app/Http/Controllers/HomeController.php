@@ -192,9 +192,9 @@ class HomeController extends Controller
     private function getStudyMaterials($groupIds, $userId){
         $key = 'material_home' . $userId;
     
-        if (Cache::has($key)) {
-            return collect(json_decode(Cache::get($key), true));
-        }
+        // if (Cache::has($key)) {
+        //     return collect(json_decode(Cache::get($key), true));
+        // }
     
         $studyMaterials = collect();
     

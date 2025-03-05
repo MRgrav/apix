@@ -21,6 +21,7 @@ class PaymentOrder extends Model
         'class_frequency_id',
         'class',
         'duration',
+        'category',
     ];
 
     // Define relationships if needed
