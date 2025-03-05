@@ -203,6 +203,8 @@ class HomeController extends Controller
                 ->where('group_id', $groupId)
                 ->orderBy('created_at', 'desc')
                 ->first();
+
+            Log::info("Is getting : ", $material);
     
             if ($material) {
                 $studyMaterials = $studyMaterials->merge([$material]);
