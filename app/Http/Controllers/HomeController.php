@@ -135,11 +135,17 @@ class HomeController extends Controller
             $myCourses = $this->getMyCourses($userId);
             $studyMaterials = $this->getStudyMaterials($groupIds, $userId);
 
+            $k = StudyMaterial::with(['course', 'group'])
+            ->whereIn('group_id', $groupIds)
+            ->orderByDesc('created_at')
+            ->get();
+
             return response()->json([
                 'message' => 'Fetched home,',
                 'upcomings' => $upcomingClasses,
                 'courses' => $myCourses,
-                'materials' => $studyMaterials,
+                // 'materials' => $studyMaterials,
+                'materials' => $k,
                 'renewals' => $renewals,
             ], 200);
         } catch (\Throwable $e) {
@@ -227,10 +233,13 @@ class HomeController extends Controller
         //     }
         // }
 
-        return StudyMaterial::with(['course', 'group'])
+        $k StudyMaterial::with(['course', 'group'])
         ->whereIn('group_id', $groupIds)
         ->orderByDesc('created_at')
         ->get();
+        Log::info("Is getting : ", $k);
+
+        return $k;
 
         $studyMaterials = StudyMaterial::with(['course', 'group'])
         ->whereIn('group_id', $groupIds)
