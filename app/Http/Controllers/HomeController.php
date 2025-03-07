@@ -11,6 +11,7 @@ use App\Models\GroupUser;
 use App\Models\TeacherClass;
 use App\Models\StudyMaterial;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class HomeController extends Controller
 {
@@ -227,10 +228,18 @@ class HomeController extends Controller
         // }
 
         $studyMaterials = StudyMaterial::with(['course', 'group'])
-                            ->groupBy('group_id')
-                            ->whereIn('group_id', $groupIds)
-                            ->orderBy('created_at', 'desc')
-                            ->get();
+        ->whereIn('group_id', $groupIds)
+        ->whereIn('id', function ($query) {
+            $query->select('id')
+                ->from('study_materials')
+                ->whereIn(['group_id', 'created_at'], function($subQuery){
+                    $subQuery->select('group_id', DB::raw('MAX(created_at)'))
+                    ->from('study_materials')
+                    ->groupBy('group_id');
+                });
+        })
+        ->orderByDesc('created_at')
+        ->get();
     
         Cache::put($key, $studyMaterials->toJson(), now()->addMinutes(1));
     
