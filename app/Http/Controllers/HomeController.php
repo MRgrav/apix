@@ -233,7 +233,7 @@ class HomeController extends Controller
         //     }
         // }
 
-        $k StudyMaterial::with(['course', 'group'])
+        $k = StudyMaterial::with(['course', 'group'])
         ->whereIn('group_id', $groupIds)
         ->orderByDesc('created_at')
         ->get();
