@@ -169,11 +169,12 @@ class HomeController extends Controller
         // }
 
         $upcomingClasses = TeacherClass::with(['group', 'group.course'])
-                                        ->whereDate('class_time', '>=', Carbon::now()->format('Y-m-d'))
-                                        ->groupBy('group_id')
-                                        ->where('user_id', $userId)
-                                        ->orderBy('class_time', 'desc')
-                                        ->get();
+        ->whereDate('class_time', '>=', Carbon::now()->format('Y-m-d'))
+        ->whereIn('group_id', $groupIds)
+        ->groupBy('group_id')
+        ->selectRaw('MAX(id) as id, group_id, MAX(class_time) as class_time')
+        ->orderBy('class_time', 'desc')
+        ->get();
 
         // Cache::put($upcomingKey, $upcomingClasses->toJson(), now()->addMinutes(1));
 
