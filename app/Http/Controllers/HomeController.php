@@ -206,7 +206,7 @@ class HomeController extends Controller
     }
 
     private function getStudyMaterials($groupIds, $userId){
-        $key = 'material_home' . $userId;
+        // $key = 'material_home' . $userId;
     
         // if (Cache::has($key)) {
         //     return collect(json_decode(Cache::get($key), true));
@@ -227,6 +227,11 @@ class HomeController extends Controller
         //     }
         // }
 
+        return StudyMaterial::with(['course', 'group'])
+        ->whereIn('group_id', $groupIds)
+        ->orderByDesc('created_at')
+        ->get();
+
         $studyMaterials = StudyMaterial::with(['course', 'group'])
         ->whereIn('group_id', $groupIds)
         ->whereIn('id', function ($query) {
@@ -241,7 +246,7 @@ class HomeController extends Controller
         ->orderByDesc('created_at')
         ->get();
     
-        Cache::put($key, $studyMaterials->toJson(), now()->addMinutes(1));
+        // Cache::put($key, $studyMaterials->toJson(), now()->addMinutes(1));
     
         return $studyMaterials;
     }
