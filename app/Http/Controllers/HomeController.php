@@ -173,7 +173,7 @@ class HomeController extends Controller
                                         ->groupBy('group_id')
                                         ->where('user_id', $userId)
                                         ->orderBy('class_time', 'desc')
-                                        ->first();
+                                        ->get();
 
         // Cache::put($upcomingKey, $upcomingClasses->toJson(), now()->addMinutes(1));
 
