@@ -168,12 +168,18 @@ class HomeController extends Controller
         //         }  
         // }
 
-        $upcomingClasses = TeacherClass::with(['group', 'group.course'])
-        ->whereDate('class_time', '>=', Carbon::now()->format('Y-m-d'))
+        // $upcomingClasses = TeacherClass::with(['group', 'group.course'])
+        // ->whereDate('class_time', '>=', Carbon::now()->format('Y-m-d'))
+        // ->whereIn('group_id', $groupIds)
+        // ->groupBy('group_id')
+        // ->selectRaw('MAX(id) as id, group_id, MAX(class_time) as class_time')
+        // ->orderByDesc('class_time')
+        // ->get();
+
+        return TeacherClass::with(['group', 'group.course'])
         ->whereIn('group_id', $groupIds)
-        ->groupBy('group_id')
-        ->selectRaw('MAX(id) as id, group_id, MAX(class_time) as class_time')
-        ->orderByDesc('class_time')
+        ->where('class_time', '>=', Carbon::now()->format('Y-m-d'))
+        ->orderBy('class_time')
         ->get();
 
         // Cache::put($upcomingKey, $upcomingClasses->toJson(), now()->addMinutes(1));
