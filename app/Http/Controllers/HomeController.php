@@ -232,8 +232,8 @@ class HomeController extends Controller
         ->whereIn('id', function ($query) {
             $query->select('id')
                 ->from('study_materials')
-                ->whereIn(['group_id', 'created_at'], function($subQuery){
-                    $subQuery->select('group_id', DB::raw('MAX(created_at)'))
+                ->whereIn(DB::raw("CONCAT(group_id, '-', created_at)"), function($subQuery){
+                    $subQuery->select(DB::raw("CONCAT(group_id, '-', MAX(created_at))"))
                     ->from('study_materials')
                     ->groupBy('group_id');
                 });
