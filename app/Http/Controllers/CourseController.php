@@ -439,7 +439,7 @@ class CourseController extends Controller
                 'class_frequency_id' => $classFrequecny->id,
                 'number_of_classes' => $classFrequecny->classes_per_month,
                 'class' => $request->class ?? 'na',
-                'category' => $request->category,
+                // 'category' => $request->category,
             ]);
 
             $existGroup = GroupUser::where('user_id', auth()->id())

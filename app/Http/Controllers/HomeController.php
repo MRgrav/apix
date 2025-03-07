@@ -154,19 +154,26 @@ class HomeController extends Controller
         //     return collect(json_decode(Cache::get($upcomingKey), true));
         // }
 
-        $upcomingClasses = collect();
+        // $upcomingClasses = collect();
 
-        foreach ($groupIds as $groupId) {
-                $upcoming = TeacherClass::with(['group', 'group.course'])
-                                        ->where('group_id', $groupId)
+        // foreach ($groupIds as $groupId) {
+        //         $upcoming = TeacherClass::with(['group', 'group.course'])
+        //                                 ->where('group_id', $groupId)
+        //                                 ->whereDate('class_time', '>=', Carbon::now()->format('Y-m-d'))
+        //                                 ->orderBy('class_time', 'desc')
+        //                                 ->first();
+
+        //         if ($upcoming) {
+        //             $upcomingClasses = $upcomingClasses->merge([$upcoming]);
+        //         }  
+        // }
+
+        $upcomingClasses = TeacherClass::with(['group', 'group.course'])
                                         ->whereDate('class_time', '>=', Carbon::now()->format('Y-m-d'))
+                                        ->distinct('group_id')
+                                        ->where('user_id', $userId)
                                         ->orderBy('class_time', 'desc')
                                         ->first();
-
-                if ($upcoming) {
-                    $upcomingClasses = $upcomingClasses->merge([$upcoming]);
-                }  
-        }
 
         // Cache::put($upcomingKey, $upcomingClasses->toJson(), now()->addMinutes(1));
 
@@ -182,6 +189,7 @@ class HomeController extends Controller
 
         $myCourses = GroupUser::with(['course', 'group', 'user', 'plan'])
             ->where('user_id', $userId)
+            ->whereNotNull('group_id')
             ->get();
 
         Cache::put($key, $myCourses->toJson(), now()->addMinutes(1));
@@ -196,20 +204,26 @@ class HomeController extends Controller
         //     return collect(json_decode(Cache::get($key), true));
         // }
     
-        $studyMaterials = collect();
+        // $studyMaterials = collect();
     
-        foreach ($groupIds as $groupId) {
-            $material = StudyMaterial::with(['course', 'group'])
-                ->where('group_id', $groupId)
-                ->orderBy('created_at', 'desc')
-                ->first();
+        // foreach ($groupIds as $groupId) {
+        //     $material = StudyMaterial::with(['course', 'group'])
+        //         ->where('group_id', $groupId)
+        //         ->orderBy('created_at', 'desc')
+        //         ->first();
 
-            Log::info("Is getting : ", $material);
+        //     Log::info("Is getting : ", $material);
     
-            if ($material) {
-                $studyMaterials = $studyMaterials->merge([$material]);
-            }
-        }
+        //     if ($material) {
+        //         $studyMaterials = $studyMaterials->merge([$material]);
+        //     }
+        // }
+
+        $studyMaterials = StudyMaterial::with(['course', 'group'])
+                            ->distinct('group_id')
+                            ->where('user_id', $userId)
+                            ->orderBy('created_at', 'desc')
+                            ->get();
     
         Cache::put($key, $studyMaterials->toJson(), now()->addMinutes(1));
     
