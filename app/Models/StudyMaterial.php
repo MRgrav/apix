@@ -18,7 +18,7 @@ class StudyMaterial extends Model
         'audio'
     ];
 
-    public function course()
+    public function course(): BelongsTo
     {
         return $this->belongsTo(Course::class);
     }

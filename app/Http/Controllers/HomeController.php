@@ -137,7 +137,7 @@ class HomeController extends Controller
 
             $k = StudyMaterial::with(['course', 'group'])
             ->whereIn('group_id', $groupIds)
-            ->orderByDesc('created_at')
+            ->orderBy('created_at', 'desc')
             ->get();
 
             return response()->json([
@@ -252,7 +252,7 @@ class HomeController extends Controller
                     ->groupBy('group_id');
                 });
         })
-        ->orderByDesc('created_at')
+        ->orderBy('created_at', 'desc')
         ->get();
     
         // Cache::put($key, $studyMaterials->toJson(), now()->addMinutes(1));
