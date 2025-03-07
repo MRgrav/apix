@@ -173,7 +173,7 @@ class HomeController extends Controller
         ->whereIn('group_id', $groupIds)
         ->groupBy('group_id')
         ->selectRaw('MAX(id) as id, group_id, MAX(class_time) as class_time')
-        ->orderBy('class_time', 'desc')
+        ->orderByDesc('class_time')
         ->get();
 
         // Cache::put($upcomingKey, $upcomingClasses->toJson(), now()->addMinutes(1));
@@ -222,7 +222,7 @@ class HomeController extends Controller
 
         $studyMaterials = StudyMaterial::with(['course', 'group'])
                             ->groupBy('group_id')
-                            ->where('user_id', $userId)
+                            ->whereIn('group_id', $groupIds)
                             ->orderBy('created_at', 'desc')
                             ->get();
     
