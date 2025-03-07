@@ -170,7 +170,7 @@ class HomeController extends Controller
 
         $upcomingClasses = TeacherClass::with(['group', 'group.course'])
                                         ->whereDate('class_time', '>=', Carbon::now()->format('Y-m-d'))
-                                        ->distinct('group_id')
+                                        ->groupBy('group_id')
                                         ->where('user_id', $userId)
                                         ->orderBy('class_time', 'desc')
                                         ->first();
@@ -220,7 +220,7 @@ class HomeController extends Controller
         // }
 
         $studyMaterials = StudyMaterial::with(['course', 'group'])
-                            ->distinct('group_id')
+                            ->groupBy('group_id')
                             ->where('user_id', $userId)
                             ->orderBy('created_at', 'desc')
                             ->get();
