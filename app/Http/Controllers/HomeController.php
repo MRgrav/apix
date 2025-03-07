@@ -237,7 +237,7 @@ class HomeController extends Controller
         ->whereIn('group_id', $groupIds)
         ->orderByDesc('created_at')
         ->get();
-        Log::info("Is getting : ", $k);
+        Log::info("Is getting : ", $k->toArray());
 
         return $k;
 
