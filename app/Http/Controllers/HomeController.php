@@ -138,7 +138,8 @@ class HomeController extends Controller
             $k = StudyMaterial::with(['course', 'group'])
             ->whereIn('group_id', $groupIds)
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->get()
+            ->toArray();
 
             return response()->json([
                 'message' => 'Fetched home,',
