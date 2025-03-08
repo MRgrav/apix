@@ -98,15 +98,72 @@ class HomeController extends Controller
         }
     }
 
+    public function getHomePage() {
+        try {
+            // my courses
+            $myCourses = GroupUser::with()->where('user_id', auth()->id())->get();
 
-    public function getHomePage(){
+            // study material
+            $groupIds = GroupUser::where('user_id', auth()->id())->whereColumn('expiry_date', '>', Carbon::now())->pluck('group_id');
+
+            // $latestStudyMaterials = StudyMaterial::with(['course', 'group'])
+            //                 ->whereIn(
+            //                     ['group_id', 'created_at'],
+            //                     StudyMaterial::groupBy('group_id')
+            //                         ->selectRaw('group_id, MAX(created_at) as max_created_at')
+            //                 )
+            //                 ->get();
+            $latestStudyMaterials = StudyMaterial::with(['course', 'group'])
+                            ->whereIn('group_id', $groupIds)
+                            ->whereIn(
+                                ['group_id', 'created_at'],
+                                StudyMaterial::whereIn('group_id', $groupIds)
+                                    ->groupBy('group_id')
+                                    ->selectRaw('group_id, MAX(created_at) as max_created_at')
+                            )
+                            ->get();
+                        
+
+            // live class
+            $groupIds = GroupUser::where('user_id', auth()->id())->whereColumn('class_counted', '<=', 'total_classes')->pluck('group_id');
+            $upcomingClasses = TeacherClass::with(['group', 'group.course'])
+                            ->whereIn('group_id', $groupIds)
+                            ->where('class_time', '>=', Carbon::now()->format('Y-m-d'))
+                            ->orderBy('class_time')
+                            ->get();
+
+            // renewals
+            $renewals = GroupUser::with('course','plan')
+                            ->where('user_id', $userId)
+                            ->whereBetween('expiry_date',[Carbon::now(), Carbon::now()->addMonth()])
+                            ->orWhere('expiry_date', )
+                            ->get();
+
+            // response
+            return response()->json([
+                'message' => 'Home fetched success',
+                'courses' => $myCourses,
+                'materials' => $latestStudyMaterials,
+                'upcomings' => $upcomingClasses,
+                'renewals' => $renewals,
+            ], 200);
+
+        } catch (\Throwable $e) {
+            //throw $e;
+            Log::error("Web Home error : " . $e->getMessage() . "\n" . $e->getTraceAsString());
+            return response()->json(['message' => 'Internal server error'], 500);
+        }
+    }
+
+
+    public function getHomePage2(){
         try {
             $userId = auth()->id();
 
             // Fetch group IDs where class_counted is less than or equal to total_classes
             $groupIds = GroupUser::where('user_id', $userId)
                                 ->whereColumn('class_counted', '<=', 'total_classes')
-                                ->pluck('group_id')->toArray();
+                                ->pluck('group_id');
 
             Log::info('ids: '.  implode(', ', $groupIds));
 

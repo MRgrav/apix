@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 use App\Models\Course;
 use App\Models\Instructor;
@@ -259,11 +260,22 @@ class MicroController extends Controller
 
     public function getPaymentHistory () {
         try {
-            //code...
             $payments = Purchase::with('course', 'plan')
-                                    ->where('user_id',auth()->id())
-                                    ->orderBy('created_at','desc')
-                                    ->get();
+                    ->leftJoin('group_user', function ($join) {
+                        $join->on('purchases.user_id', '=', 'group_user.user_id')
+                            ->on('purchases.course_id', '=', 'group_user.course_id')
+                            ->on('purchases.plan_id', '=', 'group_user.plan_id');
+                    })
+                    ->where('purchases.user_id', auth()->id())
+                    ->select('purchases.*', 'group_user.*')
+                    ->orderBy('purchases.created_at', 'desc')
+                    ->get();
+
+        
+            // $payments = Purchase::with('course', 'plan')
+            //                         ->where('user_id',auth()->id())
+            //                         ->orderBy('created_at','desc')
+            //                         ->get();
             if($payments->isEmpty()) {
                 return response()->json(['message' => 'No purchase yet'], 404);
             }
