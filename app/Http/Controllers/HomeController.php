@@ -139,10 +139,11 @@ class HomeController extends Controller
             // renewals
             $renewals = GroupUser::with('course','plan')
                             ->where('user_id', auth()->id())
-                            ->where(function ($query){
-                                $query->whereBetween('expiry_date',[Carbon::now(), Carbon::now()->addMonth()])
-                                    ->orWhere('expiry_date', '<', Carbon::now()->format('Y-m-d'));
-                            })
+                            // ->where(function ($query){
+                            //     $query->whereBetween('expiry_date',[Carbon::now(), Carbon::now()->addMonth()])
+                            //         ->orWhere('expiry_date', '<', Carbon::now()->format('Y-m-d'));
+                            // })
+                            ->where('expiry_date', '<', Carbon::now()->addMonth())
                             ->get();
 
             // response
