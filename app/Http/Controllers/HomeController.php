@@ -136,8 +136,8 @@ class HomeController extends Controller
             $studyMaterials = $this->getStudyMaterials($groupIds, $userId);
 
             $k = StudyMaterial::with(['course', 'group'])
-            // ->whereIn('group_id', $groupIds)
-            // ->orderBy('created_at', 'desc')
+            ->whereIn('group_id', $groupIds)
+            ->orderBy('created_at', 'desc')
             ->get();
             // ->toArray();
 
