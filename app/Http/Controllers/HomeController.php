@@ -108,6 +108,8 @@ class HomeController extends Controller
                                 ->whereColumn('class_counted', '<=', 'total_classes')
                                 ->pluck('group_id')->toArray();
 
+            Log::info('ids: '. $groupIds);
+
             $renewalKey = 'renewal'.auth()->id();
             if (Cache::has($renewalKey)) {
                 $renewals = json_decode(Cache::get($renewalKey), true); // Decode the JSON data
