@@ -108,7 +108,7 @@ class HomeController extends Controller
                                 ->whereColumn('class_counted', '<=', 'total_classes')
                                 ->pluck('group_id')->toArray();
 
-            Log::info('ids: '. $groupIds);
+            Log::info('ids: '.  implode(', ', $groupIds));
 
             $renewalKey = 'renewal'.auth()->id();
             if (Cache::has($renewalKey)) {
