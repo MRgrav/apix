@@ -104,15 +104,9 @@ class HomeController extends Controller
             $myCourses = GroupUser::with(['course', 'group'])->where('user_id', auth()->id())->get();
 
             // study material
-            $groupIds = GroupUser::where('user_id', auth()->id())->whereColumn('expiry_date', '>', Carbon::now())->pluck('group_id');
-
-            // $latestStudyMaterials = StudyMaterial::with(['course', 'group'])
-            //                 ->whereIn(
-            //                     ['group_id', 'created_at'],
-            //                     StudyMaterial::groupBy('group_id')
-            //                         ->selectRaw('group_id, MAX(created_at) as max_created_at')
-            //                 )
-            //                 ->get();
+            $groupIds = GroupUser::where('user_id', auth()->id())
+                                    ->where('expiry_date', '>', Carbon::now()->format('Y-m-d'))
+                                    ->pluck('group_id');
             $latestStudyMaterials = StudyMaterial::with(['course', 'group'])
                             ->whereIn('group_id', $groupIds)
                             ->whereIn(
