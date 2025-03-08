@@ -101,7 +101,7 @@ class HomeController extends Controller
     public function getHomePage() {
         try {
             // my courses
-            $myCourses = GroupUser::with()->where('user_id', auth()->id())->get();
+            $myCourses = GroupUser::with(['course', 'group'])->where('user_id', auth()->id())->get();
 
             // study material
             $groupIds = GroupUser::where('user_id', auth()->id())->whereColumn('expiry_date', '>', Carbon::now())->pluck('group_id');
