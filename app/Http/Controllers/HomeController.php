@@ -136,10 +136,10 @@ class HomeController extends Controller
             $studyMaterials = $this->getStudyMaterials($groupIds, $userId);
 
             $k = StudyMaterial::with(['course', 'group'])
-            ->whereIn('group_id', $groupIds)
-            ->orderBy('created_at', 'desc')
-            ->get()
-            ->toArray();
+            // ->whereIn('group_id', $groupIds)
+            // ->orderBy('created_at', 'desc')
+            ->get();
+            // ->toArray();
 
             return response()->json([
                 'message' => 'Fetched home,',
@@ -234,11 +234,11 @@ class HomeController extends Controller
         //     }
         // }
 
-        $k = StudyMaterial::with(['course', 'group'])
-        ->whereIn('group_id', $groupIds)
-        ->orderByDesc('created_at')
-        ->get();
-        Log::info("Is getting : ", $k->toArray());
+        $k = StudyMaterial::with(['course', 'group'])->get();
+        // ->whereIn('group_id', $groupIds)
+        // ->orderByDesc('created_at')
+        // ->get()->toArray();
+        Log::info("Is getting : ", $k);
 
         return $k;
 
