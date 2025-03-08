@@ -107,15 +107,25 @@ class HomeController extends Controller
             $groupIds = GroupUser::where('user_id', auth()->id())
                                     ->where('expiry_date', '>', Carbon::now()->format('Y-m-d'))
                                     ->pluck('group_id');
+            // $latestStudyMaterials = StudyMaterial::with(['course', 'group'])
+            //                 ->whereIn('group_id', $groupIds)
+            //                 ->whereIn(
+            //                     ['group_id', 'created_at'],
+            //                     StudyMaterial::whereIn('group_id', $groupIds)
+            //                         ->groupBy('group_id')
+            //                         ->selectRaw('group_id, MAX(created_at) as max_created_at')
+            //                 )
+            //                 ->get();
             $latestStudyMaterials = StudyMaterial::with(['course', 'group'])
                             ->whereIn('group_id', $groupIds)
-                            ->whereIn(
-                                ['group_id', 'created_at'],
-                                StudyMaterial::whereIn('group_id', $groupIds)
-                                    ->groupBy('group_id')
-                                    ->selectRaw('group_id, MAX(created_at) as max_created_at')
-                            )
+                            ->where('created_at', function ($query) use ($groupIds) {
+                                $query->selectRaw('MAX(created_at)')
+                                    ->from((new StudyMaterial)->getTable())
+                                    ->where('group_id', DB::raw('study_materials.group_id'))
+                                    ->whereIn('group_id', $groupIds);
+                            })
                             ->get();
+    
                         
 
             // live class
@@ -130,7 +140,7 @@ class HomeController extends Controller
             $renewals = GroupUser::with('course','plan')
                             ->where('user_id', $userId)
                             ->whereBetween('expiry_date',[Carbon::now(), Carbon::now()->addMonth()])
-                            ->orWhere('expiry_date', )
+                            ->orWhere('expiry_date', '<', Carbon::now()->format('Y-m-d'))
                             ->get();
 
             // response
