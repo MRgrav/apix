@@ -106,7 +106,7 @@ class HomeController extends Controller
             // Fetch group IDs where class_counted is less than or equal to total_classes
             $groupIds = GroupUser::where('user_id', $userId)
                                 ->whereColumn('class_counted', '<=', 'total_classes')
-                                ->pluck('group_id');
+                                ->pluck('group_id')->toArray();
 
             $renewalKey = 'renewal'.auth()->id();
             if (Cache::has($renewalKey)) {
