@@ -153,6 +153,7 @@ class HomeController extends Controller
                 'materials' => $latestStudyMaterials,
                 'upcomings' => $upcomingClasses,
                 'renewals' => $renewals,
+                'teso' => "don't be serious",
             ], 200);
 
         } catch (\Throwable $e) {
