@@ -69,8 +69,8 @@ class TeacherClassController extends Controller
             // Get the current date using Carbon
             $currentDate = Carbon::now();
 
-            $carbonTime = Carbon::createFromFormat("H:i", $request->class_time);
-            $formattedTime = $carbonTime->format("h:i A");
+            // $carbonTime = Carbon::createFromFormat("H:i", $request->class_time);
+            // $formattedTime = $carbonTime->format("h:i A");
     
             // Format the group_id as a four-digit string with leading zeros
             $formattedGroupId = str_pad($validated['group_id'], 4, '0', STR_PAD_LEFT);
@@ -86,7 +86,7 @@ class TeacherClassController extends Controller
                 'user_id' => $userId,
                 'group_id' => $validated['group_id'],
                 'class_code' => $class_code,
-                'class_time' => $formattedTime ?? $currentDate,
+                'class_time' => $validated['class_time'] ?? $currentDate,
             ]);
 
             
