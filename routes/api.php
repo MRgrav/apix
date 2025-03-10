@@ -208,6 +208,7 @@ Route::prefix('admin')->group(function() {
     Route::get('/', [AdminController::class, 'getAdminDashboard'])->middleware('auth:sanctum');
     Route::get('/config/carousels', [AdminController::class, 'getSlides']);
     Route::get('/config/social-contacts', [AdminController::class, 'getSocialContacts']);
+    Route::patch('/config/social-contacts', [AdminController::class, 'updateSocialContacts']);
 });
 
 Route::prefix('admin/promotions')->middleware('auth:sanctum')->group(function () {

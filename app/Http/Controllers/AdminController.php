@@ -269,6 +269,38 @@ class AdminController extends Controller
         }
     }
 
+    public function updateSocialContacts() {
+        try {
+             // Validate the incoming request data
+            $request->validate([
+                'contacts' => 'required|array',
+                'contacts.*.id' => 'required',
+                'contacts.*.label' => 'required|string|max:200',
+                'contacts.*.url' => 'required|url|max:200',
+            ]);
+
+            // Iterate through each contact in the request
+            foreach ($request->contacts as $contactData) {
+                // Find the social contact by ID
+                $socialContact = SocialContact::find($contactData['id']);
+
+                // Compare existing values with new values
+                if ($socialContact) {
+                    $socialContact->update($contactData);
+                }
+            }
+            
+            return response()->json([
+                'message' => 'Social contacts processed successfully.',
+            ], 200);
+            
+        } catch (\Throwable $e) {
+            //throw $e;
+            Log::error("Get Social Contacts: ". $e->getMessage());
+            return response()->json(['message' => 'internal server error.'], 500);
+        }
+    }
+
     public function getShareAppLink () {
         $link = env('SHARE_APP_LINK');
         return response()->json($link, 200);
