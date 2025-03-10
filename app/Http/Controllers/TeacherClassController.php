@@ -92,7 +92,7 @@ class TeacherClassController extends Controller
                 'user_id' => $userId,
                 'group_id' => $validated['group_id'],
                 'class_code' => $class_code,
-                'class_time' => $dt->timestamp ?? $currentDate,
+                'class_time' => $dt ?? $currentDate,
             ]);
 
             
