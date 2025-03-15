@@ -10,7 +10,13 @@ class PromotedCourseController extends Controller
     // Create a new promotion
     public function createPromotion(Request $request) {
         // Implementation here
-        $validator = Validator::make($request->all(), [
+        // $validator = Validator::make($request->all(), [
+        //     'course_id' => 'required|exists:courses,id',
+        //     'status' => 'boolean',
+        //     'display_order' => 'nullable|integer',
+        // ]);
+
+        $validator = $request->validate([
             'course_id' => 'required|exists:courses,id',
             'status' => 'boolean',
             'display_order' => 'nullable|integer',

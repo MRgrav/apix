@@ -269,7 +269,7 @@ class AdminController extends Controller
         }
     }
 
-    public function updateSocialContacts() {
+    public function updateSocialContacts(Request $request) {
         try {
              // Validate the incoming request data
             $request->validate([
