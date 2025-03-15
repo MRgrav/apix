@@ -17,6 +17,12 @@ class PromotedCourseController extends Controller
                 // 'status' => 'boolean',
                 'display_order' => 'nullable|integer',
             ]); 
+            $existingPromotion = ShowcaseCourse::where('course_id', $validator['course_id'])->first();
+
+            if ($existingPromotion) {
+                return response()->json(['message' => 'Course ID already exists'], 400);
+            }
+
             $promotion = ShowcaseCourse::create([
                 'course_id' => $validator['course_id'], 
                 'status' => true, 
