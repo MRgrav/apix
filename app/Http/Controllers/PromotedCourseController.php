@@ -4,30 +4,31 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\ShowcaseCourse;
+use Illuminate\Support\Facades\Log;
 
 class PromotedCourseController extends Controller
 {
     // Create a new promotion
     public function createPromotion(Request $request) {
-        // Implementation here
-        // $validator = Validator::make($request->all(), [
-        //     'course_id' => 'required|exists:courses,id',
-        //     'status' => 'boolean',
-        //     'display_order' => 'nullable|integer',
-        // ]);
+        try {
+            //code...
+            $validator = $request->validate([
+                'course_id' => 'required|exists:courses,id',
+                'status' => 'boolean',
+                'display_order' => 'nullable|integer',
+            ]); 
+            $promotion = ShowcaseCourse::create([
+                'course_id' => $validate->course_id, 
+                'status', 
+                'display_order'
+            ]);
 
-        $validator = $request->validate([
-            'course_id' => 'required|exists:courses,id',
-            'status' => 'boolean',
-            'display_order' => 'nullable|integer',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
-        }
-
-        $promotion = ShowcaseCourse::create($request->only(['course_id', 'status', 'display_order']));
-        return response()->json($promotion, 201);
+            return response()->json($promotion, 201);
+        } catch (\Throwable $e) {
+            //throw $th;
+            Log::error("Create: ". $e->getMessage());
+            return response()->json(['message' => 'internal server error'], 500);
+        }       
     }
 
     // Retrieve all promotions
