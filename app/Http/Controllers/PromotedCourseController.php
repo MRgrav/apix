@@ -18,9 +18,9 @@ class PromotedCourseController extends Controller
                 'display_order' => 'nullable|integer',
             ]); 
             $promotion = ShowcaseCourse::create([
-                'course_id' => $validator->course_id, 
+                'course_id' => $validator['course_id'], 
                 'status' => true, 
-                'display_order' => $validator->display_order,
+                'display_order' => $validator['display_order'],
             ]);
 
             return response()->json($promotion, 201);
