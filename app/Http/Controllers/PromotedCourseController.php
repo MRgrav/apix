@@ -14,13 +14,13 @@ class PromotedCourseController extends Controller
             //code...
             $validator = $request->validate([
                 'course_id' => 'required|exists:courses,id',
-                'status' => 'boolean',
+                // 'status' => 'boolean',
                 'display_order' => 'nullable|integer',
             ]); 
             $promotion = ShowcaseCourse::create([
-                'course_id' => $validate->course_id, 
+                'course_id' => $validator->course_id, 
                 'status' => true, 
-                'display_order' => $validate->display_order,
+                'display_order' => $validator->display_order,
             ]);
 
             return response()->json($promotion, 201);
