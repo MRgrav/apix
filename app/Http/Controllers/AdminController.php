@@ -295,10 +295,9 @@ class AdminController extends Controller
 
             // Iterate through each contact in the request
             foreach ($request->contacts as $contactData) {
+                // Find the social contact by ID
+                $socialContact = SocialContact::findOrFail($contactData['id']);
                 try {
-                    // Find the social contact by ID
-                    $socialContact = SocialContact::findOrFail($contactData['id']);
-
                     // Update only the URL
                     $socialContact->update(['url' => $contactData['url']]);
                     Log::info('url => '. $contactData['url']);
