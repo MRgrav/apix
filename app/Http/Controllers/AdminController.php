@@ -295,16 +295,22 @@ class AdminController extends Controller
 
             // Iterate through each contact in the request
             foreach ($request->contacts as $contactData) {
+                Log::info('Processing contact with ID ' . $contactData['id']);
+    
                 // Find the social contact by ID
                 $socialContact = SocialContact::findOrFail($contactData['id']);
+    
+                Log::info('Found social contact with ID ' . $socialContact->id);
+    
                 try {
                     // Update only the URL
                     $socialContact->update(['url' => $contactData['url']]);
-                    Log::info('url => '. $contactData['url']);
+    
+                    Log::info('Updated URL to ' . $contactData['url']);
                 } catch (\Throwable $e) {
                     // Roll back the transaction
                     DB::rollBack();
-
+    
                     Log::error("Error updating social contact: " . $e->getMessage());
                     return response()->json(['message' => 'Error updating social contact'], 500);
                 }
