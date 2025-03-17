@@ -280,15 +280,38 @@ class AdminController extends Controller
             ]);
 
             // Iterate through each contact in the request
-            foreach ($request->contacts as $contactData) {
-                // Find the social contact by ID
-                $socialContact = SocialContact::find($contactData['id']);
+            // foreach ($request->contacts as $contactData) {
+            //     // Find the social contact by ID
+            //     $socialContact = SocialContact::find($contactData['id']);
 
-                // Compare existing values with new values
-                if ($socialContact) {
-                    $socialContact->update($contactData);
+            //     // Compare existing values with new values
+            //     if ($socialContact) {
+            //         $socialContact->update(['url' => $contactData['url']]);
+            //     }
+            // }
+
+            // Start a database transaction
+            DB::beginTransaction();
+
+            // Iterate through each contact in the request
+            foreach ($request->contacts as $contactData) {
+                try {
+                    // Find the social contact by ID
+                    $socialContact = SocialContact::findOrFail($contactData['id']);
+
+                    // Update only the URL
+                    $socialContact->update(['url' => $contactData['url']]);
+                } catch (\Throwable $e) {
+                    // Roll back the transaction
+                    DB::rollBack();
+
+                    Log::error("Error updating social contact: " . $e->getMessage());
+                    return response()->json(['message' => 'Error updating social contact'], 500);
                 }
             }
+
+            // Commit the transaction
+            DB::commit();
             
             return response()->json([
                 'message' => 'Social contacts processed successfully.',
