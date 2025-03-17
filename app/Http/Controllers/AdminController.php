@@ -301,6 +301,7 @@ class AdminController extends Controller
 
                     // Update only the URL
                     $socialContact->update(['url' => $contactData['url']]);
+                    Log::info('url => '. $contactData['url']);
                 } catch (\Throwable $e) {
                     // Roll back the transaction
                     DB::rollBack();
