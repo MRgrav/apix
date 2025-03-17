@@ -276,7 +276,7 @@ class AdminController extends Controller
                 'contacts' => 'required|array',
                 'contacts.*.id' => 'required',
                 'contacts.*.label' => 'required|string|max:200',
-                'contacts.*.url' => 'required|url|max:200',
+                'contacts.*.url' => 'required|max:200',
             ]);
 
             // Iterate through each contact in the request
