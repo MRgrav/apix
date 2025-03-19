@@ -18,7 +18,7 @@ class StudentController extends Controller
             'subject' => 'required|string|max:100',
             'contact_number' => 'required|string|max:15',
             'whatsapp_number' => 'nullable|string|max:15',
-            'email' => 'required|email|unique:students,email',
+            'email' => 'required|email',
             'address' => 'required|string|max:500',
         ]);
 
