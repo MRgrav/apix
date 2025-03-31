@@ -46,6 +46,7 @@ public function store(Request $request)
             'play_limit' => 'nullable|integer|min:1',
         ]);
         Cache::forget('videos'.$validatedData['group_id']);
+        Cache::forget('group_details_'.$validatedData['group_id']);
 
         $video = new Video();
         $video->group_id = $validatedData['group_id'];
