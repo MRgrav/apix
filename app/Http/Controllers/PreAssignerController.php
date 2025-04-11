@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Course;
-use App\Models\Plan;
+use App\Models\CoursePlan;
 use App\Models\ClassFrequency;
 use App\Models\GroupUser;
 use App\Models\Purchase;
@@ -75,7 +75,7 @@ class PreAssignerController extends Controller
             // get courses
             $courses = Course::select('id','title')->with('category')->get();
             // get plans
-            $plans = Plan::get();
+            $plans = CoursePlan::get();
             // get class frequency
             $classFrequency = ClassFrequency::get();
             
