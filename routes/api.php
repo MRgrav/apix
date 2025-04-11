@@ -24,6 +24,7 @@ use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\PromotedCourseController;
 use App\Http\Controllers\InstructorPayrollController;
+use App\Http\Controllers\PreAssignerController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -120,6 +121,12 @@ Route::prefix('home')->group(function() {
 });
 Route::apiResource('materials', StudyMaterialController::class);
 
+
+// custom student course assign
+Route::prefix('custom-assign')->group(function() {
+    Route::get('/', [PreAssignerController::class, 'view'])->middleware('auth:sanctum');
+    Route::post('/', [PreAssignerController::class, 'assignStudent'])->middleware('auth:sanctum');
+});
 
 // Route::get('courses/{course_id}/videos', [VideoController::class, 'index']);
 Route::get('courses/{group_id}/videos', [VideoController::class, 'index']);
