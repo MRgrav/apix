@@ -2,6 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
+use App\Models\Course;
+use App\Models\Plan;
+use App\Models\ClassFrequency;
+use App\Models\GroupUser;
+use App\Models\Purchase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
@@ -30,7 +36,7 @@ class PreAssignerController extends Controller
             ]);
 
             DB::beginTransaction();
-            App\Models\Purchase::create([
+            Purchase::create([
                 'user_id' => $validated['student_id'],
                 'course_id' => $validated['course_id'],
                 'payment_id' => $validated['payment_id'],
@@ -42,7 +48,7 @@ class PreAssignerController extends Controller
                 'class' => $validated['class'],
             ]);
 
-            App\Models\GroupUser::create([
+            GroupUser::create([
                 'group_id' => $validated[''],
                 'user_id' => $validated['student_id'],
                 'course_id' => $validated['course_id'],
@@ -65,13 +71,13 @@ class PreAssignerController extends Controller
     public function view() {
         try {
             // get students
-            $students = App\Models\User::where('role_id', 1)->get();
+            $students = User::where('role_id', 1)->get();
             // get courses
-            $courses = App\Models\Course::select('id','title')->with('category')->get();
+            $courses = Course::select('id','title')->with('category')->get();
             // get plans
-            $plans = App\Models\Plan::get();
+            $plans = Plan::get();
             // get class frequency
-            $classFrequency = App\Models\ClassFrequency::get();
+            $classFrequency = ClassFrequency::get();
             
             return response()->json([
                 'students' => $students,
