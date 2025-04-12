@@ -79,8 +79,7 @@ class PreAssignerController extends Controller
             $groups = Group::get();
 
             // Fetch group user
-            $purchases = GroupUser::leftJoin('purchases', 'purchases.user_id', '=', 'group_users.user_id')
-                ->select('purchases.*', 'group_users.group_id', 'group_users.course_id')
+            $purchases = GroupUser::with(['plan','course','group','user'])
                 ->paginate($perPage);
 
             $purchases->appends(['page' => $page, 'per_page' => $perPage]);
