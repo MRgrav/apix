@@ -126,6 +126,8 @@ Route::apiResource('materials', StudyMaterialController::class);
 Route::prefix('custom-assign')->group(function() {
     Route::get('/', [PreAssignerController::class, 'view'])->middleware('auth:sanctum');
     Route::post('/', [PreAssignerController::class, 'assignStudent'])->middleware('auth:sanctum');
+    Route::get('/{id}', [PreAssignerController::class, 'getById'])->middleware('auth:sanctum');
+    Route::patch('/{groupId}', [PreAssignerController::class, 'update'])->middleware('auth:sanctum');
 });
 
 // Route::get('courses/{course_id}/videos', [VideoController::class, 'index']);

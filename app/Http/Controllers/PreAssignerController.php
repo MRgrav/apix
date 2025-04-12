@@ -100,4 +100,90 @@ class PreAssignerController extends Controller
         }
     }
 
+
+    public function getById($id){
+        try {
+
+            // Get data
+            $students = User::where('role_id', 1)->get();
+            $courses = Course::with('category')->select('id', 'title')->get();
+            $plans = CoursePlan::get();
+            $classFrequency = ClassFrequency::get();
+            $groups = Group::get();
+
+            // Fetch group user
+            $purchases = GroupUser::with(['plan','course','group','user'])->findOrFail($id);
+
+            // Return response
+            return response()->json([
+                'students' => $students,
+                'courses' => $courses,
+                'plans' => $plans,
+                'classFrequency' => $classFrequency,
+                'groups' => $groups,
+                'purchases' => $purchases,
+            ], 200);
+
+        } catch (\Throwable $e) {
+            Log::error('Assign controller view: ' . $e->getMessage());
+            return response()->json(['message' => 'Internal server error'], 500);
+        }
+    }
+
+    public function update(Request $request, $groupId){
+        try {
+            $validated = $request->validate([
+                'student_id' => 'nullable|integer|exists:users,id',
+                'course_id' => 'nullable|integer',
+                'plan_id' => 'nullable|integer',
+                'class_frequency_id' => 'nullable|integer',
+                'payment_id' => 'nullable|string',
+                'expiry_date' => 'nullable|date',
+                'class' => 'nullable|string',
+                'total_classes' => 'nullable|integer',
+                'class_counted' => 'nullable|integer',
+                'category' => 'nullable|integer',
+                'amount' => 'nullable|integer',
+            ]);
+
+            DB::beginTransaction();
+            $groupUser = GroupUser::where('group_id', $groupId)->first();
+
+            if (!$groupUser) {
+                return response()->json(['message' => 'Group not found'], 404);
+            }
+
+            $purchase = Purchase::where('user_id', $groupUser->user_id)->first();
+
+            if (!$purchase) {
+                return response()->json(['message' => 'Purchase not found for student'], 404);
+            }
+
+            $purchaseData = [];
+            $groupUserData = [];
+
+            foreach ($validated as $key => $value) {
+                if ($value !== null) {
+                    if ($purchase->{$key}) {
+                        $purchaseData[$key] = $value;
+                    }
+                    if ($groupUser->{$key}) {
+                        $groupUserData[$key] = $value;
+                    }
+                }
+            }
+
+            $purchase->update($purchaseData);
+            $groupUser->update($groupUserData);
+
+            DB::commit();
+            return response()->json(['message' => 'Student updated successfully'], 200);
+        } catch (\Throwable $e) {
+            DB::rollback();
+            Log::error('Assign controller update: ' . $e->getMessage());
+            return response()->json(['message' => 'Student update failed', 'error' => $e->getMessage()], 500);
+        }
+    }
+
+
 }
