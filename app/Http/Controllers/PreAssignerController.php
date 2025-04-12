@@ -18,7 +18,7 @@ class PreAssignerController extends Controller
     public function AssignStudent(Request $request) {
         try {
             $validated = $request->validate([
-                'student_id' => 'required|integer|exist:users',
+                'student_id' => 'required|integer|exists:users,id',
                 'course_id' => 'required|integer',
                 'plan_id' => 'required|integer',
                 'class_frequency_id' => 'required|integer',
@@ -29,7 +29,7 @@ class PreAssignerController extends Controller
                 'class_counted' => 'required|integer',
                 'category' => 'nullable|integer',
                 'amount' => 'required|integer',
-                'group_id' => 'required|integer|exist:groups'
+                'group_id' => 'required|integer|exists:groups,id'
             ]);
 
             DB::beginTransaction();
