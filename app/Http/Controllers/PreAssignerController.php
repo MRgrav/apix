@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Course;
 use App\Models\CoursePlan;
 use App\Models\ClassFrequency;
+use App\Models\Group;
 use App\Models\GroupUser;
 use App\Models\Purchase;
 use Illuminate\Http\Request;
@@ -14,25 +15,21 @@ use Illuminate\Support\Facades\DB;
 
 class PreAssignerController extends Controller
 {
-    public function AssignStudent(Reuqest $request) {
+    public function AssignStudent(Request $request) {
         try {
-            // purchases
-            // payments
-            // group_user
             $validated = $request->validate([
                 'student_id' => 'required|integer|exist:users',
                 'course_id' => 'required|integer',
                 'plan_id' => 'required|integer',
                 'class_frequency_id' => 'required|integer',
                 'payment_id' => 'required|string',
-                // 'duration' => 'nullable|integer|min:1',
                 'expiry_date' => 'required|date',
-                'number_of_classes' => 'required|integer',
                 'class' => 'required|string',
                 'total_classes' => 'required|integer',
                 'class_counted' => 'required|integer',
-                'category' => 'required|integer',
-                'amount' => 'required|integer'
+                'category' => 'nullable|integer',
+                'amount' => 'required|integer',
+                'group_id' => 'required|integer|exist:groups'
             ]);
 
             DB::beginTransaction();
@@ -43,13 +40,13 @@ class PreAssignerController extends Controller
                 'amount' => $validated['amount'],
                 'plan_id' => $validated['plan_id'],
                 'expiry_date' => $validated['expiry_date'],
-                'number_of_classes' => $validated['number_of_classes'],
+                'number_of_classes' => $validated['total_classes'],
                 'class_frequency_id' => $validated['class_frequency_id'],
                 'class' => $validated['class'],
             ]);
 
             GroupUser::create([
-                'group_id' => $validated[''],
+                'group_id' => $validated['group_id'],
                 'user_id' => $validated['student_id'],
                 'course_id' => $validated['course_id'],
                 'expiry_date' => $validated['expiry_date'],
@@ -61,7 +58,7 @@ class PreAssignerController extends Controller
             ]);
 
             DB::commit();
-        } catch (\Throwable $th) {
+        } catch (\Throwable $e) {
             DB::rollback();
             Log::error('Assign controller create: ' . $e->getMessage());
             return response()->json(['message' => 'Student Assign Failed', 'error' => $e->getMessage()], 500);
@@ -78,12 +75,15 @@ class PreAssignerController extends Controller
             $plans = CoursePlan::get();
             // get class frequency
             $classFrequency = ClassFrequency::get();
+
+            $groups = Group::get();
             
             return response()->json([
                 'students' => $students,
                 'courses' => $courses,
                 'plans' => $plans,
                 'classFrequency' => $classFrequency,
+                'groups' => $groups,
             ], 200);
             
         } catch (\Throwable $e) {
