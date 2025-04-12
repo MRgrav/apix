@@ -66,31 +66,38 @@ class PreAssignerController extends Controller
         }
     }
 
-    public function view() {
+    public function view(){
         try {
-            // get students
-            $students = User::where('role_id', 1)->get();
-            // get courses
-            $courses = Course::select('id','title')->with('category')->get();
-            // get plans
-            $plans = CoursePlan::get();
-            // get class frequency
-            $classFrequency = ClassFrequency::get();
+            $perPage = request('per_page', 10);
+            $page = request('page', 1);
 
+            // Get data
+            $students = User::where('role_id', 1)->get();
+            $courses = Course::with('category')->select('id', 'title')->get();
+            $plans = CoursePlan::get();
+            $classFrequency = ClassFrequency::get();
             $groups = Group::get();
-            
+
+            // Fetch group user
+            $purchases = GroupUser::leftJoin('purchases', 'purchases.user_id', '=', 'group_users.user_id')
+                ->select('purchases.*', 'group_users.group_id', 'group_users.course_id')
+                ->paginate($perPage);
+
+            $purchases->appends(['page' => $page, 'per_page' => $perPage]);
+
+            // Return response
             return response()->json([
                 'students' => $students,
                 'courses' => $courses,
                 'plans' => $plans,
                 'classFrequency' => $classFrequency,
                 'groups' => $groups,
+                'purchases' => $purchases,
             ], 200);
-            
+
         } catch (\Throwable $e) {
             Log::error('Assign controller view: ' . $e->getMessage());
-            return response()->json(['message' => 'Internal server error', 'error' => $e->getMessage()], 500);
-
+            return response()->json(['message' => 'Internal server error'], 500);
         }
     }
 
