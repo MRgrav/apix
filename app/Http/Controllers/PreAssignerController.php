@@ -37,6 +37,7 @@ class PreAssignerController extends Controller
                 'user_id' => $validated['student_id'],
                 'course_id' => $validated['course_id'],
                 'payment_id' => $validated['payment_id'],
+                'status' => 'active',
                 'amount' => $validated['amount'],
                 'plan_id' => $validated['plan_id'],
                 'expiry_date' => $validated['expiry_date'],
