@@ -62,7 +62,7 @@ class CourseController extends Controller
         }
         try {
             //code...
-            $course = Course::with('category', 'sections', 'instructor')->findOrFail($id)->first();
+            $course = Course::with('category', 'sections', 'instructor')->findOrFail($id);
 
             // Cache the course data for future requests (e.g., cache for 1 hour)
             Cache::put($cacheKey, $course, now()->addMinutes(1));
