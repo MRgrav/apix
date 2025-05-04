@@ -12,10 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('courses', function (Blueprint $table) {
-            //
-            $table->json('desc')->nullable();
-            $table->json('prereq')->nullable();
-            $table->json('outcome')->nullable();
+            $table->longText('topics')->nullable();
         });
     }
 
@@ -24,10 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('courses', function (Blueprint $table) {
-            $table->dropColumn('desc');
-            $table->dropColumn('prereq');
-            $table->dropColumn('outcome');
+        Schema::table('course', function (Blueprint $table) {
+            $table->dropColumn('topics');
         });
     }
 };

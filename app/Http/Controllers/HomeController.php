@@ -259,7 +259,7 @@ class HomeController extends Controller
 
         // Cache::put($upcomingKey, $upcomingClasses->toJson(), now()->addMinutes(1));
 
-        return $upcomingClasses;
+        // return $upcomingClasses;
     }
 
     private function getMyCourses($userId){
@@ -309,23 +309,23 @@ class HomeController extends Controller
 
         return $k;
 
-        $studyMaterials = StudyMaterial::with(['course', 'group'])
-        ->whereIn('group_id', $groupIds)
-        ->whereIn('id', function ($query) {
-            $query->select('id')
-                ->from('study_materials')
-                ->whereIn(DB::raw("CONCAT(group_id, '-', created_at)"), function($subQuery){
-                    $subQuery->select(DB::raw("CONCAT(group_id, '-', MAX(created_at))"))
-                    ->from('study_materials')
-                    ->groupBy('group_id');
-                });
-        })
-        ->orderBy('created_at', 'desc')
-        ->get();
+        // $studyMaterials = StudyMaterial::with(['course', 'group'])
+        // ->whereIn('group_id', $groupIds)
+        // ->whereIn('id', function ($query) {
+        //     $query->select('id')
+        //         ->from('study_materials')
+        //         ->whereIn(DB::raw("CONCAT(group_id, '-', created_at)"), function($subQuery){
+        //             $subQuery->select(DB::raw("CONCAT(group_id, '-', MAX(created_at))"))
+        //             ->from('study_materials')
+        //             ->groupBy('group_id');
+        //         });
+        // })
+        // ->orderBy('created_at', 'desc')
+        // ->get();
     
         // Cache::put($key, $studyMaterials->toJson(), now()->addMinutes(1));
     
-        return $studyMaterials;
+        // return $studyMaterials;
     }
     
    

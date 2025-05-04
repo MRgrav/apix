@@ -18,13 +18,13 @@ Route::get('/', function () {
 });
 // web.php
 
-use App\Http\Controllers\Panel\Instructor\CourseController;
+// use App\Http\Controllers\Panel\Instructor\CourseController;
 
-Route::prefix('courses')->group(function () {
-    Route::get('/', [CourseController::class, 'courses'])->name('instructor.courses');
-    Route::get('/add', [CourseController::class, 'addCourse'])->name('instructor.courses.add');
-    Route::post('/store', [CourseController::class, 'storeCourse'])->name('instructor.courses.store');
-    Route::get('/edit/{slug}', [CourseController::class, 'editCourse'])->name('instructor.courses.edit');
-    Route::post('/update/{slug}', [CourseController::class, 'updateCourse'])->name('instructor.courses.update');
-    Route::delete('/delete/{id}', [CourseController::class, 'deleteCourse'])->name('instructor.courses.delete');
-});
+// Route::prefix('courses')->group(function () {
+//     Route::get('/', [CourseController::class, 'courses'])->name('instructor.courses');
+//     Route::get('/add', [CourseController::class, 'addCourse'])->name('instructor.courses.add');
+//     Route::post('/store', [CourseController::class, 'storeCourse'])->name('instructor.courses.store');
+//     Route::get('/edit/{slug}', [CourseController::class, 'editCourse'])->name('instructor.courses.edit');
+//     Route::post('/update/{slug}', [CourseController::class, 'updateCourse'])->name('instructor.courses.update');
+//     Route::delete('/delete/{id}', [CourseController::class, 'deleteCourse'])->name('instructor.courses.delete');
+// });

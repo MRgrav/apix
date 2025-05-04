@@ -122,10 +122,16 @@ class CourseController extends Controller
         // Validate the request data
         $validatedData = $request->validate([
             'title' => 'required|string|max:255',
-            'slug' => 'required|string|unique:courses,slug,'.$id,
+            // 'slug' => 'required|string|unique:courses,slug,'.$id,
+            'short_description' => 'required|string',
             'description' => 'nullable|string',
             'course_category_id' => 'nullable|exists:course_categories,id',
-            'instructor_id' => 'nullable|exists:users,id',
+            // 'instructor_id' => 'nullable|exists:users,id',
+            'topics' => 'string',
+            'requirements' => 'string',
+            'outcomes' => 'string',
+            'meta_title' => 'string',
+            'meta_description' => 'string',
         ]);
 
         // Find and update the course
