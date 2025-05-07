@@ -357,8 +357,9 @@ class MicroController extends Controller
                         ->where('user_id', auth()->id())
                         // ->where('expiry_date', '>=', Carbon::now()->addMonth()->firstOfMonth()) // Start of next month
                         // ->where('expiry_date', '<=', Carbon::now()->addMonth()->lastOfMonth())  // End of next month
-                        ->whereBetween('expiry_date',[Carbon::now(), Carbon::now()->addMonth()])
-                        ->orWhere('expiry_date', '<', Carbon::now())
+                        // ->whereBetween('expiry_date',[Carbon::now(), Carbon::now()->addMonth()])
+                        // ->orWhere('expiry_date', '<', Carbon::now())
+                        ->where('expiry_date', '<', Carbon::now()->addMonth())
                         ->get();
 
             if ($renewals->isEmpty()) {
