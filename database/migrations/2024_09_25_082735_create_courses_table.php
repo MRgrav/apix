@@ -32,7 +32,7 @@ return new class extends Migration
             // $table->foreignId('meta_image')->nullable()->constrained('uploads')->onDelete('set null');
 
             // course media
-            $table->unsignedBigInteger('thumbnail')->nullable();
+            $table->string('thumbnail')->nullable();
             $table->unsignedBigInteger('course_overview_type')->nullable();
             // $table->foreignId('thumbnail')->nullable()->constrained('uploads')->onDelete('set null');
             // $table->foreignId('course_overview_type')->nullable()->constrained('statuses')->onDelete('cascade');
