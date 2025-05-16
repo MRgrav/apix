@@ -127,9 +127,9 @@ class CourseController extends Controller
             'description' => 'nullable|string',
             'course_category_id' => 'nullable|exists:course_categories,id',
             // 'instructor_id' => 'nullable|exists:users,id',
-            'topics' => 'string',
-            'requirements' => 'string',
-            'outcomes' => 'string',
+            'topics' => 'nullable|string',
+            'requirements' => 'nullable|string',
+            'outcomes' => 'nullable|string',
             'meta_title' => 'string',
             'meta_description' => 'string',
         ]);
