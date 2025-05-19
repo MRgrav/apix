@@ -119,26 +119,31 @@ class CourseController extends Controller
 
     public function update(Request $request, $id)
     {
-        // Validate the request data
-        $validatedData = $request->validate([
-            'title' => 'required|string|max:255',
-            // 'slug' => 'required|string|unique:courses,slug,'.$id,
-            'short_description' => 'required|string',
-            'description' => 'nullable|string',
-            'course_category_id' => 'nullable|exists:course_categories,id',
-            // 'instructor_id' => 'nullable|exists:users,id',
-            'topics' => 'nullable|string',
-            'requirements' => 'nullable|string',
-            'outcomes' => 'nullable|string',
-            'meta_title' => 'string',
-            'meta_description' => 'string',
-        ]);
+        try {
+            // Validate the request data
+            $validatedData = $request->validate([
+                'title' => 'required|string|max:255',
+                // 'slug' => 'required|string|unique:courses,slug,'.$id,
+                'short_description' => 'required|string',
+                'description' => 'nullable|string',
+                'course_category_id' => 'nullable|exists:course_categories,id',
+                // 'instructor_id' => 'nullable|exists:users,id',
+                'topics' => 'nullable|string',
+                'requirements' => 'nullable|string',
+                'outcomes' => 'nullable|string',
+                'meta_title' => 'string',
+                'meta_description' => 'string',
+            ]);
 
-        // Find and update the course
-        $course = Course::findOrFail($id);
-        $course->update($validatedData);
+            // Find and update the course
+            $course = Course::findOrFail($id);
+            $course->update($validatedData);
 
-        return response()->json($course, 200);
+            return response()->json($course, 200);
+        } catch (\Throwable $e) {
+            Log::error($e->getMessage());
+            return response()->json('Internal server error', 500);
+        }
     }
 
     public function destroy($id)
