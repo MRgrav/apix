@@ -104,7 +104,7 @@ class GroupController extends Controller
 
             // Update the group_id field in the existing GroupUser record
             $groupUser->update([
-                'user_id' => null, // Update only the group_id
+                'group_id' => null, // Update only the group_id
                 // 'plan_id' => $request->plan_id ?? $groupUser->plan_id, // Optionally update the plan_id if provided
             ]);
 
