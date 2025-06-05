@@ -191,6 +191,7 @@ Route::post('/class/start', [TeacherClassController::class, 'store'])->middlewar
 Route::get('/micro/courses', [MicroController::class, 'getCoursesName']);
 Route::get('/micro/instructors', [MicroController::class, 'getInstructors']);
 Route::get('/micro/students', [MicroController::class, 'getStudents']);
+Route::get('/micro/students/{studentId}', [MicroController::class, 'getStudentById']);
 Route::get('/micro/users', [MicroController::class, 'getUsers']);
 Route::get('/micro/enrollables/{courseId}', [MicroController::class, 'enrollableStudents']);
 Route::get('/micro/groups/{courseId}', [MicroController::class, 'getGroupsByCourseId']);

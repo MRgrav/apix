@@ -83,7 +83,9 @@ class GroupController extends Controller
 
         return response()->json([
             'message' => 'User assigned to group successfully',
-            'group_user' => $groupUser // Optionally return the updated GroupUser record
+            'group_user' => GroupUser::with('user')
+            ->where('group_id', $groupId)
+            ->get() // Optionally return the updated GroupUser record
         ], 201);
     }
 
@@ -110,7 +112,9 @@ class GroupController extends Controller
 
             return response()->json([
                 'message' => 'User removed from group successfully',
-                'group_user' => $groupUser // Optionally return the updated GroupUser record
+                'group_user' => GroupUser::with('user')
+                ->where('group_id', $groupId)
+                ->get()
             ], 201);
         } catch (\Throwable $e) {
             //throw $th;

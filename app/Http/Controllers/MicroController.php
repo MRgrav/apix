@@ -77,6 +77,28 @@ class MicroController extends Controller
         ], 200);
     }
 
+    public function getStudentById ($studentId) {
+        try {
+            $student = User::with(['groups'])->findOrfail($studentId);
+
+            if (!$student) {
+                return response()->json([
+                    'message' => 'Not found',
+                ], 404);
+            }
+
+            return response()->json([
+                'student' => $student,
+            ], 200);
+        } catch (\Throwable $e) {
+            //throw $th;
+            Log::error($e->getMessage());
+            return response()->json([
+                'message'=>'internal server error'
+            ], 500);
+        }
+    }
+
     // redis : done
     // fetch instructors for other groups or assign new instructor
     public function getInstructors () {
