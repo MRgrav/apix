@@ -402,7 +402,7 @@ class MicroController extends Controller
     public function getInstructorProfile($instructorId) {
         try {
             //code...
-            $user = Instructor::with('user', 'course')->where('', $instructorId)->first();
+            $user = Instructor::with('user', 'course')->where('user_id', $instructorId)->first();
 
             if (!$user) {
                 return response()->json(['message' => 'not found'], 404);
