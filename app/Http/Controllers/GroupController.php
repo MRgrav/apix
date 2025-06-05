@@ -86,6 +86,40 @@ class GroupController extends Controller
             'group_user' => $groupUser // Optionally return the updated GroupUser record
         ], 201);
     }
+
+    public function removeUserFromGroup($groupId, $studentId) {
+        try {
+            // Find the group or fail with 404 if not found
+            // $group = Group::findOrFail($groupId);
+
+            // Find the existing GroupUser entry for the user and their associated course
+            $groupUser = GroupUser::where('user_id', $studentId)
+                                ->where('group_id', $groupId) // Match by course_id
+                                ->first();
+
+            // Check if the GroupUser record exists
+            if (!$groupUser) {
+                return response()->json(['message' => 'User is not enrolled in the course'], 400);
+            }
+
+            // Update the group_id field in the existing GroupUser record
+            $groupUser->update([
+                'user_id' => null, // Update only the group_id
+                // 'plan_id' => $request->plan_id ?? $groupUser->plan_id, // Optionally update the plan_id if provided
+            ]);
+
+            return response()->json([
+                'message' => 'User removed from group successfully',
+                'group_user' => $groupUser // Optionally return the updated GroupUser record
+            ], 201);
+        } catch (\Throwable $e) {
+            //throw $th;
+            Log::error($e->getMessage());
+            return response()->json([
+                'message' => 'Internal server error',
+            ], 500);
+        }
+    }
     
     // redis : done
     public function getAllGroups()

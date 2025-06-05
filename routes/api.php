@@ -144,6 +144,7 @@ Route::post('videos/{id}/play', [VideoController::class, 'play']);
 Route::prefix('groups')->group(function () {
     Route::post('/{courseId}', [GroupController::class, 'addGroup'])->middleware('auth:sanctum');
     Route::post('/{groupId}/assign-user', [GroupController::class, 'assignUserToGroup']);
+    Route::delete('/{groupId}/assign-user/{studentId}', [GroupController::class, 'removeUserFromGroup']);
     Route::get('/{groupId}', [GroupController::class, 'getGroup']);
     Route::get('/{groupId}/study', [GroupController::class, 'getGroupStudent'])->middleware('auth:sanctum'); // Get a group by ID
     Route::delete('/{groupId}', [GroupController::class, 'deleteGroup']); // Delete a group by ID
