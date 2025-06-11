@@ -143,7 +143,7 @@ class MicroController extends Controller
             ], 200);
         }
 
-        $micro = User::where('role_id',1)->whereNotNull('phone_verified_at')->get();
+        $micro = User::whereNotNull('phone_verified_at')->get();
 
         if ($micro->isEmpty()) {
             return response()->json(['message' => 'You have no users'], 404);
