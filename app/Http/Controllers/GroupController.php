@@ -71,7 +71,7 @@ class GroupController extends Controller
 
             // Update the group_id field in the existing GroupUser record
             $group->update([
-                'instructor_id' => $request->instructorId, // Update only the group_id
+                'instructor_id' => $request->instructor_id, // Update only the group_id
             ]);
 
             Cache::flush();
