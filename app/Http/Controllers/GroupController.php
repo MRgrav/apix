@@ -57,7 +57,7 @@ class GroupController extends Controller
     public function assignInstructorToGroup(Request $request, $groupId) {
         try {
             $request->validate([
-                'instructor_id' => 'required|exists:users',
+                'instructor_id' => 'required|exists:users,id',
             ]);
 
             // Find the existing GroupUser entry for the user and their associated course
