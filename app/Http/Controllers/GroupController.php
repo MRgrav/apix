@@ -54,7 +54,7 @@ class GroupController extends Controller
         }
     }
 
-    public function assignInstructorToGroup($groupId) {
+    public function assignInstructorToGroup(Request $request, $groupId) {
         try {
             $request->validate([
                 'instructor_id' => 'required|exists:users',
@@ -74,7 +74,7 @@ class GroupController extends Controller
                 'instructor_id' => $request->instructorId, // Update only the group_id
             ]);
 
-            Cache::forget('allgroup');
+            Cache::flush();
 
             return response()->json([
                 'message' => 'Instructor Assigned into the group successfully',
@@ -104,7 +104,8 @@ class GroupController extends Controller
                 'instructor_id' => null, // Update only the group_id
             ]);
 
-            Cache::forget('allgroup');
+            // Cache::forget('allgroup');
+            Cache::flush();
 
             return response()->json([
                 'message' => 'Instructor removed from the group successfully',
