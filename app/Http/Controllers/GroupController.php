@@ -61,8 +61,7 @@ class GroupController extends Controller
             ]);
 
             // Find the existing GroupUser entry for the user and their associated course
-            $group = Group::findOrFail($groupId) // Match by course_id
-                                ->first();
+            $group = Group::findOrFail($groupId); // Match by course_id
 
             // Check if the GroupUser record exists
             if (!$group) {
