@@ -152,6 +152,8 @@ Route::prefix('groups')->group(function () {
     Route::post('/{groupId}/live-class', [GroupController::class, 'updateLiveClass']);
     Route::get('/{groupId}/live-class', [GroupController::class, 'getLiveClass']);
     Route::get('/content/{groupId}', [HomeController::class, 'getPurchasedCourseDetails']);
+    Route::post('/{groupId}/instructor', [GroupController::class, 'assignInstructorToGroup'])->middleware('auth:sanctum');
+    Route::delete('/{groupId}/instructor/{instructorId}', [GroupController::class, 'removeInstructorFromGroup'])->middleware('auth:sanctum');
 });
 
 // for student

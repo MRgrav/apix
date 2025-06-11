@@ -54,6 +54,70 @@ class GroupController extends Controller
         }
     }
 
+    public function assignInstructorToGroup($groupId) {
+        try {
+            $request->validate([
+                'instructor_id' => 'required|exists:users',
+            ]);
+
+            // Find the existing GroupUser entry for the user and their associated course
+            $group = Group::findOrFail($groupId) // Match by course_id
+                                ->first();
+
+            // Check if the GroupUser record exists
+            if (!$group) {
+                return response()->json(['message' => 'Group not found'], 400);
+            }
+
+            // Update the group_id field in the existing GroupUser record
+            $group->update([
+                'instructor_id' => $request->instructorId, // Update only the group_id
+            ]);
+
+            Cache::forget('allgroup');
+
+            return response()->json([
+                'message' => 'Instructor Assigned into the group successfully',
+            ], 201);
+        } catch (\Throwable $e) {
+            //throw $th;
+            Log::error($e->getMessage());
+            return response()->json([
+                'message' => 'Internal server error',
+            ], 500);
+        }
+    }
+
+    public function removeInstructorFromGroup($groupId, $instructorId) {
+        try {
+            // Find the existing GroupUser entry for the user and their associated course
+            $group = Group::where('instructor_id', $instructorId)
+                                ->findOrFail($groupId);
+
+            // Check if the GroupUser record exists
+            if (!$group) {
+                return response()->json(['message' => 'Instructor is not assigned in the course'], 400);
+            }
+
+            // Update the group_id field in the existing GroupUser record
+            $group->update([
+                'instructor_id' => null, // Update only the group_id
+            ]);
+
+            Cache::forget('allgroup');
+
+            return response()->json([
+                'message' => 'Instructor removed from the group successfully',
+            ], 201);
+        } catch (\Throwable $e) {
+            //throw $th;
+            Log::error($e->getMessage());
+            return response()->json([
+                'message' => 'Internal server error',
+            ], 500);
+        }
+    }
+
     // Method to assign a user to an existing group
     public function assignUserToGroup(Request $request, $groupId)
     {
