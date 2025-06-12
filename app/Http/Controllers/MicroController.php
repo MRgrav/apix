@@ -112,10 +112,13 @@ class MicroController extends Controller
             ], 200);
         }
 
-        $micro = Instructor::with(['user','course'])->get();
+        $micro = Instructor::with(['user','course'])->join('users', 'instructors.user_id', '=', 'users.id')
+        ->orderBy('users.name', 'asc')
+        ->select('instructors.*')
+        ->get();
 
         if ($micro->isEmpty()) {
-            $micro = User::where('role_id',1)->whereNotNull('phone_verified_at')->get();
+            $micro = User::where('role_id',1)->whereNotNull('phone_verified_at')->orderBy('name', 'asc')->get();
         }
 
         if ($micro->isEmpty()) {
@@ -143,7 +146,7 @@ class MicroController extends Controller
             ], 200);
         }
 
-        $micro = User::whereNotNull('phone_verified_at')->get();
+        $micro = User::whereNotNull('phone_verified_at')->orderBy('name', 'asc')->get();
 
         if ($micro->isEmpty()) {
             return response()->json(['message' => 'You have no users'], 404);

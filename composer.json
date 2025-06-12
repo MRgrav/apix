@@ -16,6 +16,7 @@
         "laravel/tinker": "^2.8",
         "league/flysystem-aws-s3-v3": "^3.0",
         "league/flysystem-path-prefixing": "^3.0",
+        "opcodesio/log-viewer": "^3.17",
         "predis/predis": "^2.3",
         "razorpay/razorpay": "^2.9"
     },
