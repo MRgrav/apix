@@ -29,7 +29,7 @@ return [
     |
     */
 
-    'route_domain' => null,
+    'route_domain' => ['localhost','127.0.0.1'],
 
     /*
     |--------------------------------------------------------------------------
@@ -88,7 +88,7 @@ return [
     'middleware' => [
         'web',
         \Opcodes\LogViewer\Http\Middleware\AuthorizeLogViewer::class,
-        'auth',
+        // 'auth',
     ],
 
     /*

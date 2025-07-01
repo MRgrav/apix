@@ -21,5 +21,8 @@ class Authenticate extends Middleware
 
         // If the request does not expect JSON (i.e., it's a web request), proceed with the usual behavior
         return route('login');
+        // return response()->json([
+        //     'message' => 'oh no'
+        // ]);
     }
 }
