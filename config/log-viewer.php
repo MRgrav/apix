@@ -29,7 +29,8 @@ return [
     |
     */
 
-    'route_domain' => ['localhost','127.0.0.1','api.laravel.classwix.com'],
+    'route_domain' => null,
+    //['localhost','127.0.0.1','api.laravel.classwix.com'],
 
     /*
     |--------------------------------------------------------------------------
