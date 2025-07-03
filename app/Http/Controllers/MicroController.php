@@ -198,7 +198,6 @@ class MicroController extends Controller
         }
     }
 
-
     public function getGroupsByCourseId ($courseId) {
         try {
             //code...
@@ -342,7 +341,6 @@ class MicroController extends Controller
         }
     }
 
-
     public function upcomingClassesTodayByInstructor() {
         try {
             //code...
@@ -438,6 +436,41 @@ class MicroController extends Controller
             //throw $e;
             Log::error("inst profile : ". $e->getMessage());
             return response()->json(['message' => 'internal server error'], 500);
+        }
+    }
+
+    // redis : done
+    public function getGroupsByStudentId($studentId) {
+        try {
+
+            $key = 'studentsGroup' . $studentId;
+
+            if (Cache::has($key)) {
+                $myCourses = json_decode(Cache::get($key), true); // Decode the JSON data
+                return response()->json([
+                    'message' => 'Fetched enrolled courses,',
+                    'courses' => $myCourses
+                ], 200);
+            }  
+
+            $myCourses = GroupUser::with(['course','group','user','plan'])
+                                    ->where('user_id', $userId)
+                                    ->get();
+
+            if (!$myCourses) {
+                return response()->json(['message' => 'You have not enrolled any course yet'], 404);
+            }
+
+            Cache::put($key, $myCourses->toJson(), now()->addMinutes(1));
+
+            return response()->json([
+                'message' => 'Fetched enrolled courses',
+                'courses' => $myCourses
+            ], 200);
+
+        } catch (\Throwable $e) {
+            //throw $th;
+            Log::error("Purchase courses/groups error : " . $e->getMessage());
         }
     }
 
