@@ -477,4 +477,24 @@ class MicroController extends Controller
         }
     }
 
+    // manual expiry date update
+    public function updatePlanExpiry (Request $request) {
+        try {
+            $validatedData = $request->validate([
+                'expiry_date' => 'required|date',
+            ]);
+        
+            GroupUser::where('id', $request->id)->update($validatedData);
+
+            return response()->json([
+                'message' => 'Expiry date updated successfully'
+            ],201);
+        } catch (\Throwable $e) {
+            Log::error("expiry date: ", $e->getMessage());
+            return response()->json([
+                'message' => 'internal server error'
+            ],500);
+        }
+    }
+
 }
