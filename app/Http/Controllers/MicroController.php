@@ -454,7 +454,7 @@ class MicroController extends Controller
             }  
 
             $myCourses = GroupUser::with(['course','group','user','plan'])
-                                    ->where('user_id', $userId)
+                                    ->where('user_id', $studentId)
                                     ->get();
 
             if (!$myCourses) {
