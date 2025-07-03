@@ -471,6 +471,9 @@ class MicroController extends Controller
         } catch (\Throwable $e) {
             //throw $th;
             Log::error("Purchase courses/groups error : " . $e->getMessage());
+            return response()->json([
+                'message' => 'Internal server error'
+            ], 500);
         }
     }
 

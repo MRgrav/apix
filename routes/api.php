@@ -190,6 +190,7 @@ Route::post('/class/start', [TeacherClassController::class, 'store'])->middlewar
 
 
 // micro apis
+Route::get('/micro/groups-by-students/{studentId}', [MicroController::class, 'getGroupsByStudentId'])->middleware('auth:sanctum');
 Route::get('/micro/courses', [MicroController::class, 'getCoursesName']);
 Route::get('/micro/instructors', [MicroController::class, 'getInstructors']);
 Route::get('/micro/students', [MicroController::class, 'getStudents']);
