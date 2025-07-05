@@ -132,7 +132,7 @@ class HomeController extends Controller
             $groupIds = GroupUser::where('user_id', auth()->id())->whereColumn('class_counted', '<=', 'total_classes')->pluck('group_id');
             $upcomingClasses = TeacherClass::with(['group', 'group.course'])
                             ->whereIn('group_id', $groupIds)
-                            ->where('class_time', '>=', Carbon::now()->format('Y-m-d'))
+                            ->where('class_time', '>=', Carbon::now()) // ->format('Y-m-d'))
                             ->orderBy('class_time')
                             ->get();
 
@@ -143,7 +143,7 @@ class HomeController extends Controller
                             //     $query->whereBetween('expiry_date',[Carbon::now(), Carbon::now()->addMonth()])
                             //         ->orWhere('expiry_date', '<', Carbon::now()->format('Y-m-d'));
                             // })
-                            ->where('expiry_date', '<', Carbon::now()->addMonth())
+                            ->where('expiry_date', '<', Carbon::now()) // ->addMonth())
                             ->get();
 
             // response

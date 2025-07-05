@@ -72,11 +72,13 @@ class TeacherClassController extends Controller
             // $carbonTime = Carbon::createFromFormat("H:i", $request->class_time);
             // $formattedTime = $carbonTime->format("h:i A");
 
-            if ($request->class_time) {
-                $dt = Carbon::parse($request->class_time);
-                $dt->addHours(5);
-                $dt->addMinutes(30);
-            }
+            // if ($request->class_time) {
+                // $dt = Carbon::parse($request->class_time)->setTimezone('UTC');;
+                // $dt->addHours(5);
+                // $dt->addMinutes(30);
+                // Convert the timestamp to a Carbon instance with the desired time zone
+                $dt = Carbon::parse($request->class_time)->setTimezone('UTC'); // setTimezone('Asia/Kolkata');
+            // }
     
             // Format the group_id as a four-digit string with leading zeros
             $formattedGroupId = str_pad($validated['group_id'], 4, '0', STR_PAD_LEFT);
