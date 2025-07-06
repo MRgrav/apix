@@ -136,8 +136,8 @@ class HomeController extends Controller
                             ->orderBy('class_time')
                             ->get();
 
-            Log::debug("class time now: ", Carbon::now());
-            Log::debug("class time: ", $upcomingClasses);
+            Log::debug("class time now: ". Carbon::now());
+            Log::debug("class time: ". $upcomingClasses);
             
 
             // renewals
