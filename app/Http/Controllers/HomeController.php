@@ -136,6 +136,10 @@ class HomeController extends Controller
                             ->orderBy('class_time')
                             ->get();
 
+            Log::debug("class time now: ", Carbon::now());
+            Log::debug("class time: ", $upcomingClasses);
+            
+
             // renewals
             $renewals = GroupUser::with('course','plan')
                             ->where('user_id', auth()->id())
