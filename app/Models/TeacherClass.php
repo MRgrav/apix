@@ -17,6 +17,11 @@ class TeacherClass extends Model
         'class_time',
     ];
 
+    protected $casts = [
+        'class_time' => 'datetime',
+    ];
+
+
     /**
      * Get the user that owns the TeacherClass
      *
