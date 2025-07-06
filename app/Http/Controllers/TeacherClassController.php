@@ -77,7 +77,7 @@ class TeacherClassController extends Controller
                 // $dt->addHours(5);
                 // $dt->addMinutes(30);
                 // Convert the timestamp to a Carbon instance with the desired time zone
-                $dt = Carbon::parse($request->class_time)->setTimezone('UTC'); // setTimezone('Asia/Kolkata');
+                $dt = Carbon::parse($request->class_time); // ->setTimezone('UTC'); // setTimezone('Asia/Kolkata');
             // }
     
             // Format the group_id as a four-digit string with leading zeros
