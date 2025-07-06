@@ -125,7 +125,6 @@ class HomeController extends Controller
                                     ->whereIn('group_id', $groupIds);
                             })
                             ->get();
-    
                         
 
             // live class
@@ -133,12 +132,11 @@ class HomeController extends Controller
             $upcomingClasses = TeacherClass::with(['group', 'group.course'])
                             ->whereIn('group_id', $groupIds)
                             ->where('class_time', '>=', Carbon::now()) //->format('Y-m-d H:i:s'))
-                            ->orderBy('class_time')
+                            ->orderBy('class_time', 'DESC')
                             ->get();
 
             Log::debug("class time now: ". Carbon::now());
             Log::debug("class time: ". $upcomingClasses);
-            
 
             // renewals
             $renewals = GroupUser::with('course','plan')
