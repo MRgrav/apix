@@ -132,7 +132,7 @@ class HomeController extends Controller
             $groupIds = GroupUser::where('user_id', auth()->id())->whereColumn('class_counted', '<=', 'total_classes')->pluck('group_id');
             $upcomingClasses = TeacherClass::with(['group', 'group.course'])
                             ->whereIn('group_id', $groupIds)
-                            ->where('class_time', '>=', Carbon::now()) // ->format('Y-m-d'))
+                            ->where('class_time', '>=', Carbon::now()->format('Y-m-d H:i:s'))
                             ->orderBy('class_time')
                             ->get();
 
