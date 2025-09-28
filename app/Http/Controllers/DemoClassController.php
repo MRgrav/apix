@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Cache;
 
 class DemoClassController extends Controller
 {
@@ -30,6 +31,7 @@ class DemoClassController extends Controller
                 'demo_class_time' => $validated['class_time'],
             ]);
             DB::commit();
+            Cache::forget('allUsers');
 
             return response()->json([
                 'message' => 'Demo class created successfully',
