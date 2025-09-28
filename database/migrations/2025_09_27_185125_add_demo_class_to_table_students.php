@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             //
-            $table->string('demo_class_url')>nullable();
+            $table->string('demo_class_url')->nullable();
             $table->boolean('is_demo_active')->default(false);
             $table->timestamp('demo_class_time')->nullable();
         });
