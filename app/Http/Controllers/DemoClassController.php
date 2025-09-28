@@ -136,13 +136,16 @@ class DemoClassController extends Controller
     /**
      * Retrieve specific demo class details
      */
-    public function getByPhone(Request $request) {
+    public function getByPhone($phone) {
         try {
-            $validated = $request->validate([
-                'phone' => 'required|digits:10'
-            ]);
+            if (!preg_match('/^\d{10}$/', $phone)) {
+                return response()->json([
+                    'message' => 'Invalid phone number format',
+                    'errors' => ['phone' => 'Phone number must be 10 digits']
+                ], 422);
+            }
 
-            $user = User::where('phone', $validated['phone'])
+            $user = User::where('phone', $phone)
                 ->where('is_demo_active', true)
                 ->firstOrFail();
 
