@@ -25,6 +25,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\PromotedCourseController;
 use App\Http\Controllers\InstructorPayrollController;
 use App\Http\Controllers\PreAssignerController;
+use App\Http\Controllers\DemoClassController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -242,3 +243,10 @@ Route::prefix('admin/promotions')->middleware('auth:sanctum')->group(function ()
 });
 
 
+Route::prefix('demo')->middleware('auth:sanctum')->group(function () {
+    Route::post('/', [DemoClassController::class, 'create']);
+    Route::get('/', [DemoClassController::class, 'getAll']);
+    Route::patch('/', [DemoClassController::class, 'update']);
+    Route::get('/{phone}', [DemoClassController::class, 'getByPhone']);
+    Route::post('/cancel', [DemoClassController::class, 'cancel']);
+});

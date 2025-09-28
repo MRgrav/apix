@@ -27,6 +27,9 @@ class User extends Authenticatable
         'state',
         'address',
         'district',
+        'demo_class_url',
+        'is_demo_active',
+        'demo_class_time',
     ];
 
     protected $hidden = [
@@ -38,6 +41,8 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'phone_verified_at' => 'datetime',
+        'demo_class_time' => 'datetime',
+        'is_demo_active' => 'boolean',
     ];
 
     public function trials()
