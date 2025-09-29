@@ -151,13 +151,18 @@ class DemoClassController extends Controller
                 ->where('is_demo_active', true)
                 ->firstOrFail();
 
+            // Check if demo class is in the past
+            $isDemoActive = $user->is_demo_active && 
+                (!$user->demo_class_time || 
+                Carbon::parse($user->demo_class_time)->isAfter(now()));
+
             return response()->json([
                 'message' => 'Student demo class details retrieved',
                 'student' => [
                     'phone' => $user->phone,
                     'demo_class_url' => $user->demo_class_url,
                     'demo_class_time' => $user->demo_class_time,
-                    'is_demo_active' => $user->is_demo_active
+                    'is_demo_active' => $isDemoActive
                 ]
             ], 200);
 
