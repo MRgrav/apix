@@ -156,7 +156,8 @@ class DemoClassController extends Controller
                 'student' => [
                     'phone' => $user->phone,
                     'demo_class_url' => $user->demo_class_url,
-                    'demo_class_time' => $user->demo_class_time
+                    'demo_class_time' => $user->demo_class_time,
+                    'is_demo_active' => $user->is_demo_active
                 ]
             ], 200);
 
