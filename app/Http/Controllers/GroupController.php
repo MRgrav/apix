@@ -690,7 +690,7 @@ class GroupController extends Controller
             ], 200);
         }  
 
-        $groups = Group::with(['users', 'course'])->where('instructor_id', auth()->id())->get();
+        $groups = Group::with(['users', 'course'])->orderBy('created_at', 'desc')->where('instructor_id', auth()->id())->get();
 
         if (!$groups) {
             return response()->json(['message'=>'no group found'], 404);

@@ -442,7 +442,7 @@ public function verifyPhoneOtp(Request $request)
             ], 200);
         }  
 
-        $users = User::all(); // Fetch all users
+        $users = User::orderBy('created_at', 'desc')->get(); // Fetch all users
 
         Cache::put($key, $users->toJson(), now()->addMinutes(1));
 
