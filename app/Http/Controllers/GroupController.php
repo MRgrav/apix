@@ -202,7 +202,7 @@ class GroupController extends Controller
             ], 200);
         }  
 
-        $groups = Group::with('users', 'course')->get();
+        $groups = Group::with('users', 'course')->orderBy('created_at', 'desc')->get();
         Cache::put($key, $groups->toJson(), now()->addMinutes(1));
 
         return response()->json([
