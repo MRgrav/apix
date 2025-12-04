@@ -11,7 +11,7 @@
         "kawankoding/laravel-fcm": "^0.2.9",
         "kreait/firebase-php": "^7.16",
         "laravel/framework": "^10.10",
-        "laravel/octane": "^2.9",
+        "laravel/octane": "^2.13",
         "laravel/sanctum": "^3.3",
         "laravel/tinker": "^2.8",
         "league/flysystem-aws-s3-v3": "^3.0",
